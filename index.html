@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#143E41">
+<meta name="color-scheme" content="light dark">
 <meta name="robots" content="noindex, nofollow">
 <script>window.PN_PUBLIC = true;</script>
 <title>Perde Nemis Demo</title>
@@ -16,7 +17,7 @@
    The palette (data-design on the root element), light or dark (data-mode) and the language only swap tokens and strings.
    Each of the six combinations is a deliberate look, so the page sets every colour itself. */
 :root {
-  color-scheme: light;
+  color-scheme: only light; /* "only": a phone browser's own dark theme must not recolour the page, or cloth and swatches stop matching */
   /* Pishë: dark teal with sand. Teal carries the frame of the page; fabrics hang on a warm neutral. */
   --bg: #ECE6DA; --surface: #F8F4EC; --surface-2: #DFD7C7; --ink: #17292B; --ink-2: #4D5B58; --line: #CDC3B0; --field-line: #7B8580;
   --accent: #17474A; --accent-ink: #F6F0E4; --accent-2: #8F4E30; --link: #1A5559; --btn-line: #17474A;
@@ -31,7 +32,7 @@
   --shadow: none;
 }
 :root[data-design="toke"] {
-  color-scheme: light;
+  color-scheme: only light;
   /* Tokë: the same teal frame, with clay doing the calling. Warmer and more earthen. */
   --bg: #EFE5D8; --surface: #FAF4EA; --surface-2: #E3D5C2; --ink: #2A211B; --ink-2: #5A4E44; --line: #D3C2AC; --field-line: #857768;
   --accent: #9A4E32; --accent-ink: #FFF7EC; --accent-2: #1F5054; --link: #1C5357; --btn-line: #9A4E32;
@@ -61,7 +62,7 @@
   --ground: #1A120D; --spot: rgba(255, 214, 160, .16); --cast: rgba(0, 0, 0, .55); --art: #D3C5B0; --tape: #DDB565; --tape-ink: #2A2118;
 }
 :root[data-design="nate"][data-mode="light"] {
-  color-scheme: light;
+  color-scheme: only light;
   /* Natë, light: sand ground under the deepest teal bar, with ochre doing the calling. */
   --bg: #EEE8DB; --surface: #F9F5EC; --surface-2: #E0D8C6; --ink: #14292B; --ink-2: #4C5A57; --line: #CEC4AF; --field-line: #7B8580;
   --accent: #CFA25A; --accent-ink: #1E1609; --accent-2: #7E5210; --link: #1A5559; --btn-line: #8A6A2A;
@@ -3086,7 +3087,7 @@ var FX = (function () {
   function emptyLead() { return { name: '', phone: '', address: '', notes: '', zone: 'A', source: 'phone', err: false }; }
 
   var S = {
-    lang: 'sq', design: 'pishe', mode: 'light', view: 'home', menu: false,
+    lang: 'sq', design: 'pishe', mode: 'light', modePicked: false, view: 'home', menu: false,
     cfg: defaultCfg(), wantMount: 'ceiling', room: '', railNote: '', open: 35, added: false, wa: null,
     car: { i: 0, col: {}, wall: 'white', t: 0 }, homeRail: 'wave', catCol: {},
     est: [], undo: null, zone: 'A', cat: 'all', lastCode: '',
@@ -3097,12 +3098,14 @@ var FX = (function () {
   var st = Seed.build(Ops.businessToday());
 
   /* ----- per-viewer conveniences; the page works without storage ----- */
+  function sysDark() { try { return !!(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches); } catch (e) { return false; } }
   function loadPrefs() {
+    S.mode = sysDark() ? 'dark' : 'light'; // no choice made yet: the page follows the phone's setting
     try {
       var l = localStorage.getItem('pn.lang'), d = localStorage.getItem('pn.design'), e = localStorage.getItem('pn.est'), c = localStorage.getItem('pn.code');
       if (l === 'sq' || l === 'en') S.lang = l;
       if (DESIGNS.indexOf(d) >= 0) S.design = d;
-      var m = localStorage.getItem('pn.mode'); S.mode = m === 'dark' || m === 'light' ? m : S.design === 'nate' ? 'dark' : 'light'; // Natë was first shown dark
+      var m = localStorage.getItem('pn.mode'); if (m === 'dark' || m === 'light') { S.mode = m; S.modePicked = true; } else if (S.design === 'nate') S.mode = 'dark'; // Natë was first shown dark
       if (typeof c === 'string' && /^PN-\d{4}-[A-Z0-9]{4}$/.test(c)) S.lastCode = c;
       if (e) {
         var data = JSON.parse(e), now = Date.now();
@@ -3117,7 +3120,8 @@ var FX = (function () {
       }
     } catch (err) { /* storage unavailable or damaged: defaults apply */ }
   }
-  function savePrefs() { try { localStorage.setItem('pn.lang', S.lang); localStorage.setItem('pn.design', S.design); localStorage.setItem('pn.mode', S.mode); } catch (e) { /* ignore */ } }
+  function relook() { chrome(); if (S.view === 'home') { FX.stage.refresh(); paintAmbient(); setHTML($('cover-art'), coverArt()); } } // palette or light/dark changed
+  function savePrefs() { try { localStorage.setItem('pn.lang', S.lang); localStorage.setItem('pn.design', S.design); if (S.modePicked) localStorage.setItem('pn.mode', S.mode); } catch (e) { /* ignore */ } }
   function saveEst() {
     try {
       if (S.est.length) localStorage.setItem('pn.est', JSON.stringify({ est: S.est, zone: S.zone }));
@@ -4359,7 +4363,7 @@ var FX = (function () {
     var el = ev.target.closest('[data-go],[data-design],[data-mode],[data-lang],[data-act]');
     if (!el || el.disabled) return;
     if (el.hasAttribute('data-go')) { go(el.getAttribute('data-go')); return; }
-    if (el.hasAttribute('data-design') || el.hasAttribute('data-mode')) { if (el.hasAttribute('data-mode')) S.mode = el.getAttribute('data-mode') === 'dark' ? 'dark' : 'light'; else S.design = el.getAttribute('data-design'); savePrefs(); chrome(); if (S.view === 'home') { FX.stage.refresh(); paintAmbient(); setHTML($('cover-art'), coverArt()); } return; }
+    if (el.hasAttribute('data-design') || el.hasAttribute('data-mode')) { if (el.hasAttribute('data-mode')) { S.mode = el.getAttribute('data-mode') === 'dark' ? 'dark' : 'light'; S.modePicked = true; } else S.design = el.getAttribute('data-design'); savePrefs(); relook(); return; }
     if (el.hasAttribute('data-lang')) { S.lang = el.getAttribute('data-lang'); savePrefs(); S.railNote = ''; S.ops.notes = {}; S.ops.flash = ''; render(); var lb = $('lang-' + S.lang); if (lb) lb.focus({ preventScroll: true }); return; }
     var act = el.getAttribute('data-act'), o = S.ops.open ? orderById(S.ops.open) : null, i = Number(el.getAttribute('data-i')), r, v;
     switch (act) {
@@ -4661,6 +4665,10 @@ var FX = (function () {
   FX.dress($('intro'));
   render();
   if (S.ops.open) { var oc = $('od-close'); if (oc) oc.focus(); }
+  try { // until a form is chosen with the switch, the page follows the phone when its setting changes
+    var mq = window.matchMedia('(prefers-color-scheme: dark)'), onSys = function () { if (S.modePicked) return; S.mode = mq.matches || S.design === 'nate' ? 'dark' : 'light'; relook(); };
+    if (mq.addEventListener) mq.addEventListener('change', onSys); else if (mq.addListener) mq.addListener(onSys);
+  } catch (e) { /* the form chosen at load stays */ }
 })();
 </script>
 
