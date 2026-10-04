@@ -107,7 +107,8 @@ bdi { unicode-bidi: isolate; }
 /* top bar: clear over the opening scene, solid as soon as the page moves and on every other view */
 .top { position: relative; z-index: 20; background: var(--chrome); color: var(--chrome-ink); --tk: var(--chrome-ink); --tk2: var(--chrome-2); --tbg: var(--chrome); --tmark: var(--chrome-mark); transition: background-color .35s ease; }
 @media (min-height: 600px) { .top { position: sticky; top: env(safe-area-inset-top, 0px); } }
-:root.top-clear .top { background: transparent; --tk: var(--ink); --tk2: var(--ink-2); --tbg: var(--bg); --tmark: var(--accent-2); }
+/* over the cover the bar is clear: the picture's own pelmet stands behind its words */
+:root.top-clear .top { background: transparent; }
 .top-row { display: flex; align-items: center; gap: 8px 18px; min-height: 64px; padding-block: 8px; }
 .brand { display: inline-flex; align-items: center; gap: 10px; flex: none; background: none; border: 0; padding: 0; cursor: pointer; font-family: var(--font-display); font-size: 1.7rem; font-weight: 400; letter-spacing: .01em; color: var(--tk); transition: color .35s ease; }
 .brand svg { width: 30px; height: 30px; color: var(--tmark); flex: none; }
@@ -206,13 +207,42 @@ main.view-home.is-entering { animation-name: viewFade; }
 /* chapter one: the display rail, one screen tall. The backdrop takes a little of the fabric's colour and carries its
    name, very large, drifting behind; the curtains are canvases hung from the rail, moved and swung by the
    experience layer. The headline and the choices stand on the floor in front of them. */
-.hero { position: relative; display: grid; grid-template-rows: minmax(0, 1fr) auto; min-height: 100vh; min-height: 100svh; margin-top: calc(var(--top-h, 0px) * -1); padding-top: var(--top-h, 0px); background: var(--grain, none), var(--amb, var(--bg)); background-color: var(--amb, var(--bg)); transition: background-color .9s ease; overflow: clip; }
+/* scene zero: the cover. One large picture before anything else: a window at full height, a sheer in the daylight and
+   two heavy curtains at the sides that draw apart as the page moves on. A photograph takes this place once there is one. */
+.cover { position: relative; height: 100vh; height: 100svh; min-height: 480px; margin-top: calc(var(--top-h, 0px) * -1); overflow: clip; --sky1: #E6F1F4; --sky2: #FFF9EA; --cfloor: #C4B292; background: linear-gradient(180deg, var(--sky1), var(--sky2) 80%); }
+:root[data-mode="dark"] .cover { --sky1: #232C48; --sky2: #D29A6C; --cfloor: #5F5546; }
+.cover-art { position: absolute; inset: 0; }
+.cover-win { position: absolute; inset: 0 13%; background: linear-gradient(90deg, transparent calc(33.3% - 3px), rgba(255, 255, 255, .7) calc(33.3% - 3px), rgba(255, 255, 255, .7) calc(33.3% + 3px), transparent calc(33.3% + 3px), transparent calc(66.6% - 3px), rgba(255, 255, 255, .7) calc(66.6% - 3px), rgba(255, 255, 255, .7) calc(66.6% + 3px), transparent calc(66.6% + 3px)), radial-gradient(58% 44% at 60% 30%, rgba(255, 250, 230, .95), transparent 72%); }
+:root[data-mode="dark"] .cover-win { background: linear-gradient(90deg, transparent calc(33.3% - 3px), rgba(255, 255, 255, .28) calc(33.3% - 3px), rgba(255, 255, 255, .28) calc(33.3% + 3px), transparent calc(33.3% + 3px), transparent calc(66.6% - 3px), rgba(255, 255, 255, .28) calc(66.6% - 3px), rgba(255, 255, 255, .28) calc(66.6% + 3px), transparent calc(66.6% + 3px)), radial-gradient(60% 40% at 56% 74%, rgba(255, 200, 140, .7), transparent 72%); }
+.cover-sheer { position: absolute; left: 7%; right: 7%; top: 0; bottom: 8%; opacity: .93; transform-origin: 50% 0; animation: coverSway 11s ease-in-out infinite alternate; }
+:root[data-mode="dark"] .cover-sheer { filter: brightness(.78); }
+@keyframes coverSway { from { transform: skewX(-.7deg); } to { transform: skewX(.9deg); } }
+.cover-floor { position: absolute; left: 0; right: 0; bottom: 0; height: 12%; background: radial-gradient(60% 120% at 50% 0, rgba(255, 246, 220, .5), transparent 70%), linear-gradient(180deg, rgba(0, 0, 0, .22), transparent 45%), var(--cfloor); }
+/* no filters on the large moving cloth: the shadow each curtain casts on the sheer is a plain gradient beside it */
+.cover-drape { position: absolute; top: 0; bottom: 5%; width: calc(31% - 21% * var(--q, 0)); }
+.cover-drape::after { content: ''; position: absolute; top: 0; bottom: 0; width: 34px; background: linear-gradient(90deg, rgba(0, 0, 0, .34), transparent); }
+.cover-drape.l { left: 0; }
+.cover-drape.l::after { left: 100%; }
+.cover-drape.r { right: 0; }
+.cover-drape.r::after { right: 100%; transform: scaleX(-1); }
+.cover.is-off .cover-sheer { animation-play-state: paused; }
+.cover-pelmet { position: absolute; left: 0; right: 0; top: 0; height: calc(var(--top-h, 64px) + 30px); box-shadow: 0 8px 16px rgba(0, 0, 0, .38); }
+.cover-shade { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(6, 22, 24, .3), transparent 140px, transparent 48%, rgba(6, 22, 24, .68)), linear-gradient(90deg, rgba(6, 22, 24, .36), transparent 58%); }
+.cover-text { position: absolute; left: 0; right: 0; bottom: clamp(26px, 7vh, 76px); z-index: 2; display: flex; flex-direction: column; gap: 16px; align-items: flex-start; opacity: clamp(0, calc(1 - var(--q, 0) * 1.7), 1); translate: 0 calc(var(--q, 0) * -46px); }
+.cover-text h1 { font-size: clamp(2.7rem, 1.2rem + 7vw, 6.6rem); line-height: .94; letter-spacing: -.015em; max-width: 13ch; color: #FBF5E8; text-shadow: 0 2px 28px rgba(0, 0, 0, .4); }
+.cover-text p { font-size: clamp(1rem, .9rem + .5vw, 1.25rem); max-width: 40ch; color: #EFE7D6; text-shadow: 0 1px 14px rgba(0, 0, 0, .5); }
+.cover .btn { padding: 13px 24px; }
+.cover .btn.inv { background: #F6EFE0; color: #12302F; border-color: #F6EFE0; }
+.cover .btn.ghost.inv { background: rgba(6, 22, 24, .28); color: #F6EFE0; border-color: #F6EFE0; }
+.cover :focus-visible { outline-color: #F6EFE0; }
+
+.hero { position: relative; display: grid; grid-template-rows: minmax(0, 1fr) auto; min-height: calc(100vh - var(--top-h, 0px)); min-height: calc(100svh - var(--top-h, 0px)); background: var(--grain, none), var(--amb, var(--bg)); background-color: var(--amb, var(--bg)); transition: background-color .9s ease; overflow: clip; }
 .stage-view { grid-row: 1; position: relative; min-height: 300px; container-type: size; overflow: hidden; touch-action: pan-y pinch-zoom; cursor: grab; -webkit-user-select: none; user-select: none; -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent); mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent); }
 .stage-view.is-drag { cursor: grabbing; }
 .stage-in { position: absolute; inset: 0; --nav: max(64px, calc(2.4rem + 14px)); --sw: clamp(130px, min(24vw, 30vh), 360px); --sh: calc(var(--sw) * 1.7); }
 /* the curtain is as large as the stage allows: room for its reflection, room for the arrows under its hem, never wider than the side curtains leave */
 @supports (width: 1cqh) { .stage-in { --sw: clamp(110px, min((100cqh - 26px) / 1.98, (100cqh - 19px - var(--nav)) / 1.7, 44cqw), 440px); } }
-@media (max-width: 700px) { @supports (width: 1cqh) { .stage-in { --sw: clamp(110px, min((100cqh - 26px) / 1.98, (100cqh - 19px - var(--nav)) / 1.7, 52cqw), 440px); } } }
+@media (max-width: 700px) { @supports (width: 1cqh) { .stage-in { --sw: clamp(110px, min((100cqh - 26px) / 1.98, (100cqh - 19px - var(--nav)) / 1.7, 62cqw), 440px); } } }
 .stage-word { position: absolute; left: 0; right: 0; top: 14px; height: var(--sh); display: flex; align-items: center; pointer-events: none; }
 .word-track { display: flex; align-items: baseline; flex: none; white-space: nowrap; font: 400 calc(var(--sh) * .56)/1 var(--font-display); color: var(--word, var(--surface-2)); transition: color .9s ease; animation: wordIn .9s ease both; will-change: transform; }
 .word-track span, .word-track em { margin-right: .2em; }
@@ -233,7 +263,9 @@ main.view-home.is-entering { animation-name: viewFade; }
 .stage-view.is-drag .stage-cursor { scale: .8; }
 @media (hover: none) { .stage-cursor { display: none; } }
 .hero-foot { grid-row: 2; position: relative; z-index: 5; width: 100%; padding-block: 12px clamp(20px, 3.4vh, 38px); display: grid; grid-template-columns: minmax(0, 6fr) minmax(0, 7fr); gap: 16px clamp(24px, 4vw, 64px); align-items: end; }
-.hero-foot h1 { font-size: clamp(2.2rem, 1rem + 2.9vw, 3.5rem); line-height: .98; letter-spacing: -.012em; }
+.hero-lead { display: flex; flex-direction: column; gap: 8px; }
+.hero-lead h2 { font-size: clamp(2rem, 1rem + 2.6vw, 3.4rem); line-height: .98; }
+.hero-lead p { color: var(--ink-2); font-size: 1.05rem; }
 /* the arrows stand under the middle curtain, on its reflection */
 .stage-nav { position: absolute; left: 50%; top: calc(13px + var(--sh) + 10px); translate: -50% 0; z-index: 5; display: flex; align-items: center; gap: 8px; cursor: default; }
 .arrow { width: 50px; height: 50px; border-radius: 50%; border: var(--bw) solid var(--field-line); background: transparent; color: var(--ink); cursor: pointer; display: grid; place-items: center; transition: background-color .25s ease, color .25s ease, border-color .25s ease; }
@@ -648,10 +680,12 @@ ul.plain { list-style: none; padding: 0; display: flex; flex-direction: column; 
   .tile:nth-child(even) { margin-top: 24px; }
 }
 @media (max-width: 380px) { .brand svg { display: none; } }
-@media (max-height: 519px) { .hero { min-height: 0; } .stage-view { height: 320px; } }
+/* on a phone the rail gets most of a screen to itself, and its text follows underneath */
+@media (max-width: 700px) { .hero { display: block; min-height: 0; } .stage-view { height: clamp(400px, 72vh, 660px); height: clamp(400px, 72svh, 660px); } .hero-foot { padding-top: 6px; } }
+@media (max-height: 519px) { .hero { min-height: 0; } .stage-view { height: 320px; } .cover { height: auto; min-height: 0; } .cover-text { position: relative; bottom: auto; padding-block: calc(var(--top-h, 0px) + 52px) 26px; } .cover-text h1 { font-size: 2.6rem; max-width: none; } }
 @media (prefers-reduced-motion: reduce) {
-  .scene .drape, .art-cloth, .slide canvas, .hero, .word-track, .rail-tab, .sw i, .arrow, .top, .brand, .btn.top-cta, .navlink, .navlink::after, .menu, .menu-bars::before, .menu-bars::after, .stage-cursor { transition: none; }
-  .word-track, main.is-entering, .rail-show .art-view { animation: none; }
+  .scene .drape, .art-cloth, .cover-drape, .cover-text, .slide canvas, .hero, .word-track, .rail-tab, .sw i, .arrow, .top, .brand, .btn.top-cta, .navlink, .navlink::after, .menu, .menu-bars::before, .menu-bars::after, .stage-cursor { transition: none; }
+  .word-track, main.is-entering, .rail-show .art-view, .cover-sheer { animation: none; }
   .navlink { opacity: 1; translate: none; }
   .steps li { opacity: 1; translate: none; }
   .tile { translate: none; }
@@ -2194,6 +2228,7 @@ var I18N = {
     'ui.lang.sq': 'Shqip',
     'ui.menu': 'Hap menynë', 'ui.menuClose': 'Mbyll menynë',
     'nav.bookShort': 'Rezervo', 'car.role': 'karusel',
+    'cover.sub': 'Matje falas në shtëpi. Qepje, shinë dhe montim nga ekipi ynë.', 'cover.see': 'Shiko perdet', 'car.lead': 'Zgjidhni perden, pastaj ngjyrën e saj.',
     'look.tStill': 'Perdja që zgjodhët më sipër, në një dhomë, nga mëngjesi deri në mbrëmje. Zgjidhni orën.',
     'ui.lang.en': 'Anglisht',
     'ui.nav': 'Menyja kryesore',
@@ -2535,6 +2570,7 @@ var I18N = {
     'ui.lang.sq': 'Albanian',
     'ui.menu': 'Open the menu', 'ui.menuClose': 'Close the menu',
     'nav.bookShort': 'Book', 'car.role': 'carousel',
+    'cover.sub': 'Free home measurement. Sewing, rail and fitting by our own team.', 'cover.see': 'See the curtains', 'car.lead': 'Pick a curtain, then its colour.',
     'look.tStill': 'The curtain you picked above, in a room, from morning to evening. Pick the time.',
     'ui.lang.en': 'English',
     'ui.nav': 'Main menu',
@@ -2791,7 +2827,8 @@ var FX = (function () {
 
   function measure(st) {
     var first = st.slides[0].el, sw = first.offsetWidth, sh = first.offsetHeight;
-    st.sw = sw; st.sh = sh; st.step = sw * 1.27; st.dpr = Math.min(2, window.devicePixelRatio || 1);
+    st.sw = sw; st.sh = sh; st.step = sw * (st.view.clientWidth < 600 ? 1.12 : 1.27); // on a phone the neighbours stand closer, so they still show beside a large middle curtain
+     st.dpr = Math.min(2, window.devicePixelRatio || 1);
     st.metal = getComputedStyle(document.documentElement).getPropertyValue('--metal').trim() || '#8B8D86';
     var M = Math.round(sw * 0.22), gap = 3, rh = Math.round(sh * 0.16);
     st.slides.forEach(function (s, i) {
@@ -3405,6 +3442,16 @@ var FX = (function () {
     if (!fromStage) FX.stage.go(S.car.i);
     say(t('smp.' + smp().id + '.name') + ', ' + pos);
   }
+  // The cover: one large picture before anything else. A window at full height, a sheer in the daylight and two heavy
+  // curtains in the palette's own colour, which draw apart as the page moves on. A photograph takes its place once there is one.
+  var COVER = { pishe: '#1E4F54', toke: '#96553A', nate: '#B4853B' };
+  function coverArt() {
+    var hex = COVER[S.design] || COVER.pishe, bar = tok('--chrome') || '#143E41';
+    var cv = function (look, h, head, n, fit, amp) { return '<canvas class="cloth" data-look="' + look + '" data-hex="' + h + '" data-heading="' + head + '" data-n="' + n + '"' + (fit ? ' data-fit="' + fit + '"' : '') + ' data-amp="' + amp + '"></canvas>'; };
+    var drape = function (side) { return '<div class="cover-drape ' + side + ' fab" style="--fab:' + hex + ';--n:7">' + cv('velvet', hex, 'pinch', 7, 0.31, 1.5) + '</div>'; };
+    return '<div class="cover-win"></div><div class="cover-sheer fab sheer" style="--fab:#F3EEE2;--n:22">' + cv('sheer', '#F3EEE2', 'wave', 22, '', 1.2) + '</div><div class="cover-floor"></div>' +
+      drape('l') + drape('r') + '<div class="cover-pelmet fab" style="--fab:' + bar + ';--n:26">' + cv('velvet', bar, 'eyelet', 30, '', 0.5) + '</div><div class="cover-shade"></div>';
+  }
   var arrived = false;
   function homeMount() { // hands the home page to the experience layer once it is in the document
     var view = $('stage-view'), day = $('day'), tape = $('tape'), closing = $('closing'), strip = $('strip');
@@ -3420,7 +3467,8 @@ var FX = (function () {
       var p = clamp01((stickyTop() - r.top) / range);
       if (Math.abs(p - S.car.t) > 0.0004) { S.car.t = p; paintDay(); }
     });
-    if (FX.reduced()) return; // the tape lies run out, the strip and the closing curtains stand still
+    if (FX.reduced()) return; // the cover's curtains stay where they hang, the tape lies run out, the strip and the closing curtains stand still
+    var cover = $('cover'); FX.watch(cover, function (r) { cover.style.setProperty('--q', clamp01(-r.top / (r.height * 0.75)).toFixed(3)); cover.classList.toggle('is-off', r.bottom < 0); });
     FX.watch(tape, function (r, vh) { tape.style.setProperty('--q', clamp01((vh * 0.94 - r.top) / (vh * 0.55)).toFixed(3)); });
     FX.watch(strip, function (r, vh) { strip.style.setProperty('--q', clamp01((vh - r.top) / (vh + r.height)).toFixed(3)); });
     FX.watch(closing, function (r, vh) { closing.style.setProperty('--q', clamp01((vh - r.top) / (r.height * 0.9)).toFixed(3)); });
@@ -3431,14 +3479,17 @@ var FX = (function () {
     };
     var drape = function (side) { return '<div class="closing-drape ' + side + ' fab" aria-hidden="true"><canvas class="cloth" data-look="linen" data-hex="#96553A" data-heading="wave" data-n="7" data-fit="0.23" data-amp="2"></canvas></div>'; };
     // document order is the order on screen: the rail with its arrows, then the heading, then the sample's text and choices
-    var h = '<section class="hero" id="hero">' +
+    var h = '<section class="cover" id="cover"><div class="cover-art" id="cover-art" aria-hidden="true">' + coverArt() + '</div>' +
+      '<div class="wrap cover-text"><h1>' + t('home.h1') + '</h1><p>' + t('cover.sub') + '</p><div class="btn-row"><button class="btn inv" data-go="book">' + t('home.cta1') + '</button>' +
+      '<button class="btn ghost inv" data-act="cover-see" id="cover-see">' + t('cover.see') + '</button></div></div></section>';
+    h += '<section class="hero" id="hero">' +
       '<div class="stage-view" id="stage-view"><div class="stage-in"><div class="stage-word" id="stage-word" aria-hidden="true">' + wordHtml() + '</div><div class="stage-floor"></div><div class="stage-spot"></div><div class="stage-rail" aria-hidden="true"></div>' +
       SAMPLES.map(function (x, i) {
         return '<div class="slide' + (i === S.car.i ? ' is-cur' : '') + '" id="slide-' + i + '" data-i="' + i + '" data-fab="' + smpFabric(x).hex + '" style="--fab:' + smpFabric(x).hex + ';--n:7' + (i === S.car.i ? '' : ';visibility:hidden') + '" aria-hidden="true"><canvas></canvas></div>';
       }).join('') + '<div class="stage-light"></div><div class="stage-cursor" aria-hidden="true">' + t('car.drag') + '</div>' +
       '<div class="stage-nav" role="group" aria-label="' + t('car.label') + '">' + arrow('car-prev', 'car-prev', 'car.prev', 'M11 3L5 9l6 6') +
       '<span class="stage-count" id="car-count">' + countHtml() + '</span>' + arrow('car-next', 'car-next', 'car.next', 'M7 3l6 6-6 6') + '</div></div></div>' +
-      '<div class="wrap hero-foot"><h1>' + t('home.h1') + '</h1>' +
+      '<div class="wrap hero-foot"><div class="hero-lead"><h2>' + t('car.label') + '</h2><p>' + t('car.lead') + '</p></div>' +
       '<div class="hero-car stage-info" id="car-info" role="group" aria-roledescription="' + t('car.role') + '" aria-label="' + t('car.label') + '">' + carInfo() + '</div></div></section>';
     h += '<section class="day' + (dayPinned() ? ' is-pinned' : '') + '" id="day" style="--wall:' + wallHex() + '"><div class="day-sticky" id="day-sticky">' +
       '<div class="day-room"><div class="look" id="look" style="--wall:' + wallHex() + '">' + lookScene() + '</div><div class="day-lamp" aria-hidden="true"><i></i></div><div class="day-light" id="day-light"></div><div class="day-glow"></div></div>' +
@@ -4308,7 +4359,7 @@ var FX = (function () {
     var el = ev.target.closest('[data-go],[data-design],[data-mode],[data-lang],[data-act]');
     if (!el || el.disabled) return;
     if (el.hasAttribute('data-go')) { go(el.getAttribute('data-go')); return; }
-    if (el.hasAttribute('data-design') || el.hasAttribute('data-mode')) { if (el.hasAttribute('data-mode')) S.mode = el.getAttribute('data-mode') === 'dark' ? 'dark' : 'light'; else S.design = el.getAttribute('data-design'); savePrefs(); chrome(); if (S.view === 'home') { FX.stage.refresh(); paintAmbient(); } return; }
+    if (el.hasAttribute('data-design') || el.hasAttribute('data-mode')) { if (el.hasAttribute('data-mode')) S.mode = el.getAttribute('data-mode') === 'dark' ? 'dark' : 'light'; else S.design = el.getAttribute('data-design'); savePrefs(); chrome(); if (S.view === 'home') { FX.stage.refresh(); paintAmbient(); setHTML($('cover-art'), coverArt()); } return; }
     if (el.hasAttribute('data-lang')) { S.lang = el.getAttribute('data-lang'); savePrefs(); S.railNote = ''; S.ops.notes = {}; S.ops.flash = ''; render(); var lb = $('lang-' + S.lang); if (lb) lb.focus({ preventScroll: true }); return; }
     var act = el.getAttribute('data-act'), o = S.ops.open ? orderById(S.ops.open) : null, i = Number(el.getAttribute('data-i')), r, v;
     switch (act) {
@@ -4339,6 +4390,9 @@ var FX = (function () {
         S.wantMount = smc.mount; S.added = false; S.railNote = (modeNote + ' ' + changeNote(Ops.fixRail(S.cfg, S.wantMount))).trim();
         go('config'); break;
       case 'look-time': setDay(el.getAttribute('data-v')); break;
+      case 'cover-see': // from the cover down to the display rail
+        var hs = $('hero'); if (hs) { try { hs.scrollIntoView({ behavior: FX.reduced() ? 'auto' : 'smooth', block: 'start' }); } catch (e3) { hs.scrollIntoView(); } }
+        var cn2 = $('car-next'); if (cn2) cn2.focus({ preventScroll: true }); break;
       case 'home-rail':
         if (!railById(el.getAttribute('data-id'))) break;
         S.homeRail = el.getAttribute('data-id'); setHTML($('rail-show'), railShow());
