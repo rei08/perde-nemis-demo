@@ -172,6 +172,10 @@ main.view-home, main.paged { display: block; padding-block: 0; }
 .page-rail .art-view:nth-child(2) .art-cloth { top: 8px; }
 @keyframes viewIn { from { opacity: 0; translate: 0 10px; } to { opacity: 1; translate: none; } }
 main.is-entering { animation: viewIn .45s cubic-bezier(.2, .7, .2, 1) both; }
+/* a change of page: the new page opens over the old one from the middle, like two curtains parting */
+:root.vt::view-transition-old(root) { animation: none; mix-blend-mode: normal; }
+:root.vt::view-transition-new(root) { animation: vtOpen .44s cubic-bezier(.7, 0, .2, 1) both; mix-blend-mode: normal; }
+@keyframes vtOpen { from { clip-path: inset(0 50% 0 50%); } to { clip-path: inset(0 0 0 0); } }
 main.view-home.is-entering { animation-name: viewFade; }
 @keyframes viewFade { from { opacity: 0; } to { opacity: 1; } }
 .view-head { display: flex; flex-direction: column; gap: 14px; padding-bottom: 6px; }
@@ -196,24 +200,137 @@ main.view-home.is-entering { animation-name: viewFade; }
 .btn-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
 .link { background: none; border: 0; padding: 0; color: var(--link); text-decoration: underline; cursor: pointer; font-size: .86rem; text-align: left; }
 
-/* home: the opening curtain (plays once per visit, never blocks a click) */
-.intro { position: fixed; inset: 0; z-index: 100; pointer-events: none; animation: introOff 0s linear 2.1s forwards; }
-.intro-drape { position: absolute; top: 0; bottom: 0; width: 50.5%; --fab: #1E4F54; --n: 9; box-shadow: 0 0 44px rgba(0, 0, 0, .4); animation: introOpen 1.35s cubic-bezier(.7, 0, .2, 1) .55s forwards; }
-.intro-drape.l { left: 0; }
-.intro-drape.r { right: 0; }
-.intro-mark { position: absolute; inset: 0; display: grid; place-items: center; font: 400 clamp(2.2rem, 7vw, 5rem)/1 var(--font-display); color: #F3ECDE; animation: introMark .5s ease .62s forwards; z-index: 1; text-shadow: 0 2px 18px rgba(0, 0, 0, .45); }
-@keyframes introOpen { to { width: 0; } }
-@keyframes introMark { to { opacity: 0; } }
-@keyframes introOff { to { visibility: hidden; } }
-:root.intro-done .intro { display: none; }
+/* The home page is one room. It is painted on the graphics card and held on the screen, and the six parts of the page
+   pass over it: where the page stands decides where the eye is, how far the curtains are open and what hour it is.
+   Each part is a tall block; what it says stays at the foot of the screen (beside the picture on a wide one) while the
+   block passes, so the page is read by scrolling, as any page is. */
+.film { position: relative; margin-top: calc(var(--top-h, 0px) * -1); background: #0C2426; }
+.film::after { content: ''; display: block; }
+.film-stage { position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden; touch-action: pan-y pinch-zoom; -webkit-user-select: none; user-select: none; cursor: grab; --sky1: #E6F1F4; --sky2: #FFF9EA; --cfloor: #C4B292; --q: .2; }
+:root[data-mode="dark"] .film-stage { --sky1: #232C48; --sky2: #D29A6C; --cfloor: #5F5546; }
+.film-stage.is-pull { cursor: grabbing; }
+.film-gl { position: absolute; inset: 0; width: 100%; height: 100%; display: none; }
+.film.gl .film-gl { display: block; }
+.film.gl .cover-art { display: none; }
+.film.no-gl .film-stage { background: linear-gradient(180deg, var(--sky1), var(--sky2) 80%); cursor: default; }
+/* the track gives the page its length; the words lie over the picture and change with the part the page has reached */
+.film-track { position: relative; margin-top: -100vh; margin-top: -100svh; pointer-events: none; }
+.shot { height: calc(var(--len, 2) * 100vh); height: calc(var(--len, 2) * 100svh); }
+.film-caps { position: sticky; top: 0; z-index: 2; height: 100vh; height: 100svh; margin-top: -100vh; margin-top: -100svh; pointer-events: none; }
+.cap { position: absolute; inset: 0; box-sizing: border-box; padding-top: var(--top-h, 0px); display: flex; align-items: flex-end; opacity: 0; translate: 0 14px; transition: opacity .34s ease, translate .44s cubic-bezier(.2, .7, .2, 1); }
+.cap.is-on { opacity: 1; translate: none; z-index: 1; }
+.cap:not(.is-on) * { pointer-events: none !important; }
 
-/* chapter one: the display rail, one screen tall. The backdrop takes a little of the fabric's colour and carries its
-   name, very large, drifting behind; the curtains are canvases hung from the rail, moved and swung by the
-   experience layer. The headline and the choices stand on the floor in front of them. */
-/* scene zero: the cover. One large picture before anything else: a window at full height, a sheer in the daylight and
-   two heavy curtains at the sides that draw apart as the page moves on. A photograph takes this place once there is one. */
-.cover { position: relative; height: 100vh; height: 100svh; min-height: 480px; margin-top: calc(var(--top-h, 0px) * -1); overflow: clip; --sky1: #E6F1F4; --sky2: #FFF9EA; --cfloor: #C4B292; background: linear-gradient(180deg, var(--sky1), var(--sky2) 80%); }
-:root[data-mode="dark"] .cover { --sky1: #232C48; --sky2: #D29A6C; --cfloor: #5F5546; }
+/* what the parts say. On a narrow screen a sheet at the foot of the picture; on a wide one a panel at its side.
+   A hair short of opaque, like the top bar: a fully opaque block over the live canvas makes some browsers skip painting it. */
+.cap-panel { pointer-events: auto; width: 100%; box-sizing: border-box; max-height: calc(100vh - var(--top-h, 0px) - 34px); max-height: calc(100svh - var(--top-h, 0px) - 34px); overflow-y: auto; overscroll-behavior: contain; background: var(--surface); color: var(--ink); border-top: 1px solid var(--line); border-radius: 22px 22px 0 0; padding: 18px clamp(16px, 4vw, 28px) max(18px, env(safe-area-inset-bottom, 0px)); display: flex; flex-direction: column; gap: 10px; box-shadow: 0 -22px 60px -34px rgba(0, 0, 0, .55); }
+@supports (color: color-mix(in srgb, red, blue)) { .cap-panel { background: color-mix(in srgb, var(--surface) 99.4%, transparent); } }
+.cap-panel h2 { font-size: clamp(1.5rem, 1.2rem + 1.1vw, 2.1rem); line-height: 1.02; }
+.cap-panel p { color: var(--ink-2); font-size: .95rem; }
+.cap-free { pointer-events: none; }
+.cap-free a, .cap-free button { pointer-events: auto; }
+@media (min-width: 901px) {
+  .cap { align-items: center; }
+  .cap-panel { width: min(410px, 34vw); margin-left: max(clamp(16px, 4vw, 32px), calc((100% - 1180px) / 2 + 32px)); border: 1px solid var(--line); border-radius: 22px; padding: 26px 26px 24px; gap: 13px; box-shadow: 0 34px 70px -34px rgba(0, 0, 0, .55); }
+}
+
+/* where the page stands in the film, and the way to any part of it */
+.film-dots { position: absolute; left: 0; right: 0; top: calc(var(--top-h, 0px) + 22px); z-index: 3; display: flex; justify-content: center; gap: 0; pointer-events: none; }
+.film-dot { pointer-events: auto; flex: none; width: 28px; height: 28px; padding: 0; border: 0; background: none; cursor: pointer; display: grid; place-items: center; }
+.film-dot::before { content: ''; width: 7px; height: 7px; border-radius: 7px; background: rgba(255, 255, 255, .62); box-shadow: 0 0 0 1px rgba(0, 0, 0, .28); transition: width .3s ease, height .3s ease, background-color .3s ease; }
+.film-dot[aria-current]::before { width: 20px; background: #fff; }
+@media (min-width: 901px) { .film-dots { left: auto; right: 6px; top: 50%; translate: 0 -50%; flex-direction: column; } .film-dot[aria-current]::before { width: 7px; height: 20px; } }
+.film-dot:focus-visible { outline: 2px solid #fff; outline-offset: -4px; border-radius: 50%; }
+
+/* part one: the heading, on the cloth */
+.cover-text { width: 100%; padding-bottom: clamp(26px, 7vh, 76px); display: flex; flex-direction: column; gap: 16px; align-items: flex-start; opacity: clamp(0, calc(1 - var(--q, 0) * 1.5), 1); translate: 0 calc(var(--q, 0) * -40px); }
+.cover-text h1 { font-size: clamp(2.7rem, 1.2rem + 7vw, 6.6rem); line-height: .94; letter-spacing: -.015em; max-width: 13ch; color: #FBF5E8; text-shadow: 0 2px 28px rgba(0, 0, 0, .45); }
+.cover-text p { font-size: clamp(1rem, .9rem + .5vw, 1.25rem); max-width: 40ch; color: #EFE7D6; text-shadow: 0 1px 14px rgba(0, 0, 0, .55); }
+.cap-open .btn, .cap-close .btn { padding: 13px 24px; }
+.cap-open .btn.inv, .cap-close .btn.inv { background: #F6EFE0; color: #12302F; border-color: #F6EFE0; }
+.cap-open .btn.ghost.inv, .cap-close .btn.ghost.inv { background: rgba(6, 22, 24, .34); color: #F6EFE0; border-color: #F6EFE0; }
+.cap-open :focus-visible, .cap-close :focus-visible { outline-color: #F6EFE0; }
+.film.first .cover-text > * { animation: coverRise .9s cubic-bezier(.2, .7, .2, 1) both; animation-delay: 1.15s; }
+.film.first .cover-text > p { animation-delay: 1.3s; }
+.film.first .cover-text > .btn-row { animation-delay: 1.45s; }
+@keyframes coverRise { from { opacity: 0; transform: translateY(18px); } }
+@media (max-width: 700px) { .cover-text h1 { max-width: min(9.6ch, 62vw); font-size: clamp(2.1rem, 10.6vw, 2.9rem); } .cover-text p { max-width: min(24ch, 62vw); } }
+@media (max-height: 519px) { .cover-text h1 { font-size: clamp(1.7rem, 4vh + 1rem, 2.6rem); max-width: 16ch; } .cover-text { padding-bottom: 14px; gap: 10px; } }
+
+/* part two: the samples. The cloth itself is in the picture; the panel names it and carries its colours */
+.cap-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.stage-nav { display: flex; align-items: center; gap: 4px; }
+.arrow { width: 44px; height: 44px; border-radius: 50%; border: var(--bw) solid var(--field-line); background: transparent; color: var(--ink); cursor: pointer; display: grid; place-items: center; transition: background-color .25s ease, color .25s ease, border-color .25s ease; }
+.arrow:hover { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.arrow svg { width: 18px; height: 18px; }
+.stage-count { font-family: var(--font-display); font-size: 1.35rem; font-variant-numeric: tabular-nums; color: var(--ink); min-width: 4.2ch; text-align: center; white-space: nowrap; }
+.stage-count small { font-size: .62em; }
+/* every sample's text lies in the same cell and only the chosen one shows: the panel is as tall as the tallest, so the picture keeps its place from sample to sample */
+.stage-info { display: grid; min-width: 0; }
+.car-pane { grid-area: 1 / 1; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.car-pane:not(.is-cur) { visibility: hidden; }
+.car-pane > div { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.car-h { font-family: var(--font-display); font-weight: 400; font-size: clamp(1.3rem, 1.1rem + .6vw, 1.6rem); line-height: 1.05; color: var(--ink); }
+.car-pane .ok-text { color: var(--good); font-size: .88rem; }
+.car-pane .warn-text { color: var(--warn); font-size: .88rem; }
+.spec-line { font-size: .84rem; }
+.car-pane .btn-row { gap: 6px 14px; align-items: center; }
+.cloth-art, .rail-art { display: none; }
+.film.no-gl .cloth-art, .film.no-gl .rail-art { display: block; height: 150px; border-radius: 14px; overflow: hidden; background: var(--art); }
+
+/* part three: the rail */
+.rail-tabs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
+.rail-tab { display: flex; flex-direction: column; gap: 2px; text-align: left; background: none; border: 1px solid var(--field-line); border-radius: 12px; padding: 9px 12px; cursor: pointer; color: var(--ink); font: 600 .88rem/1.2 var(--font-body); transition: background-color .2s ease, color .2s ease; }
+.rail-tab small { font: 400 .76rem/1.2 var(--font-body); color: var(--ink-2); }
+.rail-tab[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.rail-tab[aria-pressed="true"] small { color: inherit; opacity: .78; }
+.rail-show { display: flex; flex-direction: column; gap: 8px; align-items: flex-start; }
+.rail-show h3 { font: 400 1.35rem/1.1 var(--font-display); }
+.rail-show .specs { font-size: .9rem; align-self: stretch; }
+.rail-show .specs dt { color: var(--ink-2); }
+
+/* part four: how an order goes, along a measuring tape that runs out as the page moves; the step it has reached is the one that shows */
+.tape { position: relative; height: 30px; }
+.tape-strip { position: absolute; left: 0; top: 0; bottom: 0; width: calc(8% + 92% * var(--q, 1)); overflow: hidden; border-radius: 0 3px 3px 0; background-color: var(--tape); background-image: repeating-linear-gradient(90deg, var(--tape-ink) 0 1px, transparent 1px 10px), repeating-linear-gradient(90deg, var(--tape-ink) 0 2px, transparent 2px 100px); background-size: 100% 9px, 100% 16px; background-repeat: no-repeat; background-position: 0 100%, 0 100%; }
+.tape-strip::after { content: ''; position: absolute; right: 0; top: 0; bottom: 0; width: 7px; background: var(--metal); }
+.tape-strip span { position: absolute; top: 3px; font: 600 .66rem/1 var(--font-body); color: var(--tape-ink); padding-left: 5px; }
+.steps { list-style: none; padding: 0; margin: 0; display: grid; }
+.steps li { grid-area: 1 / 1; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 2px 14px; align-content: start; opacity: 0; transition: opacity .35s ease; }
+.steps li::before { content: '0' attr(data-n); grid-row: 1 / span 2; font-family: var(--font-display); font-size: 2.8rem; line-height: .9; color: var(--accent-2); }
+.steps h3 { font-size: 1.08rem; align-self: end; }
+.steps p { grid-column: 2; }
+#tape[data-step="1"] .steps li[data-n="1"], #tape[data-step="2"] .steps li[data-n="2"], #tape[data-step="3"] .steps li[data-n="3"], #tape[data-step="4"] .steps li[data-n="4"] { opacity: 1; }
+#tape:not([data-step]) .steps, .film.no-gl .steps { display: flex; flex-direction: column; gap: 12px; }
+#tape:not([data-step]) .steps li, .film.no-gl .steps li { opacity: 1; }
+@media (min-width: 901px) { /* beside the picture there is room for all four; the one the tape has reached stands out */
+  .steps { display: flex; flex-direction: column; gap: 14px; }
+  .steps li { opacity: .34; }
+}
+
+/* part five: a day at the window */
+.day-panel .day-clock { font-family: var(--font-display); font-size: clamp(3rem, 2rem + 4.4vw, 5.6rem); line-height: .82; font-variant-numeric: tabular-nums; color: var(--ink); }
+.day-line { position: relative; height: 2px; margin: 8px 6px 4px; background: var(--line); border-radius: 2px; }
+.day-line::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: calc(var(--t, 0) * 100%); background: var(--accent-2); }
+.day-line::after { content: ''; position: absolute; left: calc(var(--t, 0) * 100%); top: 50%; width: 12px; height: 12px; margin: -6px 0 0 -6px; border-radius: 50%; background: var(--accent-2); }
+.day-panel legend, .day-panel .field-label { margin: 0 0 6px; }
+.day-panel #day-cap { color: var(--ink); min-height: 2.9em; }
+
+/* part six: night, the curtains drawn, and the call to book */
+.cap-close { align-items: center; justify-content: center; }
+.closing-in { width: min(660px, 86%); display: flex; flex-direction: column; align-items: center; text-align: center; gap: 22px; color: #EFE7D6; text-shadow: 0 2px 22px rgba(0, 0, 0, .55); }
+.closing-in h2 { font-size: clamp(2.2rem, 1.3rem + 3.8vw, 4.6rem); line-height: .98; color: #FBF5E8; }
+.closing-in .btn-row { justify-content: center; }
+.closing-in .contact dt { color: #C9C2B2; }
+.closing-in .contact a { color: #FBF5E8; }
+.closing-in p { color: #C9C2B2; font-size: .95rem; }
+.film.no-gl .closing-in { background: rgba(8, 28, 30, .78); padding: 26px 22px; border-radius: 22px; } /* over the drawn window the words need a ground of their own */
+
+@media (max-width: 560px) {
+  .cap-panel { gap: 8px; }
+  .car-pane > div:first-child p:not(.spec-line), .cap-lead, .rail-show > p, .day-note { display: none; }
+}
+
+/* drawn cloth and the pieces the film shares with the other pages; the drawn window is what a page without a graphics card shows behind the film */
 .cover-art { position: absolute; inset: 0; }
 .cover-win { position: absolute; inset: 0 13%; background: linear-gradient(90deg, transparent calc(33.3% - 3px), rgba(255, 255, 255, .7) calc(33.3% - 3px), rgba(255, 255, 255, .7) calc(33.3% + 3px), transparent calc(33.3% + 3px), transparent calc(66.6% - 3px), rgba(255, 255, 255, .7) calc(66.6% - 3px), rgba(255, 255, 255, .7) calc(66.6% + 3px), transparent calc(66.6% + 3px)), radial-gradient(58% 44% at 60% 30%, rgba(255, 250, 230, .95), transparent 72%); }
 :root[data-mode="dark"] .cover-win { background: linear-gradient(90deg, transparent calc(33.3% - 3px), rgba(255, 255, 255, .28) calc(33.3% - 3px), rgba(255, 255, 255, .28) calc(33.3% + 3px), transparent calc(33.3% + 3px), transparent calc(66.6% - 3px), rgba(255, 255, 255, .28) calc(66.6% - 3px), rgba(255, 255, 255, .28) calc(66.6% + 3px), transparent calc(66.6% + 3px)), radial-gradient(60% 40% at 56% 74%, rgba(255, 200, 140, .7), transparent 72%); }
@@ -221,85 +338,14 @@ main.view-home.is-entering { animation-name: viewFade; }
 :root[data-mode="dark"] .cover-sheer { filter: brightness(.78); }
 @keyframes coverSway { from { transform: skewX(-.7deg); } to { transform: skewX(.9deg); } }
 .cover-floor { position: absolute; left: 0; right: 0; bottom: 0; height: 12%; background: radial-gradient(60% 120% at 50% 0, rgba(255, 246, 220, .5), transparent 70%), linear-gradient(180deg, rgba(0, 0, 0, .22), transparent 45%), var(--cfloor); }
-/* no filters on the large moving cloth: the shadow each curtain casts on the sheer is a plain gradient beside it */
 .cover-drape { position: absolute; top: 0; bottom: 5%; width: calc(31% - 21% * var(--q, 0)); }
 .cover-drape::after { content: ''; position: absolute; top: 0; bottom: 0; width: 34px; background: linear-gradient(90deg, rgba(0, 0, 0, .34), transparent); }
 .cover-drape.l { left: 0; }
 .cover-drape.l::after { left: 100%; }
 .cover-drape.r { right: 0; }
 .cover-drape.r::after { right: 100%; transform: scaleX(-1); }
-.cover.is-off .cover-sheer { animation-play-state: paused; }
 .cover-pelmet { position: absolute; left: 0; right: 0; top: 0; height: calc(var(--top-h, 64px) + 30px); box-shadow: 0 8px 16px rgba(0, 0, 0, .38); }
 .cover-shade { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(6, 22, 24, .3), transparent 140px, transparent 48%, rgba(6, 22, 24, .68)), linear-gradient(90deg, rgba(6, 22, 24, .36), transparent 58%); }
-.cover-text { position: absolute; left: 0; right: 0; bottom: clamp(26px, 7vh, 76px); z-index: 2; display: flex; flex-direction: column; gap: 16px; align-items: flex-start; opacity: clamp(0, calc(1 - var(--q, 0) * 1.7), 1); translate: 0 calc(var(--q, 0) * -46px); }
-.cover-text h1 { font-size: clamp(2.7rem, 1.2rem + 7vw, 6.6rem); line-height: .94; letter-spacing: -.015em; max-width: 13ch; color: #FBF5E8; text-shadow: 0 2px 28px rgba(0, 0, 0, .4); }
-.cover-text p { font-size: clamp(1rem, .9rem + .5vw, 1.25rem); max-width: 40ch; color: #EFE7D6; text-shadow: 0 1px 14px rgba(0, 0, 0, .5); }
-/* the cover as a live window: one canvas, painted on the graphics card; the drawn cover above stays underneath as its fallback */
-.cover-gl { position: absolute; inset: 0; width: 100%; height: 100%; display: none; }
-.cover.gl { background: #0C2426; touch-action: pan-y pinch-zoom; cursor: grab; -webkit-user-select: none; user-select: none; }
-.cover.gl.is-pull { cursor: grabbing; }
-.cover.gl .cover-gl { display: block; }
-.cover.gl .cover-art > :not(.cover-shade) { display: none; }
-.cover.gl .cover-shade { background: linear-gradient(0deg, rgba(6, 22, 24, .66), transparent 56%); -webkit-mask-image: linear-gradient(90deg, #000 40%, transparent 92%); mask-image: linear-gradient(90deg, #000 40%, transparent 92%); }
-@media (max-width: 700px) { .cover.gl .cover-text h1 { max-width: 9.2ch; } .cover.gl .cover-text p { max-width: 24ch; } }
-.cover.gl.first .cover-text > * { animation: coverRise .9s cubic-bezier(.2, .7, .2, 1) both; animation-delay: 1.15s; }
-.cover.gl.first .cover-text > p { animation-delay: 1.3s; }
-.cover.gl.first .cover-text > .btn-row { animation-delay: 1.45s; }
-@keyframes coverRise { from { opacity: 0; transform: translateY(18px); } }
-.cover .btn { padding: 13px 24px; }
-.cover .btn.inv { background: #F6EFE0; color: #12302F; border-color: #F6EFE0; }
-.cover .btn.ghost.inv { background: rgba(6, 22, 24, .28); color: #F6EFE0; border-color: #F6EFE0; }
-.cover :focus-visible { outline-color: #F6EFE0; }
-
-.hero { position: relative; display: grid; grid-template-rows: minmax(0, 1fr) auto; min-height: calc(100vh - var(--top-h, 0px)); min-height: calc(100svh - var(--top-h, 0px)); background: var(--grain, none), var(--amb, var(--bg)); background-color: var(--amb, var(--bg)); transition: background-color .9s ease; overflow: clip; }
-.stage-view { grid-row: 1; position: relative; min-height: 300px; container-type: size; overflow: hidden; touch-action: pan-y pinch-zoom; cursor: grab; -webkit-user-select: none; user-select: none; -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent); mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent); }
-.stage-view.is-drag { cursor: grabbing; }
-.stage-in { position: absolute; inset: 0; --nav: max(64px, calc(2.4rem + 14px)); --sw: clamp(130px, min(24vw, 30vh), 360px); --sh: calc(var(--sw) * 1.7); }
-/* the curtain is as large as the stage allows: room for its reflection, room for the arrows under its hem, never wider than the side curtains leave */
-@supports (width: 1cqh) { .stage-in { --sw: clamp(110px, min((100cqh - 26px) / 1.98, (100cqh - 19px - var(--nav)) / 1.7, 44cqw), 440px); } }
-@media (max-width: 700px) { @supports (width: 1cqh) { .stage-in { --sw: clamp(110px, min((100cqh - 26px) / 1.98, (100cqh - 19px - var(--nav)) / 1.7, 62cqw), 440px); } } }
-.stage-word { position: absolute; left: 0; right: 0; top: 14px; height: var(--sh); display: flex; align-items: center; pointer-events: none; }
-.word-track { display: flex; align-items: baseline; flex: none; white-space: nowrap; font: 400 calc(var(--sh) * .56)/1 var(--font-display); color: var(--word, var(--surface-2)); transition: color .9s ease; animation: wordIn .9s ease both; will-change: transform; }
-.word-track span, .word-track em { margin-right: .2em; }
-.word-track em { font-size: .62em; opacity: .62; }
-@keyframes wordIn { from { opacity: 0; } to { opacity: 1; } }
-.stage-floor { position: absolute; left: 0; right: 0; top: calc(14px + var(--sh) - 5px); bottom: 0; background: linear-gradient(180deg, var(--floor-tint, rgba(0, 0, 0, .07)), transparent 62%); }
-.stage-spot { position: absolute; left: 50%; top: 0; width: calc(var(--sw) * 3); height: 100%; translate: -50% 0; background: radial-gradient(closest-side, var(--spot), transparent); }
-.stage-rail { position: absolute; left: 0; right: 0; top: 9px; height: 9px; background: linear-gradient(180deg, rgba(255, 255, 255, .5), rgba(255, 255, 255, 0) 50%, rgba(0, 0, 0, .32)), var(--metal); box-shadow: 0 7px 14px -4px var(--cast); z-index: 3; }
-/* no drawing surface: the curtains are the striped CSS drawing */
-.stage-view.no-canvas .slide { background: linear-gradient(90deg, rgba(0, 0, 0, .22), rgba(255, 255, 255, .2) 50%, rgba(0, 0, 0, .22)) 0 0 / calc(100% / var(--n, 7)) 100% repeat-x, var(--fab, #ccc); }
-.slide { position: absolute; top: 13px; left: 50%; width: var(--sw); height: var(--sh); margin-left: calc(var(--sw) / -2); transform-origin: 50% 0; z-index: 2; }
-.slide canvas { position: absolute; top: 0; left: 50%; translate: -50% 0; pointer-events: none; transition: filter .5s ease; }
-.slide:not(.is-cur) canvas { filter: brightness(.92) saturate(.82); }
-.slide::after { content: ''; position: absolute; left: -6%; right: -6%; top: calc(var(--sh) - 11px); height: 34px; background: radial-gradient(closest-side, var(--cast), transparent); z-index: -1; }
-.stage-light { position: absolute; inset: 0; z-index: 4; pointer-events: none; background: radial-gradient(circle at var(--lx, 50%) var(--ly, 30%), rgba(255, 244, 222, .6), transparent 38%); mix-blend-mode: soft-light; }
-.stage-cursor { position: absolute; left: 0; top: 0; z-index: 6; width: 82px; height: 82px; margin: -41px 0 0 -41px; border-radius: 50%; display: grid; place-items: center; background: var(--ink); color: var(--bg); font-size: .8rem; font-weight: 600; letter-spacing: .04em; pointer-events: none; opacity: 0; scale: .5; transition: opacity .2s ease, scale .25s cubic-bezier(.2, .7, .2, 1); }
-.stage-cursor.on { opacity: .94; scale: 1; }
-.stage-view.is-drag .stage-cursor { scale: .8; }
-@media (hover: none) { .stage-cursor { display: none; } }
-.hero-foot { grid-row: 2; position: relative; z-index: 5; width: 100%; padding-block: 12px clamp(20px, 3.4vh, 38px); display: grid; grid-template-columns: minmax(0, 6fr) minmax(0, 7fr); gap: 16px clamp(24px, 4vw, 64px); align-items: end; }
-.hero-lead { display: flex; flex-direction: column; gap: 8px; }
-.hero-lead h2 { font-size: clamp(2rem, 1rem + 2.6vw, 3.4rem); line-height: .98; }
-.hero-lead p { color: var(--ink-2); font-size: 1.05rem; }
-/* the arrows stand under the middle curtain, on its reflection */
-.stage-nav { position: absolute; left: 50%; top: calc(13px + var(--sh) + 10px); translate: -50% 0; z-index: 5; display: flex; align-items: center; gap: 8px; cursor: default; }
-.arrow { width: 50px; height: 50px; border-radius: 50%; border: var(--bw) solid var(--field-line); background: transparent; color: var(--ink); cursor: pointer; display: grid; place-items: center; transition: background-color .25s ease, color .25s ease, border-color .25s ease; }
-@supports (color: color-mix(in srgb, red, blue)) { .arrow { background: color-mix(in srgb, var(--amb, var(--bg)) 72%, transparent); } }
-.arrow:hover { background: var(--ink); color: var(--bg); border-color: var(--ink); }
-.arrow svg { width: 18px; height: 18px; }
-.stage-count { font-family: var(--font-display); font-size: 1.5rem; font-variant-numeric: tabular-nums; color: var(--ink); min-width: 4.4ch; text-align: center; white-space: nowrap; text-shadow: 0 0 10px var(--amb, var(--bg)), 0 0 4px var(--amb, var(--bg)); }
-.stage-count small { font-size: .62em; }
-/* every sample's text lies in the same cell and only the chosen one shows: the block is as tall as the tallest, so the stage keeps its size from sample to sample */
-.stage-info { display: grid; min-width: 0; }
-.car-pane { grid-area: 1 / 1; display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 12px clamp(18px, 2.6vw, 40px); align-items: end; min-width: 0; }
-.car-pane:not(.is-cur) { visibility: hidden; }
-.car-pane > div { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
-.car-h { font-family: var(--font-display); font-weight: 400; font-size: clamp(1.4rem, 1.1rem + .8vw, 1.8rem); line-height: 1.05; }
-.car-pane p { font-size: .93rem; color: var(--ink-2); }
-.car-pane .ok-text { color: var(--good); font-size: .88rem; }
-.car-pane .warn-text { color: var(--warn); font-size: .88rem; }
-.spec-line { font-size: .84rem; }
-.car-pane .btn-row { gap: 6px 14px; }
 .swatches { display: flex; flex-wrap: wrap; gap: 8px; }
 .sw { position: relative; display: inline-flex; cursor: pointer; }
 .sw input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; }
@@ -310,106 +356,24 @@ main.view-home.is-entering { animation-name: viewFade; }
 .sw input:focus-visible + i { outline: 2px solid var(--link); outline-offset: 4px; }
 .sw-name { font-size: .88rem; }
 .sw-name b { font-weight: 600; }
-
-/* cloth painted by the experience layer; until it is, the striped CSS drawing underneath shows */
 canvas.cloth { position: absolute; inset: 0; width: 100%; height: 100%; display: block; z-index: 0; pointer-events: none; }
 .fab.dressed { background: none; }
-
-/* chapter two: a day at the window. The section is the room; while it is pinned, the scroll is the clock */
-.day { position: relative; background: var(--wall, var(--surface-2)); }
-.day.is-pinned { height: 250vh; }
-.day-sticky { position: relative; overflow: clip; min-height: max(640px, var(--need, 0px)); }
-.day.is-pinned .day-sticky { position: sticky; top: calc(env(safe-area-inset-top, 0px) + var(--top-h, 0px)); min-height: 0; height: calc(100vh - var(--top-h, 0px)); height: calc(100svh - var(--top-h, 0px)); }
-.day-room { position: absolute; inset: 0; --floor: #B7A68C; --frame: #FBF8F1; --metal: #8B8D86; }
-.day-room .look { position: absolute; inset: 0; }
-.day-room .scene { aspect-ratio: auto; width: 100%; height: 100%; border: 0; border-radius: 0; }
-.day-room .scene-dim { display: none; }
-.day-room .scene-win, .day-room .scene-hang { left: 63%; }
-.day-room .scene-hang { z-index: 2; }
-.day-room .scene .fab { filter: brightness(var(--cloth-b, 1)); }
-.day-room .scene .drape.dressed { filter: brightness(var(--cloth-b, 1)) drop-shadow(0 0 9px rgba(0, 0, 0, .2)); }
-.day-room .scene-win { overflow: hidden; border-width: 7px; box-shadow: 0 0 0 1px rgba(0, 0, 0, .16), inset 0 0 22px rgba(0, 0, 0, .16), 0 13px 0 -3px var(--frame), 0 15px 0 -3px rgba(0, 0, 0, .14); background: radial-gradient(circle at var(--sunx, 30%) var(--suny, 40%), rgba(255, 253, 240, var(--sun, 1)) 0, rgba(255, 253, 240, var(--sun, 1)) 2.2%, rgba(255, 244, 205, calc(var(--sun, 1) * .5)) 3.4%, rgba(255, 240, 190, 0) 18%), linear-gradient(180deg, var(--sky1), var(--sky2)); }
-.day-room .scene-win::before { content: ''; position: absolute; inset: 0; opacity: var(--night, 0); background: radial-gradient(circle at 74% 20%, #F6F1DC 0, #F6F1DC 2%, rgba(246, 241, 220, .22) 2.8%, transparent 9%), radial-gradient(1.6px 1.6px at 18% 26%, #fff, transparent), radial-gradient(1.4px 1.4px at 34% 14%, #fff, transparent), radial-gradient(1.6px 1.6px at 52% 34%, #fff, transparent), radial-gradient(1.2px 1.2px at 12% 58%, #fff, transparent), radial-gradient(1.5px 1.5px at 88% 46%, #fff, transparent), radial-gradient(1.2px 1.2px at 62% 12%, #fff, transparent), radial-gradient(1.4px 1.4px at 40% 52%, #fff, transparent); }
-.day-room .scene-floor { height: 10%; background: linear-gradient(180deg, rgba(0, 0, 0, .14), transparent 50%), repeating-linear-gradient(90deg, rgba(0, 0, 0, .09) 0, rgba(0, 0, 0, .09) 1px, transparent 1px, transparent 9.09%), var(--floor); }
-.day-room .scene-floor::before { content: ''; position: absolute; left: 0; right: 0; bottom: 100%; height: 13px; background: linear-gradient(180deg, rgba(255, 255, 255, .55), rgba(255, 255, 255, .3)); box-shadow: 0 -1px 0 rgba(0, 0, 0, .1); }
-.scene-beam { display: none; }
-.day-room .scene-beam { display: block; position: absolute; left: 63%; top: calc(var(--winTop) + var(--winH)); width: calc(var(--winW) * .9); bottom: 0; translate: -50% 0; transform-origin: 50% 0; transform: skewX(var(--skew, -22deg)); background: linear-gradient(180deg, rgba(255, 242, 208, .6), rgba(255, 242, 208, 0) 85%); opacity: var(--beam, 1); z-index: 1; }
-.day-lamp { position: absolute; right: 2.2%; bottom: 10%; width: 92px; height: 46%; z-index: 2; }
-.day-lamp::before { content: ''; position: absolute; left: 50%; bottom: 0; width: 3px; height: 100%; translate: -50% 0; background: #4E473D; }
-.day-lamp::after { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 64px; clip-path: polygon(20% 0, 80% 0, 100% 100%, 0 100%); background: linear-gradient(180deg, #EFE3CB, #D9C49E); filter: brightness(calc(.96 + var(--lamp, 0) * .34)); }
-.day-lamp i { position: absolute; left: 50%; bottom: 0; width: 46px; height: 6px; translate: -50% 0; border-radius: 4px 4px 0 0; background: #4E473D; }
-.day-light, .day-glow { position: absolute; inset: 0; pointer-events: none; z-index: 1; }
-.day-glow { opacity: var(--lamp, 0); background: radial-gradient(26% 56% at 95% 46%, rgba(255, 196, 120, .7), transparent 72%); }
-.day-panel { position: absolute; z-index: 7; left: max(clamp(16px, 4vw, 32px), calc((100% - 1180px) / 2 + 32px)); top: 50%; translate: 0 -50%; width: min(350px, 30%); background: var(--surface); color: var(--ink); border: 1px solid var(--line); border-radius: 20px; padding: 26px 26px 22px; display: flex; flex-direction: column; gap: 12px; box-shadow: 0 34px 60px -34px rgba(0, 0, 0, .45); }
-@supports ((-webkit-backdrop-filter: blur(2px)) or (backdrop-filter: blur(2px))) and (color: color-mix(in srgb, red, blue)) {
-  .day-panel { background: color-mix(in srgb, var(--surface) 93%, transparent); -webkit-backdrop-filter: blur(18px) saturate(1.25); backdrop-filter: blur(18px) saturate(1.25); border-color: color-mix(in srgb, var(--line) 55%, transparent); }
-}
-.day-panel h2 { font-size: clamp(1.5rem, 1.15rem + 1.2vw, 2.1rem); }
-.day-panel p { color: var(--ink-2); }
-.day-panel legend, .day-panel .field-label { margin: 0 0 6px; }
-.day-panel .day-clock { font-family: var(--font-display); font-size: clamp(3.6rem, 2rem + 5vw, 6.4rem); line-height: .82; font-variant-numeric: tabular-nums; color: var(--ink); }
-.day-line { position: relative; height: 2px; margin: 8px 6px 4px; background: var(--line); border-radius: 2px; }
-.day-line::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: calc(var(--t, 0) * 100%); background: var(--accent-2); }
-.day-line::after { content: ''; position: absolute; left: calc(var(--t, 0) * 100%); top: 50%; width: 12px; height: 12px; margin: -6px 0 0 -6px; border-radius: 50%; background: var(--accent-2); box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent-2) 22%, transparent); }
-.day-panel #day-cap { min-height: 3.1em; color: var(--ink); }
-
-/* chapter three: how it works, measured out on a tape that runs out as the page scrolls; each step shows as the tape reaches it */
 .band { display: flex; flex-direction: column; gap: 16px; }
-.tape-band { padding-block: clamp(72px, 10vw, 150px) clamp(64px, 9vw, 130px); gap: 22px; }
 .lead { font-size: 1.14rem; color: var(--ink-2); max-width: 58ch; }
-.tape { position: relative; height: 44px; margin-top: 18px; }
-.tape-strip { position: absolute; left: 0; top: 0; bottom: 0; width: calc(8% + 92% * var(--q, 1)); overflow: hidden; border-radius: 0 3px 3px 0; background-color: var(--tape); background-image: repeating-linear-gradient(90deg, var(--tape-ink) 0 1px, transparent 1px 10px), repeating-linear-gradient(90deg, var(--tape-ink) 0 2px, transparent 2px 100px); background-size: 100% 9px, 100% 19px; background-repeat: no-repeat; background-position: 0 100%, 0 100%; box-shadow: 0 10px 18px -10px var(--cast); }
-.tape-strip::after { content: ''; position: absolute; right: 0; top: 0; bottom: 0; width: 9px; background: var(--metal); }
-.tape-strip span { position: absolute; top: 5px; font: 600 .72rem/1 var(--font-body); color: var(--tape-ink); padding-left: 5px; }
-.steps { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 26px; counter-reset: s; }
-.steps li { counter-increment: s; padding-top: 10px; display: flex; flex-direction: column; gap: 8px; opacity: clamp(.1, calc((var(--q, 1) - var(--at, 0)) * 6), 1); translate: 0 calc((1 - clamp(0, calc((var(--q, 1) - var(--at, 0)) * 6), 1)) * 18px); }
-.steps li::before { content: '0' counter(s); font-family: var(--font-display); font-size: 3.2rem; line-height: .9; color: var(--accent-2); }
-.steps h3 { font-size: 1.12rem; }
-.steps p { color: var(--ink-2); font-size: .96rem; }
-
-/* chapter four: the workshop, in the dark of the frame colour */
 .night { background: var(--grain, none), var(--chrome); background-color: var(--chrome); color: var(--chrome-ink); }
 .night h2, .night h3 { color: var(--chrome-ink); }
 .night p { color: var(--chrome-2); }
 .night :focus-visible { outline-color: var(--chrome-ink); }
-.rails-band { padding-block: clamp(72px, 10vw, 150px); }
-.rails-band .wrap { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); gap: clamp(28px, 6vw, 88px); align-items: start; }
-.rails-band .wrap > div:first-child { display: flex; flex-direction: column; gap: 16px; align-items: flex-start; }
-.rail-tabs { align-self: stretch; display: flex; flex-direction: column; border-top: 1px solid var(--chrome-line); margin-top: 6px; }
-.rail-tab { display: flex; justify-content: space-between; align-items: baseline; gap: 14px; text-align: left; background: none; border: 0; border-bottom: 1px solid var(--chrome-line); padding: 14px 2px; cursor: pointer; color: var(--chrome-2); font: 400 clamp(1.4rem, 1rem + 1.4vw, 2.1rem)/1.1 var(--font-display); transition: color .25s ease, padding-left .35s cubic-bezier(.2, .7, .2, 1); }
-.rail-tab small { font: 600 .78rem/1.2 var(--font-body); text-align: right; }
-.rail-tab:hover { color: var(--chrome-ink); padding-left: 8px; }
-.rail-tab[aria-pressed="true"] { color: var(--chrome-ink); padding-left: 16px; box-shadow: inset 3px 0 0 var(--chrome-mark); }
-.rail-show { display: flex; flex-direction: column; gap: 14px; align-items: flex-start; }
-/* the top of a curtain on its rail, close up: used for the rail on show, the fabric cards and the rail cards */
 .art-view { position: relative; align-self: stretch; height: 100%; overflow: hidden; }
 .art-cloth { position: absolute; left: 9%; right: 9%; top: 26px; height: 560px; transition: scale .7s cubic-bezier(.2, .7, .2, 1); transform-origin: 50% 0; }
 .art-view.k-track::before { content: ''; position: absolute; left: 0; right: 0; top: 20px; height: 8px; background: linear-gradient(180deg, rgba(255, 255, 255, .5), rgba(255, 255, 255, 0) 55%, rgba(0, 0, 0, .3)), #A9ABA3; z-index: 2; }
 .art-view.is-motor::after { content: ''; position: absolute; left: 3%; top: 13px; width: 15%; height: 28px; border-radius: 5px; background: linear-gradient(180deg, #C4C6BE, #8F9189); z-index: 3; box-shadow: inset -14px 0 0 -11px #3DBE7B; }
-.rail-show .art-view { height: clamp(220px, 30vw, 400px); border-radius: 16px; background: linear-gradient(180deg, rgba(255, 255, 255, .1), rgba(255, 255, 255, .03)); -webkit-mask-image: linear-gradient(180deg, #000 62%, transparent); mask-image: linear-gradient(180deg, #000 62%, transparent); animation: railIn .6s cubic-bezier(.2, .7, .2, 1) both; }
-@keyframes railIn { from { opacity: 0; translate: 0 -10px; } to { opacity: 1; translate: none; } }
-.rail-show h3 { font: 400 1.8rem/1.1 var(--font-display); }
-.rail-show .specs { font-size: .95rem; }
-.rail-show .specs dt { color: var(--chrome-2); }
-
-/* chapter five: recent work, a strip that slides a little as the page passes and can be pulled through */
 .strip-band { padding-top: clamp(72px, 10vw, 150px); gap: 10px; }
 .strip { display: flex; align-items: flex-start; gap: 16px; overflow-x: auto; padding: 22px max(clamp(16px, 4vw, 32px), calc((100% - 1180px) / 2 + 32px)) clamp(56px, 8vw, 110px); scroll-snap-type: x proximity; scrollbar-width: thin; }
 .strip:focus-visible { outline: 2px solid var(--link); outline-offset: -4px; }
 .tile { flex: none; width: clamp(200px, 25vw, 320px); aspect-ratio: 3 / 4; border-radius: 14px; scroll-snap-align: start; position: relative; overflow: hidden; display: flex; align-items: flex-end; translate: calc((1 - var(--q, 1)) * 110px) 0; background-color: var(--art); }
 .tile:nth-child(even) { margin-top: 40px; }
 .tile span { position: relative; z-index: 1; margin: 10px; padding: 5px 11px; border-radius: 999px; background: var(--surface); color: var(--ink); font-size: .8rem; font-weight: 600; }
-
-/* the last scene: night, and the curtains draw as the page ends */
-.closing { position: relative; overflow: clip; padding-block: clamp(96px, 14vw, 200px); }
-.closing::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 9px; z-index: 2; background: linear-gradient(180deg, rgba(255, 255, 255, .45), rgba(255, 255, 255, 0) 50%, rgba(0, 0, 0, .35)), var(--metal); }
-.closing-drape { position: absolute; top: 6px; bottom: 0; width: calc(6% + 23% * var(--q, 0)); --fab: #96553A; --n: 5; filter: drop-shadow(0 0 26px rgba(0, 0, 0, .4)); }
-.closing-drape.l { left: 0; }
-.closing-drape.r { right: 0; }
-.closing-in { position: relative; z-index: 1; width: min(660px, 40%); margin-inline: auto; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 24px; }
-.closing h2 { font-size: clamp(2.2rem, 1.3rem + 3.8vw, 4.6rem); line-height: .98; }
-.closing .btn-row { justify-content: center; }
-.closing .btn { border-radius: 999px; padding: 13px 24px; }
 .contact dl { display: grid; grid-template-columns: auto auto; gap: 6px 16px; justify-content: center; text-align: left; font-size: .95rem; }
 .contact dt { color: var(--chrome-2); }
 .contact dd { margin: 0; overflow-wrap: anywhere; }
@@ -655,23 +619,7 @@ ul.plain { list-style: none; padding: 0; display: flex; flex-direction: column; 
   .page-head-in { grid-template-columns: minmax(0, 1fr); min-height: 0; }
   .page-rail { display: none; }
   .view-body { gap: 40px; padding-block: 32px 72px; }
-  .rails-band .wrap { grid-template-columns: minmax(0, 1fr); }
-  .hero-foot { grid-template-columns: minmax(0, 1fr); }
-  .day-sticky { display: flex; flex-direction: column; min-height: 0; }
-  .day-room { position: relative; inset: auto; flex: 1 1 auto; min-height: 300px; }
-  .day-room .scene-win, .day-room .scene-hang, .day-room .scene-beam { left: 50%; }
-  .day-lamp { right: 1%; width: 56px; height: 34%; }
-  .day-lamp::after { height: 40px; }
-  .day-lamp i { width: 30px; }
-  .day-glow { background: radial-gradient(34% 44% at 94% 60%, rgba(255, 196, 120, .7), transparent 72%); }
-  .day-panel { position: static; translate: none; width: auto; border-radius: 0; border-width: 1px 0 0; padding: 14px clamp(16px, 4vw, 32px) 16px; gap: 8px; flex: none; box-shadow: none; background: var(--surface); -webkit-backdrop-filter: none; backdrop-filter: none; }
-  .day-panel .day-note { display: none; }
-  .day-panel .day-clock { font-size: 3rem; }
-  .day-panel #day-cap { min-height: 0; }
-  .closing-drape { width: calc(4% + 13% * var(--q, 0)); }
-  .closing-in { width: min(640px, 62%); }
   .cfg-grid { grid-template-columns: minmax(0, 1fr); grid-template-areas: 'preview' 'form' 'side'; grid-template-rows: auto; }
-  .steps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (max-width: 480px) { .editor { grid-template-columns: minmax(0, 1fr); } }
 @media (pointer: coarse) {
@@ -683,34 +631,24 @@ ul.plain { list-style: none; padding: 0; display: flex; flex-direction: column; 
   .sw i { width: 44px; height: 44px; }
 }
 @media (max-width: 560px) {
-  .steps { grid-template-columns: minmax(0, 1fr); }
-  .steps li { opacity: 1; translate: none; }
-  .car-pane { grid-template-columns: minmax(0, 1fr); }
-  .car-pane > div:first-child p:not(.spec-line) { display: none; }
   .top-row { gap: 8px 10px; }
   .brand { font-size: 1.35rem; gap: 8px; }
   .brand svg { width: 24px; height: 24px; }
   .btn.top-cta { flex: 0 1 auto; min-width: 0; padding-inline: 13px; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .day-panel .day-lead { display: none; }
   .tile:nth-child(even) { margin-top: 24px; }
 }
 @media (max-width: 380px) { .brand svg { display: none; } }
 /* on a phone the rail gets most of a screen to itself, and its text follows underneath */
-@media (max-width: 700px) { .hero { display: block; min-height: 0; } .stage-view { height: clamp(400px, 72vh, 660px); height: clamp(400px, 72svh, 660px); } .hero-foot { padding-top: 6px; } }
-@media (max-height: 519px) { .hero { min-height: 0; } .stage-view { height: 320px; } .cover { height: auto; min-height: 0; } .cover-text { position: relative; bottom: auto; padding-block: calc(var(--top-h, 0px) + 52px) 26px; } .cover-text h1 { font-size: 2.6rem; max-width: none; } }
 @media (prefers-reduced-motion: reduce) {
-  .scene .drape, .art-cloth, .cover-drape, .cover-text, .slide canvas, .hero, .word-track, .rail-tab, .sw i, .arrow, .top, .brand, .btn.top-cta, .navlink, .navlink::after, .menu, .menu-bars::before, .menu-bars::after, .stage-cursor { transition: none; }
-  .word-track, main.is-entering, .rail-show .art-view, .cover-sheer { animation: none; }
+  .scene .drape, .art-cloth, .cover-drape, .cover-text, .cap, .steps li, .film-dot::before, .rail-tab, .sw i, .arrow, .top, .brand, .btn.top-cta, .navlink, .navlink::after, .menu, .menu-bars::before, .menu-bars::after, .stage-cursor { transition: none; }
+  main.is-entering, .cover-sheer, .film.first .cover-text > * { animation: none; }
   .navlink { opacity: 1; translate: none; }
-  .steps li { opacity: 1; translate: none; }
   .tile { translate: none; }
-  .intro { display: none; }
 }
 </style>
 </head>
 <body>
 
-<div class="intro" id="intro" aria-hidden="true"><div class="intro-drape l fab"><canvas class="cloth" data-look="velvet" data-hex="#1E4F54" data-heading="pinch" data-n="9" data-fit="0.505" data-amp="1.5"></canvas></div><div class="intro-drape r fab"><canvas class="cloth" data-look="velvet" data-hex="#1E4F54" data-heading="pinch" data-n="9" data-fit="0.505" data-amp="1.5"></canvas></div><div class="intro-mark">Perde Nemis</div></div>
 <div class="top" id="page-top">
   <div class="wrap top-row">
     <button class="brand" data-go="home" id="brand" aria-label="Perde Nemis">
@@ -2243,6 +2181,7 @@ var I18N = {
     'ui.lang.sq': 'Shqip',
     'ui.menu': 'Hap menynë', 'ui.menuClose': 'Mbyll menynë',
     'nav.bookShort': 'Rezervo', 'car.role': 'karusel',
+    'film.nav': 'Pjesët e faqes', 'film.open': 'Hapja', 'film.cloth': 'Perdet', 'film.rail': 'Shina', 'film.steps': 'Si funksionon', 'film.day': 'Dita te dritarja', 'film.close': 'Rezervimi',
     'cover.sub': 'Matje falas në shtëpi. Qepje, shinë dhe montim nga ekipi ynë.', 'cover.see': 'Shiko perdet', 'car.lead': 'Zgjidhni perden, pastaj ngjyrën e saj.',
     'look.tStill': 'Perdja që zgjodhët më sipër, në një dhomë, nga mëngjesi deri në mbrëmje. Zgjidhni orën.',
     'ui.lang.en': 'Anglisht',
@@ -2585,6 +2524,7 @@ var I18N = {
     'ui.lang.sq': 'Albanian',
     'ui.menu': 'Open the menu', 'ui.menuClose': 'Close the menu',
     'nav.bookShort': 'Book', 'car.role': 'carousel',
+    'film.nav': 'Parts of the page', 'film.open': 'Opening', 'film.cloth': 'Curtains', 'film.rail': 'Rail', 'film.steps': 'How it works', 'film.day': 'A day at the window', 'film.close': 'Booking',
     'cover.sub': 'Free home measurement. Sewing, rail and fitting by our own team.', 'cover.see': 'See the curtains', 'car.lead': 'Pick a curtain, then its colour.',
     'look.tStill': 'The curtain you picked above, in a room, from morning to evening. Pick the time.',
     'ui.lang.en': 'English',
@@ -2727,7 +2667,8 @@ var GLX = (function () {
     // look: 0 matt, 1 linen, 2 satin, 3 velvet, 4 sheer, 5 pattern
     // returns the colour in rgb and, in a, how dense the cloth is at this point (1 for everything but a sheer)
     // L1: the light it is shown in; L2, i2: a second light from the side (the window, in a scene)
-    'vec4 cloth(float u, float v, vec2 px, float n, float seed, float look, float head, vec3 base, float deep, vec3 L1, float i1, vec3 L2, float i2, float amb) {',
+    // cpx: the same point in the cloth's own pixels; zoom: how close the eye is. From close up the weave itself shows.
+    'vec4 cloth(float u, float v, vec2 px, vec2 cpx, float zoom, float n, float seed, float look, float head, vec3 base, float deep, vec3 L1, float i1, vec3 L2, float i2, float amb) {',
     '  float e = 0.06 / n;',
     '  float ph = phase(u, v, n, seed);',
     '  float z = prof(ph, v, head);',
@@ -2743,21 +2684,28 @@ var GLX = (function () {
     '  float grain = (h21(px) - 0.5) * 0.030 + (vn(vec2(px.x * 0.7, px.y * 0.045)) - 0.5) * 0.045;',
     '  vec3 col; float a = 1.0;',
     '  float lit = amb + i1 * d1;',
+    '  float wv = smoothstep(2.0, 5.0, zoom / 0.9);',                                          // a thread has to be a few points wide before it can be told from the next
+    '  vec2 th = cpx * 0.9;',
+    '  float over = sin(3.14159 * th.x) * sin(3.14159 * th.y);',                               // plain weave: one thread over, one under
+    '  float gapT = (1.0 - abs(sin(3.14159 * th.x))) * (1.0 - abs(sin(3.14159 * th.y)));',     // the small holes between four threads
     '  if (look < 0.5) {',                                                                      // matt
-    '    col = base * (lit * ao + grain);',
+    '    col = base * (lit * ao + grain) * (1.0 + wv * (0.06 * over - 0.09 * gapT));',
     '  } else if (look < 1.5) {',                                                               // linen: threads of uneven thickness
     '    float weft = (vn(vec2(px.x * 0.05, px.y * 0.9 + 7.0)) - 0.5) * 0.05;',
     '    float slub = smoothstep(0.84, 0.97, vn(vec2(px.x * 0.035 + 3.0, px.y * 0.55))) * 0.045;',
-    '    col = base * (lit * ao + grain * 1.5 + weft - slub);',
+    '    col = base * (lit * ao + grain * 1.5 + weft - slub) * (1.0 + wv * (0.09 * over - 0.13 * gapT) + wv * 0.12 * (vn(vec2(th.x * 0.9, th.y * 0.08)) - 0.5) + wv * 0.10 * (vn(vec2(th.x * 0.07, th.y * 0.9)) - 0.5));',
     '  } else if (look < 2.5) {',                                                               // satin: a narrow bright line along each crest
     '    vec3 H = normalize(L1 + vec3(0.0, 0.0, 1.0));',
     '    float sp = pow(max(dot(N, H), 0.0), 42.0) * 0.55 + pow(max(dot(N, H), 0.0), 9.0) * 0.14;',
     '    col = base * ((amb * 0.92 + i1 * d1 * 0.96) * ao + grain * 0.5) + mix(base, vec3(1.0), 0.6) * sp * i1;',
+    '    col *= 1.0 + wv * 0.07 * sin(3.14159 * (th.x + th.y * 0.34));',                           // the diagonal of a satin weave
     '  } else if (look < 3.5) {',                                                               // velvet: dark where it faces the eye, bright where the pile is seen from the side
-    '    col = base * ((amb * 0.86 + i1 * d1 * 0.78) * ao + grain * 0.6) + mix(base, vec3(1.0), 0.22) * graze * (0.08 + 0.26 * i1) * ao;',
+    '    col = base * ((amb * 0.80 + i1 * d1 * 0.72) * ao + grain * 0.6) + mix(base, vec3(1.0), 0.09) * graze * (0.06 + 0.22 * i1) * ao;',
+    '    col *= 1.0 + wv * 0.34 * (vn(cpx * 0.55) - 0.5) + wv * 0.12 * (vn(vec2(cpx.x * 1.7, cpx.y * 0.3)) - 0.5);',  // the pile
     '  } else if (look < 4.5) {',                                                               // sheer: thin, so it is denser wherever it is seen edge-on
     '    col = base * (0.80 + 0.22 * d1 + grain * 0.8) * (amb + i1) / (amb + i1 + 0.0001) * min(1.0, amb + i1 * 0.9);',
     '    a = 0.40 + 0.40 * graze + 0.10 * (1.0 - ao);',
+    '    a = mix(a, a * (0.32 + 1.5 * (1.0 - gapT * 1.6)), wv * 0.8);',                           // an open mesh: more hole than thread
     '  } else {',                                                                               // woven pattern: matt cloth, the motif is laid on by the caller
     '    col = base * (lit * ao + grain);',
     '  }',
@@ -2779,7 +2727,7 @@ var GLX = (function () {
     '  float yTop = top - wavy * (1.0 + z0) * 0.5, yHem = hem + amp * z1;',
     '  float m = clamp(x + 0.5, 0.0, 1.0) * clamp(front - x + 0.5, 0.0, 1.0) * clamp(px.y - yTop + 0.5, 0.0, 1.0) * clamp(yHem - px.y + 0.5, 0.0, 1.0);',
     '  if (m <= 0.0) { gl_FragColor = vec4(0.0); return; }',
-    '  vec4 c = cloth(u, v, px, n, seed, look, head, uCol, 1.0, normalize(vec3(-0.58, 0.22, 0.78)), 0.66, vec3(0.0, 0.0, 1.0), 0.0, 0.60);',
+    '  vec4 c = cloth(u, v, px, px, 1.0, n, seed, look, head, uCol, 1.0, normalize(vec3(-0.58, 0.22, 0.78)), 0.66, vec3(0.0, 0.0, 1.0), 0.0, 0.60);',
     '  float edge = smoothstep(0.0, 0.10, u) * smoothstep(0.0, 0.10, front / w - u);',        // the returns at the two sides turn away from the light
     '  c.rgb *= 0.86 + 0.14 * edge;',
     '  c.rgb = mix(c.rgb, vec3(1.0), clamp((max(c.r, max(c.g, c.b)) - 1.0) * 1.4, 0.0, 1.0) * 0.6);',
@@ -2789,39 +2737,59 @@ var GLX = (function () {
     '}'
   ].join('\n');
 
-  /* The window. Everything is measured in the picture: x and y from 0 to 1, y downwards. */
+  /* The room. Everything is measured in the room: x and y from 0 to 1, y downwards. The camera says which part of the
+     room the picture shows. Two fabrics can hang at once: the new one runs down the cloth over the old one. */
   var SCENE = COMMON + '\n' + [
     'uniform vec2 uRes; uniform float uT;',
+    'uniform vec4 uCam;',        // the middle of the picture in the room, how close the eye is, device points per page point
     'uniform vec4 uWin;',        // the glass: x0, y0, x1, y1
     'uniform vec4 uHang;',       // where the curtains hang: x0, x1, y of the rail, y of the hem
     'uniform vec2 uEdge;',       // the leading edge of the left and of the right curtain
-    'uniform vec4 uFold;',       // folds in the left and in the right curtain, and how deep each stands
-    'uniform float uSheerN;',    // folds in the sheer
+    'uniform vec4 uFoldA; uniform vec4 uFoldB;',  // folds left and right for the fabric that hangs (A) and the one coming (B); in A also how deep the folds stand, left and right
+    'uniform vec4 uSpec;',       // look and heading of A, look and heading of B
+    'uniform vec3 uDrapeA; uniform vec3 uDrapeB; uniform float uWipe;',
+    'uniform vec3 uSheer; uniform vec2 uSheerN;',  // the sheer behind: colour, folds, how much of it is there (0 to 1)
     'uniform vec4 uSun;',        // x, y, strength of the daylight, night (0 to 1)
     'uniform vec3 uSky0; uniform vec3 uSky1; uniform vec3 uGlow;',
-    'uniform vec3 uDrape; uniform vec3 uSheer; uniform vec3 uWall; uniform vec3 uFloor;',
-    'uniform vec4 uRoom;',       // y where the floor begins, light in the room, drape look, drape heading
-    'uniform vec4 uOpt;',        // sheer (0 or 1), wind, shade at the top, shade at the bottom
-    'uniform vec4 uPel;',        // a pelmet across the top: its height, its colour
-    'vec3 outside(vec2 uv, float soft) {',                                                      // what stands behind the glass
+    'uniform vec3 uWall; uniform vec3 uFloor;',
+    'uniform vec4 uRoom;',       // y where the floor begins, light in the room, kind of rail (0 none, 1 track, 2 pole, 3 motorised track), -
+    'uniform vec4 uOpt;',        // wind, shade at the top, shade at the bottom, light on the cloth from the room side (0 to 1): where a fabric is being chosen it is shown in its true colour
+    'uniform vec4 uPel;',        // a pelmet across the top of the picture: its height, its colour
+    'uniform vec4 uLamp;',       // a lamp in the room: x, y, strength, reach
+    'vec3 outside(vec2 uv, float soft, float asp) {',                                           // what stands behind the glass
     '  float wy = clamp((uv.y - uWin.y) / (uWin.w - uWin.y), 0.0, 1.0), wx = (uv.x - uWin.x) / (uWin.z - uWin.x);',
     '  vec3 sky = mix(uSky0, uSky1, smoothstep(0.0, 0.9, wy));',
-    '  float asp = uRes.x / uRes.y;',
     '  vec2 ds = vec2((uv.x - uSun.x) * asp, uv.y - uSun.y);',
     '  float r = length(ds);',
-    '  sky += uGlow * uSun.z * (0.50 * exp(-r * r / 0.010) + 0.30 * exp(-r * r / 0.12) + 0.14 * exp(-r / 0.6));',
+    '  sky += uGlow * uSun.z * (0.50 * exp(-r * r / 0.010) + (0.30 * exp(-r * r / 0.12) + 0.14 * exp(-r / 0.6)) * (0.18 + 0.82 * soft));',
+    '  if (uSun.w > 0.02) {',                                                                   // night: a moon and a few stars
+    '    vec2 dm = vec2((wx - 0.70) * (uWin.z - uWin.x) * asp, (wy - 0.20) * (uWin.w - uWin.y));',
+    '    float rm = length(dm);',
+    '    sky += uSun.w * vec3(0.95, 0.94, 0.86) * (smoothstep(0.022 + soft * 0.02, 0.018, rm) + 0.22 * exp(-rm / 0.07));',
+    '    vec2 sg = floor(vec2(wx * (uWin.z - uWin.x) * asp, wy * (uWin.w - uWin.y)) * 160.0);',
+    '    sky += uSun.w * (1.0 - soft * 0.7) * step(0.9972, h21(sg)) * 0.7;',
+    '  }',
     '  float ridge = 0.72 + 0.10 * (vn(vec2(wx * 2.3 + 1.7, 0.3)) - 0.5) + 0.035 * (vn(vec2(wx * 9.0, 2.0)) - 0.5) - 0.07 * exp(-(wx - 0.62) * (wx - 0.62) / 0.05);',
     '  float hill = smoothstep(ridge - 0.006 - soft * 0.03, ridge + 0.006 + soft * 0.03, wy);',  // a mountain behind the town, pale in the haze
-    '  vec3 haze = mix(sky, uSky1 * (0.93 - 0.3 * uSun.w), 0.42 + 0.14 * smoothstep(ridge, 1.0, wy));',
+    '  vec3 haze = mix(sky, uSky1 * (0.93 - 0.55 * uSun.w), 0.42 + 0.14 * smoothstep(ridge, 1.0, wy) + 0.3 * uSun.w);',
     '  sky = mix(sky, haze, hill);',
     '  float bw = (0.011 + soft * 0.010) / asp;',                                                // two bars divide the glass
     '  float bar = (1.0 - smoothstep(bw * 0.5, bw, abs(wx - 0.333) * (uWin.z - uWin.x))) + (1.0 - smoothstep(bw * 0.5, bw, abs(wx - 0.667) * (uWin.z - uWin.x)));',
     '  sky = mix(sky, sky * 0.36 + 0.10, clamp(bar, 0.0, 1.0) * (0.9 - soft * 0.25));',
     '  return sky;',
     '}',
+    // one of the two heavy curtains in one fabric; behind: what it hangs in front of, for a sheer hung as the curtain
+    'vec4 drape(float u, float v, vec2 px, vec2 cpx, float n, float seed, float look, float head, vec3 base, float deep, float side, float lightE, float amb, float lum, vec3 behind, float inWin) {',
+    '  vec4 c = cloth(u, v, px, cpx, uCam.z, n, seed, look, head, base, deep, normalize(vec3(side * 0.45, 0.25, 0.85)), 0.10 + 0.34 * amb + 0.34 * uOpt.w, normalize(vec3(-side, 0.1, 0.42)), lum * lightE * 0.95, 0.30 + 0.30 * amb + 0.17 * uOpt.w);',
+    '  if (look > 3.5 && look < 4.5) { float bl = dot(behind, vec3(0.3, 0.55, 0.15)); c.rgb = base * (0.60 + 0.34 * amb + 0.22 * bl * inWin) * (1.0 - 0.14 * c.a); c.a = 0.20 + 0.62 * c.a; }',
+    '  return c;',
+    '}',
     'void main() {',
     '  vec2 px = vec2(gl_FragCoord.x, uRes.y - gl_FragCoord.y);',
-    '  vec2 uv = px / uRes; float asp = uRes.x / uRes.y;',
+    '  vec2 suv = px / uRes; float asp = uRes.x / uRes.y, Z = uCam.z;',
+    '  vec2 uv = uCam.xy + (suv - 0.5) / Z;',
+    '  vec2 cpx = uv * uRes / uCam.w;',                                                         // the room in page points: what is painted on the cloth grows with the picture
+    '  float aa = 1.5 / (uRes.x * Z);',
     '  float floorY = uRoom.x, amb = uRoom.y, day = uSun.z, night = uSun.w;',
     '  float inWin = step(uWin.x, uv.x) * step(uv.x, uWin.z) * step(uWin.y, uv.y) * step(uv.y, uWin.w);',
     '  float gapC = (uEdge.x + uEdge.y) * 0.5, gapW = max(0.0, uEdge.y - uEdge.x);',
@@ -2829,10 +2797,10 @@ var GLX = (function () {
     // the wall, lit from the window
     '  float dwx = max(max(uWin.x - uv.x, uv.x - uWin.z), 0.0) * asp, dwy = max(max(uWin.y - uv.y, uv.y - uWin.w), 0.0);',
     '  float dw = length(vec2(dwx, dwy));',
-    '  vec3 col = uWall * (amb * 0.92 + 0.30 * lum * exp(-dw / 0.34)) + uGlow * uWall * 0.10 * lum * exp(-dw / 0.12);',
-    '  col *= 1.0 + (h21(px) - 0.5) * 0.018;',
+    '  vec3 col = uWall * (amb * 1.22 + 0.20 * lum * exp(-dw / 0.34)) + uGlow * uWall * 0.08 * lum * exp(-dw / 0.12);',
+    '  col *= 1.0 + (h21(floor(cpx)) - 0.5) * 0.018;',
     '  if (inWin > 0.5) {',
-    '    col = outside(uv, 0.0);',
+    '    col = outside(uv, 0.0, asp);',
     '    float fr = 0.010;',                                                                    // the frame of the window
     '    float fx = min(uv.x - uWin.x, uWin.z - uv.x) * asp, fy = min(uv.y - uWin.y, uWin.w - uv.y);',
     '    col = mix(col, vec3(0.93, 0.92, 0.88) * (amb * 0.8 + 0.25), 1.0 - smoothstep(fr * 0.8, fr, min(fx, fy)));',
@@ -2840,27 +2808,30 @@ var GLX = (function () {
     // the sheer, full width behind the curtains
     '  float hx0 = uHang.x, hx1 = uHang.y, railY = uHang.z, hemY = uHang.w;',
     '  float inHang = step(hx0, uv.x) * step(uv.x, hx1);',
-    '  if (uOpt.x > 0.5 && inHang > 0.5 && uv.y > railY) {',
+    '  if (uSheerN.y > 0.01 && inHang > 0.5 && uv.y > railY) {',
     '    float v = clamp((uv.y - railY) / (hemY - railY), 0.0, 1.0);',
-    '    float wind = uOpt.y * v * v * (0.012 * sin(uT * 0.55 + uv.x * 5.0) + 0.006 * sin(uT * 0.93 + uv.x * 11.0 + 1.3));',
+    '    float wind = uOpt.x * v * v * (0.012 * sin(uT * 0.55 + uv.x * 5.0) + 0.006 * sin(uT * 0.93 + uv.x * 11.0 + 1.3));',
     '    float u = (uv.x + wind - hx0) / (hx1 - hx0);',
-    '    float sn = uSheerN;',
+    '    float sn = uSheerN.x;',
     '    float zh = prof(phase(u, 1.0, sn, 3.0), 1.0, 0.0);',
-    '    float hem = hemY - 0.012 + 0.004 * zh;',
-    '    if (uv.y < hem) {',
-    '      vec3 back = inWin > 0.5 ? outside(uv, 1.0) : col;',
-    '      vec4 c = cloth(u, v, px, sn, 3.0, 4.0, 0.0, uSheer, 0.8, normalize(vec3(-0.3, 0.2, 0.9)), amb * 0.55, vec3(0.0, 0.0, 1.0), 0.0, 0.42 + 0.3 * amb);',
+    '    float hem = hemY - 0.012 + 0.0012 * zh;',
+    '    float sm = smoothstep(0.0, 2.0 / (uRes.y * Z), hem - uv.y) * uSheerN.y;',
+    '    if (sm > 0.0) {',
+    '      vec3 was = col;',
+    '      vec3 back = inWin > 0.5 ? outside(uv, 1.0, asp) : col;',
+    '      vec4 c = cloth(u, v, px, cpx, Z, sn, 3.0, 4.0, 0.0, uSheer, 0.8, normalize(vec3(-0.3, 0.2, 0.9)), amb * 0.55, vec3(0.0, 0.0, 1.0), 0.0, 0.42 + 0.3 * amb);',
     '      float dens = clamp(c.a, 0.0, 1.0);',                                                 // thin where it faces the eye, denser where it turns away
     '      float backLum = dot(back, vec3(0.3, 0.55, 0.15));',
     '      vec3 own = uSheer * (inWin > 0.5 ? 0.50 + 0.50 * backLum : 0.55 + 0.45 * amb) * (1.0 - 0.16 * dens);',   // the cloth itself, lit from behind
     '      col = mix(back * mix(vec3(1.0), uSheer, 0.25), own, 0.05 + 0.44 * dens);',
     '      col *= 1.0 - 0.10 * smoothstep(hem - 0.03, hem, uv.y);',                             // the turned-up hem
+    '      col = mix(was, col, sm);',
     '    }',
     '  }',
     // the floor: the light of the gap lies on it
     '  if (uv.y > floorY) {',
     '    float d = (uv.y - floorY) / max(0.0001, 1.0 - floorY);',
-    '    vec3 fl = uFloor * (amb * 0.60 + 0.08) * (1.0 + (vn(vec2(px.x * 0.02, px.y * 0.6)) - 0.5) * 0.08);',
+    '    vec3 fl = uFloor * (amb * 0.60 + 0.08) * (1.0 + (vn(vec2(cpx.x * 0.02, cpx.y * 0.6)) - 0.5) * 0.08);',
     '    float lean = (gapC - uSun.x) * 1.4;',
     '    float half_ = gapW * 0.5 * (1.0 + 0.9 * d) + 0.02 + 0.10 * d;',
     '    float pool = (1.0 - smoothstep(half_ * 0.7, half_ + 0.03 + 0.10 * d, abs(uv.x - gapC - lean * d))) * (1.0 - 0.5 * d);',
@@ -2874,43 +2845,92 @@ var GLX = (function () {
     '  float edge = side < 0.0 ? uEdge.x : uEdge.y;',
     '  float anchor = side < 0.0 ? hx0 : hx1;',
     '  float wNow = abs(edge - anchor);',
+    '  float kind = uRoom.z;',
     '  if (wNow > 0.002 && uv.y > railY - 0.02) {',
     '    float v = clamp((uv.y - railY) / (hemY - railY), 0.0, 1.0);',
-    '    float n = side < 0.0 ? uFold.x : uFold.y;',
-    '    float sway = uOpt.y * 0.0018 * v * sin(uT * 0.37 + side * 1.3);',
-    '    float flare = 0.0055 * v * v / asp;',                                                         // gathered at the rail, a little wider at the hem
+    '    float sway = uOpt.x * 0.0018 * v * sin(uT * 0.37 + side * 1.3);',
+    '    float flare = 0.0055 * v * v / asp;',                                                   // gathered at the rail, a little wider at the hem
     '    float e2 = edge - side * (flare + 0.0013 / asp * sin(v * 9.0 + side * 2.0)) + sway;',
     '    float u = side < 0.0 ? (uv.x - anchor) / (e2 - anchor) : (anchor - uv.x) / (anchor - e2);',
     '    float seed = side < 0.0 ? 5.0 : 11.0;',
-    '    float z1 = prof(phase(clamp(u, 0.0, 1.0), 1.0, n, seed), 1.0, uRoom.w);',
+    '    float nA = side < 0.0 ? uFoldA.x : uFoldA.y, nB = side < 0.0 ? uFoldB.x : uFoldB.y, deep = side < 0.0 ? uFoldA.z : uFoldA.w;',
+    '    float line = uWipe * 1.16 - 0.08;',                                                    // the new fabric runs down the cloth; above the line it has arrived
+    '    float mB = smoothstep(line + 0.05, line - 0.05, v);',
+    '    float headH = uWipe > 0.5 ? uSpec.w : uSpec.y, nH = uWipe > 0.5 ? nB : nA;',
+    '    float z1 = prof(phase(clamp(u, 0.0, 1.0), 1.0, nH, seed), 1.0, headH);',
     '    float hem = hemY + 0.0022 * z1;',
     '    float inside = side < 0.0 ? e2 - uv.x : uv.x - e2;',                                   // > 0 on the cloth
-    '    float aa = 1.5 / uRes.x;',
-    '    float m = smoothstep(-aa, aa, inside) * smoothstep(-aa, aa, hem - uv.y) * step(hx0 - 0.3, uv.x);',
-    '    float shd = (1.0 - smoothstep(0.0, 0.05 / asp + 0.012, -inside)) * step(inside, 0.0) * step(uv.y, hem);', // its shadow on what hangs behind
+    '    float top = railY + (kind > 1.5 && kind < 2.5 ? -0.012 : 0.0);',                       // on a pole the cloth stands a little above the rod
+    '    float m = smoothstep(-aa, aa, inside) * smoothstep(-aa, aa, hem - uv.y) * smoothstep(-aa, aa, uv.y - top) * step(hx0 - 0.3, uv.x);',
+    '    float shd = (1.0 - smoothstep(0.0, 0.05 / asp + 0.012, -inside)) * step(inside, 0.0) * step(uv.y, hem) * step(top, uv.y);', // its shadow on what hangs behind
     '    col *= 1.0 - 0.34 * shd;',
     '    if (m > 0.0) {',
-    '      float nearE = exp(-abs(inside) * asp / 0.075);',                                       // daylight wraps round the leading edge
-    '      vec3 L2 = normalize(vec3(-side, 0.1, 0.42));',
-    '      vec4 c = cloth(u, v, px, n, seed, uRoom.z, uRoom.w, uDrape, side < 0.0 ? uFold.z : uFold.w,',
-    '        normalize(vec3(side * 0.45, 0.25, 0.85)), 0.10 + 0.34 * amb, L2, lum * nearE * 0.95, 0.30 + 0.30 * amb);',
-    '      c.rgb += uGlow * uDrape * lum * 0.28 * exp(-abs(inside) * asp / 0.02);',
+    '      float nearE = exp(-abs(inside) * asp / 0.075);',                                     // daylight wraps round the leading edge
+    '      vec4 c;',
+    '      if (mB <= 0.0) c = drape(u, v, px, cpx, nA, seed, uSpec.x, uSpec.y, uDrapeA, deep, side, nearE, amb, lum, col, inWin);',
+    '      else if (mB >= 1.0) c = drape(u, v, px, cpx, nB, seed, uSpec.z, uSpec.w, uDrapeB, deep, side, nearE, amb, lum, col, inWin);',
+    '      else c = mix(drape(u, v, px, cpx, nA, seed, uSpec.x, uSpec.y, uDrapeA, deep, side, nearE, amb, lum, col, inWin), drape(u, v, px, cpx, nB, seed, uSpec.z, uSpec.w, uDrapeB, deep, side, nearE, amb, lum, col, inWin), mB);',
+    '      vec3 baseNow = mix(uDrapeA, uDrapeB, mB);',
+    '      c.rgb += uGlow * baseNow * lum * 0.28 * exp(-abs(inside) * asp / 0.02) * c.a;',
     '      c.rgb *= 1.0 - 0.22 * smoothstep(hem - 0.035, hem, uv.y);',
-    '      col = mix(col, c.rgb, m);',
+    '      float headNow = mB > 0.5 ? uSpec.w : uSpec.y, nNow = mB > 0.5 ? nB : nA;',
+    '      if (headNow > 2.5) {',                                                               // eyelets: a metal ring where each fold comes forward
+    '        float ph = phase(u, v, nNow, seed);',
+    '        float dph = abs(mod(ph, 6.2832) - 3.14159);',
+    '        float R = min(0.0125, 0.30 * wNow * asp / nNow);',
+    '        vec2 dr = vec2(dph / (6.2832 * nNow) * wNow * asp, uv.y - (railY + 0.030));',
+    '        float rr = length(dr) / R;',
+    '        vec3 steel = vec3(0.70, 0.69, 0.66) * (amb * 0.9 + 0.3);',
+    '        c.rgb = mix(c.rgb, steel * 0.55 * (1.0 - 0.5 * abs(dr.y) / R), smoothstep(0.60, 0.52, rr));',     // the rod, seen through the hole
+    '        c.rgb = mix(c.rgb, steel * (1.0 - 0.45 * dr.y / R), smoothstep(1.0, 0.92, rr) * smoothstep(0.52, 0.60, rr));',
+    '      } else if (headNow > 0.5 && headNow < 1.5) {',                                       // pinch pleats: sewn together a hand below the top
+    '        float tack = smoothstep(0.004, 0.0, abs(uv.y - (railY + 0.045))) * smoothstep(0.55, 0.95, 0.5 - 0.5 * cos(phase(u, v, nNow, seed)));',
+    '        c.rgb *= 1.0 - 0.35 * tack;',
+    '        c.rgb *= 1.0 - 0.10 * smoothstep(railY + 0.05, railY, uv.y);',
+    '      } else if (headNow > 1.5) {',                                                        // pencil pleats: a gathered band
+    '        c.rgb *= 1.0 - 0.14 * smoothstep(railY + 0.034, railY + 0.030, uv.y) * (0.7 + 0.3 * sin(cpx.x * 2.2));',
+    '      }',
+    '      col = mix(col, c.rgb, m * c.a);',
     '    }',
     '    float under = step(hem, uv.y) * exp(-(uv.y - hem) / 0.03) * smoothstep(-0.02, 0.03, inside);',
     '    col *= 1.0 - 0.42 * under;',
+    '  }',
+    // the rail the curtains run on
+    '  if (kind > 0.5 && uv.x > hx0 - 0.06 && uv.x < hx1 + 0.06) {',
+    '    vec3 metal = vec3(0.80, 0.80, 0.77) * (amb * 0.85 + 0.30);',
+    '    if (kind > 1.5 && kind < 2.5) {',                                                      // a pole with a ball at each end
+    '      float ry = railY + 0.030, rad = 0.0075;',
+    '      float dy = (uv.y - ry) / rad;',
+    '      float rod = smoothstep(1.0, 0.86, abs(dy)) * step(hx0 - 0.03, uv.x) * step(uv.x, hx1 + 0.03);',
+    '      float onCloth = step(hx0, uv.x) * step(uv.x, uEdge.x) + step(uEdge.y, uv.x) * step(uv.x, hx1);',  // where cloth hangs the rod runs behind it, and shows through the rings only
+    '      col = mix(col, metal * (0.72 + 0.5 * (1.0 - dy) * 0.5), rod * (1.0 - onCloth));',
+    '      float b0 = length(vec2((uv.x - (hx0 - 0.03)) * asp, uv.y - ry)), b1 = length(vec2((uv.x - (hx1 + 0.03)) * asp, uv.y - ry));',
+    '      float ball = smoothstep(0.0135, 0.0125, min(b0, b1));',
+    '      col = mix(col, metal * (0.8 + 0.3 * (ry - uv.y) / 0.013), ball);',
+    '    } else {',                                                                             // a track: a slim profile at the top, the cloth runs just under it
+    '      float ty = (uv.y - (railY - 0.011)) / 0.011;',
+    '      float bar = step(0.0, ty) * step(ty, 1.0) * step(hx0 - 0.012, uv.x) * step(uv.x, hx1 + 0.012);',
+    '      col = mix(col, metal * (0.90 - 0.30 * ty) * (1.0 - 0.5 * smoothstep(0.86, 1.0, ty)), bar);',
+    '      col *= 1.0 - 0.22 * step(1.0, ty) * exp(-(ty - 1.0) / 0.7) * inHang;',
+    '      if (kind > 2.5) {',                                                                  // the motor at one end
+    '        vec2 q = vec2((uv.x - (hx0 + 0.012)) * asp, uv.y - (railY + 0.016));',
+    '        float box = step(abs(q.x), 0.016) * step(abs(q.y), 0.027);',
+    '        col = mix(col, metal * (0.92 - 6.0 * q.x), box);',
+    '        col = mix(col, vec3(0.35, 0.9, 0.55), smoothstep(0.0032, 0.0022, length(q - vec2(0.0, 0.016))));',
+    '      }',
+    '    }',
     '  }',
     // the air: light hangs in it where it comes through the gap
     '  float beamX = abs(uv.x - gapC - (gapC - uSun.x) * 0.5 * max(0.0, uv.y - 0.2)) - gapW * 0.5;',
     '  float beam = (1.0 - smoothstep(-0.02, 0.22, beamX)) * smoothstep(0.05, 0.6, uv.y) * smoothstep(0.0, 0.1, gapW);',
     '  col += uGlow * 0.085 * day * beam * (0.7 + 0.3 * vn(vec2(uv.x * 30.0 - uv.y * 6.0, uT * 0.05)));',
-    '  col *= 1.0 - uOpt.z * (1.0 - smoothstep(0.0, 0.22, uv.y));',                             // room for the words on it
-    '  col *= 1.0 - uOpt.w * smoothstep(0.42, 1.0, uv.y);',
+    '  if (uLamp.z > 0.0) { vec2 dl = vec2((uv.x - uLamp.x) * asp, uv.y - uLamp.y); col += col * vec3(1.0, 0.72, 0.42) * uLamp.z * (1.0 - inWin * 0.7) * exp(-dot(dl, dl) / (uLamp.w * uLamp.w)); }',
+    '  col *= 1.0 - uOpt.y * (1.0 - smoothstep(0.0, 0.22, suv.y));',                            // room for the words on it
+    '  col *= 1.0 - uOpt.z * smoothstep(0.42, 1.0, suv.y);',
     '  vec3 over = max(col - 0.8, 0.0);',                                                      // bright light rolls off instead of clipping
     '  col = min(col, 0.8) + over / (1.0 + 2.6 * over);',
     '  if (uPel.x > 0.0) {',                                                                   // the board the rail hides behind; the top bar stands on it
-    '    float pd = uv.y - uPel.x;',
+    '    float pd = suv.y - uPel.x;',
     '    col *= 1.0 - 0.5 * exp(-max(pd, 0.0) / 0.03);',
     '    col = mix(col, uPel.yzw, 1.0 - smoothstep(-1.5 / uRes.y, 0.0, pd));',
     '  }',
@@ -2944,7 +2964,7 @@ var GLX = (function () {
   }
   function rgb(hex) { var n = parseInt(String(hex).replace('#', ''), 16); return [(n >> 16 & 255) / 255, (n >> 8 & 255) / 255, (n & 255) / 255]; }
 
-  var LOOK = { matt: 0, linen: 1, satin: 2, velvet: 3, sheer: 4, pattern: 5 }, HEAD = { wave: 0, pinch: 1, pencil: 2, eyelet: 3 };
+  var LOOK = { matt: 0, linen: 1, satin: 2, velvet: 3, sheer: 4, pattern: 5 }, HEAD = { wave: 0, pinch: 1, pencil: 2, eyelet: 3 }, RAIL = { track: 1, pole: 2, motor: 3 };
   var off = null, dead = false, forced = false;
   try { forced = /[?&]gl=0\b/.test(location.search) || window.PN_NOGL === true; } catch (e) { forced = false; }
 
@@ -2995,17 +3015,22 @@ var GLX = (function () {
       draw: function (s) {
         if (lost) return false;
         gl.viewport(0, 0, cv.width, cv.height); gl.useProgram(p.pr);
+        var cam = s.cam || [0.5, 0.5, 1], A = s.a, B = s.b || s.a, sides = function (o) { return o.folds; };
         gl.uniform2f(p.u('uRes'), cv.width, cv.height); gl.uniform1f(p.u('uT'), s.time || 0);
+        gl.uniform4f(p.u('uCam'), cam[0], cam[1], cam[2], s.ratio || 1);
         gl.uniform4f(p.u('uWin'), s.win[0], s.win[1], s.win[2], s.win[3]);
         gl.uniform4f(p.u('uHang'), s.hang[0], s.hang[1], s.hang[2], s.hang[3]);
         gl.uniform2f(p.u('uEdge'), s.edge[0], s.edge[1]);
-        gl.uniform4f(p.u('uFold'), s.folds[0], s.folds[1], s.deep[0], s.deep[1]); gl.uniform1f(p.u('uSheerN'), s.sheerFolds || 24);
+        gl.uniform4f(p.u('uFoldA'), sides(A)[0], sides(A)[1], s.deep[0], s.deep[1]); gl.uniform4f(p.u('uFoldB'), sides(B)[0], sides(B)[1], 0, 0);
+        gl.uniform4f(p.u('uSpec'), LOOK[A.look] === undefined ? 0 : LOOK[A.look], HEAD[A.heading] || 0, LOOK[B.look] === undefined ? 0 : LOOK[B.look], HEAD[B.heading] || 0);
+        v3('uDrapeA', A.color); v3('uDrapeB', B.color); gl.uniform1f(p.u('uWipe'), s.wipe || 0);
+        v3('uSheer', s.sheer); gl.uniform2f(p.u('uSheerN'), s.sheerFolds || 24, s.sheerAmt === undefined ? 1 : s.sheerAmt);
         gl.uniform4f(p.u('uSun'), s.sun[0], s.sun[1], s.day, s.night || 0);
-        v3('uSky0', s.sky0); v3('uSky1', s.sky1); v3('uGlow', s.glow);
-        v3('uDrape', s.drape); v3('uSheer', s.sheer); v3('uWall', s.wall); v3('uFloor', s.floor);
-        gl.uniform4f(p.u('uRoom'), s.floorY, s.amb, LOOK[s.look] === undefined ? 3 : LOOK[s.look], HEAD[s.heading] || 0);
-        gl.uniform4f(p.u('uOpt'), s.hasSheer ? 1 : 0, s.wind || 0, s.shadeTop || 0, s.shadeBottom || 0);
+        v3('uSky0', s.sky0); v3('uSky1', s.sky1); v3('uGlow', s.glow); v3('uWall', s.wall); v3('uFloor', s.floor);
+        gl.uniform4f(p.u('uRoom'), s.floorY, s.amb, RAIL[s.rail] || 0, 0);
+        gl.uniform4f(p.u('uOpt'), s.wind || 0, s.shadeTop || 0, s.shadeBottom || 0, s.fill || 0);
         var pel = s.pelmet || [0, 0, 0, 0]; gl.uniform4f(p.u('uPel'), pel[0], pel[1], pel[2], pel[3]);
+        var lamp = s.lamp || [0, 0, 0, 1]; gl.uniform4f(p.u('uLamp'), lamp[0], lamp[1], lamp[2], lamp[3]);
         gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
         return true;
       }
@@ -3014,17 +3039,16 @@ var GLX = (function () {
 
   return { paint: paint, scene: scene, rgb: rgb, ok: function () { return !!offscreen(); } };
 })();
-/* ---------- Experience layer: living cloth on the display rail, and scenes that follow the scroll ---------- */
-/* The curtains on the rail are drawn once per colour into a sprite and then hung from a short rope model,
-   so they sway when the rail moves, when a pointer brushes them and in a light breeze.
-   Nothing here decides what is shown: the app keeps the state and tells this layer where to go. */
+/* ---------- Experience layer: painted cloth, the live room, and what follows the scroll ---------- */
+/* Small pictures of cloth (the cards, the drawings) are painted once into a canvas; the room of the home page is a
+   live picture on the graphics card. Nothing here decides what is shown: the app keeps the state and describes the scene. */
 var FX = (function () {
   'use strict';
   if (typeof document === 'undefined') return null;
 
   var reduce = false, mq = null;
   try { mq = window.matchMedia('(prefers-reduced-motion: reduce)'); reduce = mq.matches; } catch (e) { /* no media queries */ }
-  if (mq && mq.addEventListener) mq.addEventListener('change', function () { reduce = mq.matches; if (stage) kick(); wins.forEach(function (w) { w.dirty = true; }); wkick(); });
+  if (mq && mq.addEventListener) mq.addEventListener('change', function () { reduce = mq.matches; wins.forEach(function (w) { w.dirty = true; }); wkick(); });
 
   function rgb(hex) { var n = parseInt(String(hex).replace('#', ''), 16); return [n >> 16 & 255, n >> 8 & 255, n & 255]; }
   function mix(a, b, t) { return [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t]; }
@@ -3171,216 +3195,11 @@ var FX = (function () {
     for (var i = 0; i < list.length; i++) { try { dressOne(list[i]); } catch (e) { /* the CSS drawing underneath stays */ } }
   }
 
-  /* ----- the rail: where each curtain hangs, how it swings, and what a pointer does to it ----- */
-  var stage = null, raf = 0, NODES = 10, BANDS = 60, FLARE = 0.05;
-  function kick() { if (!raf && stage) raf = requestAnimationFrame(frame); }
-  function wrap(d, n) { d = mod(d, n); return d >= n / 2 ? d - n : d; }
-
-  function measure(st) {
-    var first = st.slides[0].el, sw = first.offsetWidth, sh = first.offsetHeight;
-    st.sw = sw; st.sh = sh; st.step = sw * (st.view.clientWidth < 600 ? 1.12 : 1.27); // on a phone the neighbours stand closer, so they still show beside a large middle curtain
-     st.dpr = Math.min(2, window.devicePixelRatio || 1);
-    st.metal = getComputedStyle(document.documentElement).getPropertyValue('--metal').trim() || '#8B8D86';
-    var M = Math.round(sw * 0.22), gap = 3, rh = Math.round(sh * 0.16);
-    st.slides.forEach(function (s, i) {
-      s.M = M * st.dpr; s.gap = gap * st.dpr; s.rh = rh * st.dpr;
-      s.cv.style.width = (sw + 2 * M) + 'px'; s.cv.style.height = (sh + gap + rh + 6) + 'px';
-      s.cv.width = Math.round((sw + 2 * M) * st.dpr); s.cv.height = Math.round((sh + gap + rh + 6) * st.dpr);
-      s.sprite = make(st, i); s.sheer = st.spec(i).look === 'sheer'; s.old = null; s.wipe = 1; s.lastX = null; s.vx = 0;
-    });
-  }
-  function make(st, i) {
-    var o = st.spec(i);
-    return sprite({ w: Math.round(st.sw * st.dpr), h: Math.round(st.sh * st.dpr), heading: o.heading, look: o.look, hex: o.hex, back: o.back, metal: st.metal });
-  }
-  function swing(s, dt, ax, time, breeze) { // a rope of nodes from the rail to the hem; returns true while it still moves
-    var N = NODES, j, moved = false, lim = s.lim;
-    for (j = 1; j <= N; j++) {
-      var up = s.x[j - 1], dn = j < N ? s.x[j + 1] : s.x[j], k = j / N;
-      // the breeze comes in gusts that cross the rail from one side, so the curtains do not nod together
-      var gust = breeze ? (36 + 170 * Math.pow(Math.sin(time * 0.19 - s.cx * 0.0016), 2)) * Math.sin(time * 0.9 - s.cx * 0.003 + j * 0.45) * k : 0;
-      var f = 120 * (up - s.x[j]) + 45 * (dn - s.x[j]) - 10 * s.x[j] - 4.4 * s.v[j] - ax * 0.017 * k + gust;
-      s.v[j] += f * dt;
-    }
-    for (j = 1; j <= N; j++) {
-      s.x[j] = clamp(s.x[j] + s.v[j] * dt, -lim, lim);
-      if (Math.abs(s.x[j]) > 0.04 || Math.abs(s.v[j]) > 0.4) moved = true;
-    }
-    return moved;
-  }
-  function draw(st, s) {
-    var ctx = s.ctx, sp = s.sprite, H = sp.cv.height, bh = H / BANDS, base = s.M - sp.pad, b;
-    ctx.clearRect(0, 0, s.cv.width, s.cv.height);
-    for (b = 0; b < BANDS; b++) {
-      var tt = (b + 0.5) / BANDS * NODES, j = Math.floor(tt), fr = tt - j; // a smooth curve through the nodes, so the cloth bends instead of folding at them
-      var p0 = s.x[Math.max(0, j - 1)], p1 = s.x[j], p2 = s.x[Math.min(NODES, j + 1)], p3 = s.x[Math.min(NODES, j + 2)];
-      var off = 0.5 * (2 * p1 + (p2 - p0) * fr + (2 * p0 - 5 * p1 + 4 * p2 - p3) * fr * fr + (3 * p1 - p0 - 3 * p2 + p3) * fr * fr * fr) * st.dpr;
-      var sy = Math.round(b * bh), hh = Math.round((b + 1) * bh) - sy; // whole rows, no overlap: a sheer drawn twice would show a seam
-      var wd = sp.cv.width * (1 + FLARE * (b + 0.5) / BANDS), dx = base + off - (wd - sp.cv.width) / 2; // gathered at the heading, a little wider at the hem
-      var mixn = s.wipe < 1 && s.old ? clamp((s.wipe * 1.12 - (b + 0.5) / BANDS) / 0.12, 0, 1) : 1; // a new colour runs down the cloth, soft at its front
-      if (s.sheer && mixn < 1) mixn = mixn > 0.5 ? 1 : 0; // a sheer drawn twice would double its density, so its front stays sharp
-      if (mixn < 1) ctx.drawImage(s.old.cv, 0, sy, s.old.cv.width, hh, dx, sy, wd, hh);
-      if (mixn > 0) { ctx.globalAlpha = mixn; ctx.drawImage(sp.cv, 0, sy, sp.cv.width, hh, dx, sy, wd, hh); ctx.globalAlpha = 1; }
-    }
-    var offB = s.x[NODES] * st.dpr; // the floor shows the hem faintly, fading away from it
-    ctx.save(); ctx.globalAlpha = 0.13; ctx.translate(0, 2 * H + s.gap); ctx.scale(1, -1);
-    ctx.drawImage(sp.cv, 0, H - s.rh, sp.cv.width, s.rh, base + offB - sp.cv.width * FLARE / 2, H - s.rh, sp.cv.width * (1 + FLARE), s.rh); ctx.restore();
-    var g = ctx.createLinearGradient(0, H + s.gap, 0, H + s.gap + s.rh);
-    g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(1, 'rgba(0,0,0,1)');
-    ctx.globalCompositeOperation = 'destination-out'; ctx.fillStyle = g; ctx.fillRect(0, H + s.gap, s.cv.width, s.rh + 8); ctx.globalCompositeOperation = 'source-over';
-  }
-  function word(st, dt) {
-    var box = st.wordBox, tr = box ? box.firstElementChild : null; if (!tr) return;
-    if (tr !== st.track) { st.track = tr; st.half = tr.scrollWidth / 2; }
-    if (reduce || st.half < 10) { if (tr.style.transform) tr.style.transform = ''; return; }
-    st.drift += 26 * dt;
-    tr.style.transform = 'translate3d(' + (-mod(st.drift + st.pos * st.step * 0.42, st.half)).toFixed(1) + 'px,0,0)';
-  }
-  function frame(now) {
-    raf = 0; if (!stage) return;
-    var st = stage, dt = clamp((now - st.last) / 1000 || 0.016, 0.001, 0.034); st.last = now; st.time += dt;
-    if (!st.drag) {
-      if (reduce) { st.pos = st.target; st.vel = 0; }
-      else {
-        st.vel += (70 * (st.target - st.pos) - 15 * st.vel) * dt; st.pos += st.vel * dt;
-        if (Math.abs(st.target - st.pos) < 0.0006 && Math.abs(st.vel) < 0.003) { st.pos = st.target; st.vel = 0; }
-      }
-    }
-    var active = st.drag || st.pos !== st.target, breeze = !reduce && st.onScreen, n = st.slides.length;
-    st.slides.forEach(function (s, i) {
-      var d = wrap(i - st.pos, n), ad = Math.abs(d), x = d * st.step, vis = ad < 2.7;
-      if (vis !== s.vis) { s.el.style.visibility = vis ? 'visible' : 'hidden'; s.vis = vis; }
-      if (!vis) { s.lastX = null; return; }
-      s.el.style.transform = 'translate3d(' + x.toFixed(2) + 'px,0,0) scale(' + (1 - 0.1 * Math.min(1, ad)).toFixed(4) + ')';
-      s.el.style.opacity = ad > 2.1 ? Math.max(0, (2.7 - ad) / 0.6).toFixed(3) : '1';
-      var vx = s.lastX === null || Math.abs(x - s.lastX) > st.step * 1.5 ? 0 : (x - s.lastX) / dt, ax = (vx - s.vx) / dt;
-      s.vx = vx; s.lastX = x; s.cx = x;
-      if (reduce) { for (var j = 0; j <= NODES; j++) { s.x[j] = 0; s.v[j] = 0; } }
-      else if (swing(s, dt, clamp(ax, -60000, 60000), st.time, breeze)) active = true;
-      if (s.wipe < 1) { s.wipe = reduce ? 1 : Math.min(1, s.wipe + dt / 0.7); active = true; }
-      draw(st, s);
-    });
-    word(st, dt);
-    if (active || breeze) kick();
-  }
-
-  function pointerHandlers(st) {
-    var view = st.view, down = null, lastT = 0, lastX = 0, pv = 0, fingers = 0, light = view.querySelector('.stage-light'), cur = view.querySelector('.stage-cursor');
-    function slideAt(ev) { var el = ev.target && ev.target.closest ? ev.target.closest('.slide') : null; return el ? Number(el.getAttribute('data-i')) : -1; }
-    function onDown(ev) {
-      if (ev.target && ev.target.closest && ev.target.closest('button')) return; // the arrows under the curtain are not the rail
-      fingers++;
-      if (fingers > 1 || (ev.pointerType === 'mouse' && ev.button !== 0)) { cancel(); return; }
-      down = { id: ev.pointerId, x: ev.clientX, y: ev.clientY, pos: st.pos, moved: false, at: slideAt(ev) };
-      lastT = ev.timeStamp; lastX = ev.clientX; pv = 0;
-    }
-    function onMove(ev) {
-      var r = view.getBoundingClientRect();
-      if (ev.pointerType === 'mouse') { // the light and the hand follow the pointer
-        if (light) { light.style.setProperty('--lx', ((ev.clientX - r.left) / r.width * 100).toFixed(1) + '%'); light.style.setProperty('--ly', ((ev.clientY - r.top) / r.height * 100).toFixed(1) + '%'); }
-        if (cur) { cur.style.transform = 'translate3d(' + (ev.clientX - r.left).toFixed(0) + 'px,' + (ev.clientY - r.top).toFixed(0) + 'px,0)'; cur.classList.toggle('on', !(ev.target && ev.target.closest && ev.target.closest('.stage-nav'))); }
-      }
-      var dtm = Math.max(1, ev.timeStamp - lastT), vx = (ev.clientX - lastX) / dtm * 1000; lastT = ev.timeStamp; lastX = ev.clientX;
-      if (down && ev.pointerType === 'mouse' && ev.buttons === 0) { fingers = 0; cancel(); } // the button was let go where this layer could not see it
-      if (!down) { // a pointer passing over a curtain brushes it
-        if (ev.pointerType === 'mouse' && !reduce) {
-          var px = ev.clientX - r.left - r.width / 2, py = ev.clientY - r.top - st.slides[0].el.offsetTop;
-          st.slides.forEach(function (s) {
-            if (!s.vis || Math.abs(px - s.cx) > st.sw / 2 || py < 0 || py > st.sh) return;
-            var j = clamp(Math.round(py / st.sh * NODES), 1, NODES), push = clamp(vx, -1800, 1800) * 0.03;
-            for (var q = Math.max(1, j - 1); q <= Math.min(NODES, j + 1); q++) s.v[q] += push;
-          });
-          kick();
-        }
-        return;
-      }
-      if (ev.pointerId !== down.id) return;
-      var dx = ev.clientX - down.x, dy = ev.clientY - down.y;
-      if (!down.moved) {
-        if (Math.abs(dx) < 8 || Math.abs(dx) < 1.2 * Math.abs(dy)) return;
-        down.moved = true; st.drag = true; view.classList.add('is-drag');
-        try { view.setPointerCapture(down.id); } catch (e) { /* capture is a convenience */ }
-      }
-      pv = pv * 0.6 + vx * 0.4;
-      st.pos = down.pos - dx / st.step; st.vel = 0; kick();
-    }
-    function onUp(ev) {
-      fingers = Math.max(0, fingers - 1);
-      if (!down || ev.pointerId !== down.id) return;
-      var d = down; down = null;
-      if (d.moved) {
-        st.drag = false; view.classList.remove('is-drag');
-        var from = Math.round(d.pos), pulled = st.pos - d.pos, to = Math.round(st.pos - clamp(pv / st.step * 0.16, -1.2, 1.2));
-        st.target = to === from && Math.abs(pulled) > 0.18 ? from + (pulled > 0 ? 1 : -1) : to; // a clear pull moves one on even when it is slow
-        st.pick(mod(st.target, st.slides.length)); kick();
-      } else if (d.at >= 0 && ev.type === 'pointerup' && view.contains(ev.target)) { // a plain click on a curtain brings it to the middle
-        if (d.at !== mod(Math.round(st.target), st.slides.length)) { api.go(d.at); st.pick(d.at); }
-      }
-    }
-    function cancel() {
-      if (down && down.moved) { st.drag = false; view.classList.remove('is-drag'); st.target = Math.round(st.pos); st.pick(mod(st.target, st.slides.length)); kick(); }
-      down = null;
-    }
-    function onCancel() { fingers = Math.max(0, fingers - 1); cancel(); }
-    function onLeave() { if (cur) cur.classList.remove('on'); if (light) { light.style.setProperty('--lx', '50%'); light.style.setProperty('--ly', '30%'); } }
-    function onBlur() { fingers = 0; cancel(); }
-    view.addEventListener('pointerdown', onDown); view.addEventListener('pointermove', onMove); view.addEventListener('pointerleave', onLeave);
-    // a press can end anywhere on the page, or outside the window
-    window.addEventListener('pointerup', onUp); window.addEventListener('pointercancel', onCancel); window.addEventListener('blur', onBlur);
-    st.off = function () { window.removeEventListener('pointerup', onUp); window.removeEventListener('pointercancel', onCancel); window.removeEventListener('blur', onBlur); };
-    view.addEventListener('dragstart', function (ev) { ev.preventDefault(); });
-  }
-
-  var api = {
-    // view: the stage element; index: the curtain in the middle; spec(i): how curtain i looks; pick(i): the user moved the rail to i
-    mount: function (view, index, spec, pick, arrive) {
-      api.unmount();
-      var els = view.querySelectorAll('.slide'); if (!els.length) return false;
-      var probe = els[0].querySelector('canvas'), ok = false;
-      try { ok = !!(probe && probe.getContext && probe.getContext('2d')); } catch (e) { ok = false; }
-      view.classList.toggle('no-canvas', !ok); if (!ok) return false; // the page shows its striped drawing instead
-      var st = stage = { view: view, spec: spec, pick: pick, slides: [], pos: index, target: index, vel: 0, drag: false, last: 0, time: 0, onScreen: true,
-        wordBox: view.querySelector('.stage-word'), track: null, half: 0, drift: 0 };
-      Array.prototype.forEach.call(els, function (el, i) {
-        var cv = el.querySelector('canvas'), x = [], v = [];
-        for (var j = 0; j <= NODES; j++) { x.push(0); v.push(0); }
-        st.slides.push({ el: el, cv: cv, ctx: cv.getContext('2d'), x: x, v: v, phase: i * 1.7, vis: null, lim: 0, cx: 0 });
-      });
-      measure(st); st.slides.forEach(function (s) { s.lim = st.sw * 0.13; });
-      pointerHandlers(st);
-      if (window.IntersectionObserver) {
-        st.io = new IntersectionObserver(function (en) { st.onScreen = en[0].isIntersecting; if (st.onScreen) kick(); });
-        st.io.observe(view);
-      }
-      if (window.ResizeObserver) { // the stage is as tall as the text under it leaves room for
-        var seen = view.clientWidth + 'x' + view.clientHeight;
-        st.ro = new ResizeObserver(function () { var now = view.clientWidth + 'x' + view.clientHeight; if (now !== seen) { seen = now; api.refresh(); } });
-        st.ro.observe(view);
-      }
-      if (arrive && !reduce) st.pos = index + 0.6; // the rail comes to rest in front of the visitor, and the cloth swings once
-      st.last = performance.now(); kick(); return true;
-    },
-    unmount: function () {
-      if (stage) { if (stage.io) stage.io.disconnect(); if (stage.ro) stage.ro.disconnect(); if (stage.off) stage.off(); }
-      stage = null; if (raf) { cancelAnimationFrame(raf); raf = 0; }
-    },
-    go: function (i) { // by the shorter way round the ring
-      if (!stage) return;
-      var n = stage.slides.length; stage.target = Math.round(stage.target) + wrap(i - mod(Math.round(stage.target), n), n); kick();
-    },
-    recolor: function (i) { // the new colour runs down the cloth
-      if (!stage || !stage.slides[i]) return;
-      var s = stage.slides[i]; s.old = s.sprite; s.sprite = make(stage, i); s.wipe = reduce ? 1 : 0; kick();
-    },
-    refresh: function () { if (stage) { measure(stage); stage.track = null; stage.slides.forEach(function (s) { s.lim = stage.sw * 0.13; }); kick(); } },
-    settled: function () { return !stage || (!stage.drag && stage.pos === stage.target); },
-    state: function () { return stage ? { pos: stage.pos, target: stage.target, drag: stage.drag, step: stage.step } : null; }
-  };
-
   /* ----- live windows: the cover and the room are one scene, painted on the graphics card ----- */
   // get(seconds) describes the scene; a live window is repainted every frame while it is on screen (the sheer moves),
   // any other only when it is poked. Returns nothing when there is no graphics card to paint with.
-  var wins = [], wraf = 0;
+  var wins = [], wraf = 0, fixedQ = false;
+  try { fixedQ = /[?&]hq=1\b/.test(location.search); } catch (e) { fixedQ = false; } // ?hq=1: never coarsen the picture, however slow the device
   function winSize(w) {
     var cw = w.cv.clientWidth, ch = w.cv.clientHeight; if (cw < 8 || ch < 8) return false;
     var k = Math.min(2, window.devicePixelRatio || 1, Math.sqrt(1.6e6 / (cw * ch))) * w.q; // never more than about 1.6 million points a frame
@@ -3399,9 +3218,11 @@ var FX = (function () {
       if (s && w.sc.draw(s)) w.dirty = false;
       if (moving) {
         again = true;
-        if (w.last && now - w.last < 250) { // a slow device gets a coarser picture, not a slower one
-          w.slow = w.slow * 0.9 + (now - w.last) * 0.1; w.n++;
-          if (w.n > 45 && w.slow > 27 && w.q > 0.45) { w.q *= 0.78; w.n = 0; w.slow = 16; }
+        if (!fixedQ && w.last) { // a slow device gets a coarser picture, not a slower one
+          var d = Math.min(2000, now - w.last);
+          w.bad = d > 70 ? w.bad + 1 : 0; w.slow = w.slow * 0.9 + d * 0.1; w.n++;
+          if (w.bad >= 3 && w.q > 0.2) { w.q *= 0.5; w.bad = 0; w.n = 0; w.slow = 30; } // three frames in a row far too slow: halve it at once
+          else if (w.n > 45 && w.slow > 27 && w.q > 0.45) { w.q *= 0.78; w.n = 0; w.slow = 16; }
         }
         w.last = now;
       }
@@ -3409,12 +3230,13 @@ var FX = (function () {
     if (again) wkick();
   }
   function wkick() { if (!wraf && wins.length) wraf = requestAnimationFrame(winFrame); }
+  document.addEventListener('visibilitychange', function () { wins.forEach(function (w) { w.last = 0; w.bad = 0; }); wkick(); }); // the time a hidden page stood still is not a slow frame
   var win = {
     mount: function (cv, get, live) {
       if (!GLX || !cv) return null;
       var sc = null; try { sc = GLX.scene(cv); } catch (e) { sc = null; }
       if (!sc) return null;
-      var w = { cv: cv, sc: sc, get: get, live: !!live, on: true, busy: true, dirty: true, q: 1, slow: 16, n: 0, last: 0 };
+      var w = { cv: cv, sc: sc, get: get, live: !!live, on: true, busy: true, dirty: true, q: 1, slow: 16, n: 0, bad: 0, last: 0 };
       wins.push(w);
       if (window.IntersectionObserver) { w.io = new IntersectionObserver(function (en) { w.on = en[0].isIntersecting; w.busy = en[0].intersectionRatio >= 0.25; w.last = 0; if (w.on) { w.dirty = true; wkick(); } }, { threshold: [0, 0.25] }); w.io.observe(cv); }
       if (window.ResizeObserver) { w.ro = new ResizeObserver(function () { w.dirty = true; wkick(); }); w.ro.observe(cv); }
@@ -3430,7 +3252,8 @@ var FX = (function () {
   function poke() { if (!tick) tick = requestAnimationFrame(run); }
   window.addEventListener('scroll', poke, { passive: true });
   var rs = 0;
-  window.addEventListener('resize', function () { poke(); clearTimeout(rs); rs = setTimeout(function () { api.refresh(); dress(document); }, 160); });
+  var onSize = null;
+  window.addEventListener('resize', function () { poke(); clearTimeout(rs); rs = setTimeout(function () { dress(document); if (onSize) onSize(); }, 160); });
 
   /* ----- things that come in as they are reached ----- */
   var io = null, rootEl = document.documentElement;
@@ -3456,8 +3279,8 @@ var FX = (function () {
   } catch (e) { /* flat colour is fine */ }
 
   return {
-    stage: api,
     win: win,
+    resized: function (fn) { onSize = fn; },
     dress: dress,
     reveal: reveal,
     watch: function (el, fn) { if (el) { watchers.push({ el: el, fn: fn }); poke(); } },
@@ -3485,7 +3308,7 @@ var FX = (function () {
   function emptyLead() { return { name: '', phone: '', address: '', notes: '', zone: 'A', source: 'phone', err: false }; }
 
   var S = {
-    lang: 'sq', design: 'pishe', mode: 'light', modePicked: false, view: 'home', menu: false,
+    lang: 'sq', design: 'pishe', mode: 'light', modePicked: false, view: 'home', menu: false, filmAt: 0,
     cfg: defaultCfg(), wantMount: 'ceiling', room: '', railNote: '', open: 35, added: false, wa: null,
     car: { i: 0, col: {}, wall: 'white', t: 0 }, homeRail: 'wave', catCol: {},
     est: [], undo: null, zone: 'A', cat: 'all', lastCode: '',
@@ -3518,7 +3341,7 @@ var FX = (function () {
       }
     } catch (err) { /* storage unavailable or damaged: defaults apply */ }
   }
-  function relook() { chrome(); if (S.view === 'home') { FX.stage.refresh(); paintAmbient(); setHTML($('cover-art'), coverArt()); if (CV.h) CV.h.poke(); } } // palette or light/dark changed
+  function relook() { chrome(); if (S.view === 'home') { setHTML($('cover-art'), coverArt()); if (FILM.h) FILM.h.poke(); } } // palette or light/dark changed
   function savePrefs() { try { localStorage.setItem('pn.lang', S.lang); localStorage.setItem('pn.design', S.design); if (S.modePicked) localStorage.setItem('pn.mode', S.mode); } catch (e) { /* ignore */ } }
   function saveEst() {
     try {
@@ -3714,138 +3537,64 @@ var FX = (function () {
   var STOCKED = RAILS.filter(function (r) { return r.kind !== 'own'; });
 
   /* ===================== VIEWS ===================== */
-  /* ----- the home page: the display rail, a day at the window, the workshop, the close ----- */
+  /* ----- the home page: one room, and the scroll moves through it like a film ----- */
   function smp() { return SAMPLES[S.car.i] || SAMPLES[0]; }
   function smpFabric(x) { return famFabric(x.fam, S.car.col[x.id] || x.color); }
-  function smpCfg(x) { // the sample as a window, for the room and for "use this curtain"
+  function smpCfg(x) { // the sample as a window, for "use this curtain"
     var f = smpFabric(x);
     return { width: 280, height: 260, mode: x.mode, layers: x.layers, sheerId: x.layers === 'sheer' ? f.id : (x.sheer || S.cfg.sheerId), mainId: x.layers === 'sheer' ? S.cfg.mainId : f.id,
       heading: x.heading, rail: x.rail, mount: x.mount, shape: 'straight', panels: 2 };
   }
-  function stageSpec(i) { // how curtain i is drawn on the rail
-    var x = SAMPLES[i], b = x.layers === 'double' ? fabricById(x.sheer) : null;
-    return { heading: x.heading, look: x.look, hex: smpFabric(x).hex, back: b ? b.hex : '' };
-  }
   function lc1(v) { return v.charAt(0).toLowerCase() + v.slice(1); } // "Shufër dekorative Ø28" keeps its diameter sign
   function carPane(x, cur) { // cur: the sample on show; the others only give the block its height
     var f = smpFabric(x), two = x.layers === 'double', id = function (v) { return cur ? ' id="' + v + '"' : ''; };
-    return '<div class="car-pane' + (cur ? ' is-cur' : '') + '"' + (cur ? '' : ' aria-hidden="true" inert') + '><div><' + (cur ? 'h2' : 'div') + ' class="car-h"' + id('car-name') + '>' + t('smp.' + x.id + '.name') + '</' + (cur ? 'h2' : 'div') + '><p>' + t('smp.' + x.id + '.text') + '</p>' +
+    return '<div class="car-pane' + (cur ? ' is-cur' : '') + '"' + (cur ? '' : ' aria-hidden="true" inert') + '><div><' + (cur ? 'h3' : 'div') + ' class="car-h"' + id('car-name') + '>' + t('smp.' + x.id + '.name') + '</' + (cur ? 'h3' : 'div') + '><p>' + t('smp.' + x.id + '.text') + '</p>' +
       '<p class="spec-line">' + t('heading.' + x.heading) + ', ' + lc1(t('rail.' + x.rail)) + ', ' + lc1(t('mount.' + x.mount)) + (two ? '. ' + t('car.behind', { v: esc(fabName(fabricById(x.sheer))) }) : '') + '</p></div>' +
       '<div><fieldset><legend class="sw-name">' + t(two ? 'car.colorMain' : 'car.color') + ': <b' + id('car-col-name') + '>' + esc(colorName(f)) + '</b></legend><div class="swatches">' +
-      familyOf(x.fam).map(function (c) { return cur ? swatch('carcol', c, c.id === f.id, 'car-color', '', true) : '<span class="sw on-bg"><i style="--c:' + c.hex + '"></i></span>'; }).join('') + '</div></fieldset>' +
+      familyOf(x.fam).map(function (c) { return cur ? swatch('carcol', c, c.id === f.id, 'car-color', '', false) : '<span class="sw"><i style="--c:' + c.hex + '"></i></span>'; }).join('') + '</div></fieldset>' +
       '<div class="btn-row">' + (cur ? '<button class="btn" data-act="car-use" id="car-use">' + t('car.use') + '</button>' + stockHtml(f, 'car-stock') : '<span class="btn">' + t('car.use') + '</span><p class="ok-text">' + stockText(f) + '</p>') + '</div></div></div>';
   }
   function carInfo() { return SAMPLES.map(function (x, i) { return carPane(x, i === S.car.i); }).join(''); }
   function countHtml() { var p2 = function (v) { return ('0' + v).slice(-2); }; return '<span aria-hidden="true">' + p2(S.car.i + 1) + '<small> / ' + p2(SAMPLES.length) + '</small></span><span class="sr-only">' + t('car.count', { i: S.car.i + 1, n: SAMPLES.length }) + '</span>'; }
-  function wordHtml() { // the fabric's name and its colour, very large, in one endless line behind the curtains
-    var f = smpFabric(smp()), unit = '<span>' + esc(f[S.lang]) + '</span><em>' + esc(colorName(f)) + '</em>', h = '';
-    for (var i = 0; i < 8; i++) h += unit; // two equal halves, so the line can run on for ever
-    return '<div class="word-track">' + h + '</div>';
-  }
   function tok(name) { return getComputedStyle(root).getPropertyValue(name).trim(); }
   function hx(h) { var n = parseInt(String(h).replace('#', ''), 16); return [n >> 16 & 255, n >> 8 & 255, n & 255]; }
+  function hexf(h) { var c = hx(h); return [c[0] / 255, c[1] / 255, c[2] / 255]; }
   function mixc(a, b, k) { return [a[0] + (b[0] - a[0]) * k, a[1] + (b[1] - a[1]) * k, a[2] + (b[2] - a[2]) * k]; }
-  function rgbc(c, al) { return 'rgba(' + Math.round(c[0]) + ',' + Math.round(c[1]) + ',' + Math.round(c[2]) + ',' + (al === undefined ? 1 : al) + ')'; }
-  function paintAmbient() { // the backdrop takes a little of the fabric's colour
-    var hero = $('hero'); if (!hero) return;
-    var f = hx(smpFabric(smp()).hex), bg = hx(tok('--bg')), ink = hx(tok('--ink')), dark = S.mode === 'dark';
-    var ground = dark ? mixc(mixc(bg, [24, 21, 17], 0.6), f, 0.08) : mixc(bg, f, 0.06); // the dark palette's stage is a warm near-black, so teal cloth stands off it
-    hero.style.setProperty('--amb', rgbc(ground));
-    hero.style.setProperty('--word', rgbc(mixc(ground, ink, dark ? 0.1 : 0.12))); // the name behind keeps one quiet strength whatever the fabric
-  }
+  function clamp01(v) { return v < 0 ? 0 : v > 1 ? 1 : v; }
+  function stickyTop() { return parseFloat(root.style.getPropertyValue('--top-h')) || 0; }
+  function wallHex() { for (var i = 0; i < WALLS.length; i++) if (WALLS[i].id === S.car.wall) return WALLS[i].hex; return WALLS[0].hex; }
 
-  // A day at the window. t runs from 0 (07:30) to 1 (21:30): sky at the top and the bottom of the window,
-  // the light laid over the room, and how far the curtains stand open.
+  // A day at the window. t runs from 0 (07:30) to 1 (21:30): the sky at the top and at the bottom of the glass,
+  // and how far the curtains stand open.
   var DAY = [
-    { t: 0, a: [188, 216, 232], b: [251, 235, 208], o: [255, 205, 140, 0.10], open: 0.8 },
-    { t: 0.33, a: [156, 199, 230], b: [234, 243, 246], o: [255, 255, 255, 0], open: 0.8 },
-    { t: 0.66, a: [124, 143, 196], b: [242, 165, 110], o: [238, 140, 70, 0.16], open: 0.4 },
-    { t: 1, a: [18, 28, 54], b: [42, 42, 76], o: [14, 20, 36, 0.66], open: 0 }
+    { t: 0, a: [188, 216, 232], b: [251, 235, 208], open: 0.8 },
+    { t: 0.33, a: [156, 199, 230], b: [234, 243, 246], open: 0.8 },
+    { t: 0.66, a: [124, 143, 196], b: [242, 165, 110], open: 0.4 },
+    { t: 1, a: [18, 28, 54], b: [42, 42, 76], open: 0 }
   ];
   var DAY_AT = { morning: 0.06, noon: 0.48, evening: 0.95 };
-  function clamp01(v) { return v < 0 ? 0 : v > 1 ? 1 : v; }
   function dayAt(tt) {
     tt = clamp01(tt);
     for (var i = 1; i < DAY.length; i++) if (tt <= DAY[i].t) {
       var p = DAY[i - 1], q = DAY[i], k = (tt - p.t) / (q.t - p.t);
-      return { a: mixc(p.a, q.a, k), b: mixc(p.b, q.b, k), o: mixc(p.o, q.o, k).concat(p.o[3] + (q.o[3] - p.o[3]) * k), open: p.open + (q.open - p.open) * k };
+      return { a: mixc(p.a, q.a, k), b: mixc(p.b, q.b, k), open: p.open + (q.open - p.open) * k };
     }
     return DAY[DAY.length - 1];
   }
   function dayPart(tt) { return tt < 0.3 ? 'morning' : tt < 0.64 ? 'noon' : 'evening'; }
   function dayClock(tt) { var m = Math.round((7.5 + clamp01(tt) * 14) * 12) * 5; return ('0' + Math.floor(m / 60)).slice(-2) + ':' + ('0' + m % 60).slice(-2); }
-  function dayPinned() { return !FX.reduced() && window.innerHeight >= 520; } // otherwise the room stands still and the three buttons set the hour
-  function dayFits() { // the room is held in place only where it and its panel fit on one screen together
-    var day = $('day'), panel = day && day.querySelector('.day-panel'); if (!panel) return false;
-    var stacked = getComputedStyle(panel).position === 'static', need = panel.offsetHeight + (stacked ? 300 : 40);
-    day.style.setProperty('--need', need + 'px');
-    return dayPinned() && need <= window.innerHeight - stickyTop();
-  }
-  function daySet() { // returns whether the room is pinned, after making the page agree
-    var day = $('day'); if (!day) return false;
-    var pinned = dayFits();
-    if (pinned !== day.classList.contains('is-pinned')) day.classList.toggle('is-pinned', pinned);
-    var lead = $('day-lead'), key = pinned ? 'look.t' : 'look.tStill';
-    if (lead && lead.getAttribute('data-k') !== key) { lead.setAttribute('data-k', key); lead.textContent = t(key); }
-    return pinned;
-  }
-  function stickyTop() { return parseFloat(root.style.getPropertyValue('--top-h')) || 0; }
-  function lookScene() { // the selected sample at a tall window, drawn at full drop so the hem meets the floor
-    var c = smpCfg(smp()); c.height = PARAMS.maxHeight; c.width = 170;
-    return scene(c, Math.round(dayAt(S.car.t).open * 100), 'look-scene');
-  }
-  function wallHex() { for (var i = 0; i < WALLS.length; i++) if (WALLS[i].id === S.car.wall) return WALLS[i].hex; return WALLS[0].hex; }
-  function paintDay() {
-    var lk = $('look'); if (!lk) return;
-    var tt = S.car.t, d = dayAt(tt), part = dayPart(tt), light = tt < 0.6 ? 1 : Math.max(0, 1 - (tt - 0.6) / 0.25);
-    lk.style.setProperty('--sky1', rgbc(d.a)); lk.style.setProperty('--sky2', rgbc(d.b));
-    lk.style.setProperty('--beam', (light * (0.25 + 0.75 * d.open / 0.8)).toFixed(3)); lk.style.setProperty('--skew', (-24 + 48 * tt).toFixed(1) + 'deg');
-    var up = tt / 0.72; // the sun crosses the window and is gone by early evening; then the moon and a few stars
-    lk.style.setProperty('--sunx', (16 + 68 * up).toFixed(1) + '%'); lk.style.setProperty('--suny', (up <= 1 ? 64 - 48 * Math.sin(Math.PI * up) : 64 + (up - 1) * 220).toFixed(1) + '%');
-    lk.style.setProperty('--sun', clamp01(1 - (tt - 0.64) / 0.14).toFixed(3)); lk.style.setProperty('--night', clamp01((tt - 0.8) / 0.14).toFixed(3));
-    var dl = $('day-line'); if (dl) dl.style.setProperty('--t', clamp01(tt).toFixed(3));
-    lk.style.setProperty('--cloth-b', (1 - 0.42 * clamp01((tt - 0.66) / 0.3)).toFixed(3)); // the cloth darkens with the room and keeps its colour
-    lk.classList.toggle('is-evening', part === 'evening');
-    if (lk.parentNode) lk.parentNode.style.setProperty('--lamp', clamp01((tt - 0.7) / 0.2).toFixed(3));
-    var sc = $('look-scene'); if (sc) sc.style.setProperty('--open', d.open.toFixed(3));
-    var li = $('day-light'); if (li) li.style.backgroundColor = rgbc(d.o, d.o[3].toFixed(3));
-    var ck = $('day-clock'); if (ck) ck.textContent = dayClock(tt);
-    var cap = $('day-cap'); if (cap && cap.getAttribute('data-part') !== part) { cap.setAttribute('data-part', part); cap.textContent = t('look.cap.' + part); }
-    ['morning', 'noon', 'evening'].forEach(function (v) { var b = $('look-' + v); if (b) b.setAttribute('aria-pressed', String(v === part)); });
-  }
-  function setDay(part) { // a button names the hour; where the room is pinned, the page is moved to it
-    if (DAY_AT[part] === undefined) return;
-    S.car.t = DAY_AT[part]; paintDay();
-    var day = $('day'), sticky = $('day-sticky');
-    if (day && sticky && day.classList.contains('is-pinned')) {
-      var r = day.getBoundingClientRect(), range = r.height - sticky.offsetHeight;
-      try { window.scrollTo(0, Math.round(window.scrollY + r.top - stickyTop() + S.car.t * range)); } catch (e) { /* the hour is set either way */ }
-    }
-    say(t('look.cap.' + part));
-  }
 
-  function railShow() { // the top of a curtain on that rail, close up
+  function railShow() { // the rail on show: what it is and what it carries; the drawing is only for a page that cannot paint the room
     var r = railById(S.homeRail) || STOCKED[0];
-    return clothArt(r.headings[0], 'linen', '#DCD2BF', r.kind, !!r.motorKit) +
+    return '<div class="rail-art">' + clothArt(r.headings[0], 'linen', '#DCD2BF', r.kind, !!r.motorKit) + '</div>' +
       '<h3>' + t('rail.' + r.id) + '</h3><p>' + t('rails.d.' + r.id) + '</p><dl class="specs">' +
       '<dt>' + t('rails.mount') + '</dt><dd>' + r.mounts.map(function (m) { return t('mount.' + m); }).join(', ') + '</dd>' +
       '<dt>' + t('rails.headings') + '</dt><dd>' + r.headings.map(function (x) { return t('heading.' + x); }).join(', ') + '</dd>' +
       '<dt>' + t('rails.max') + '</dt><dd>' + r.maxLen + ' cm</dd>' +
       '<dt>' + t('rails.double') + '</dt><dd>' + (r.layers.indexOf(2) >= 0 ? t('rails.dbl.yes') : t('rails.noDouble')) + '</dd></dl>' +
-      '<button class="btn inv small" data-act="use-rail" data-id="' + r.id + '" id="hrail-use">' + t('rails.use') + '</button>';
+      '<button class="btn small" data-act="use-rail" data-id="' + r.id + '" id="hrail-use">' + t('rails.use') + '</button>';
   }
-  function carGo(i, fromStage) { // fromStage: the rail was pulled there by hand and is already on its way
-    var n = SAMPLES.length; S.car.i = ((i % n) + n) % n;
-    var still = !FX.stage.state(); // no rail to move: the chosen curtain simply takes the place
-    SAMPLES.forEach(function (x, k) { var el = $('slide-' + k); if (!el) return; el.classList.toggle('is-cur', k === S.car.i); if (still) el.style.visibility = k === S.car.i ? 'visible' : 'hidden'; });
-    var pos = t('car.count', { i: S.car.i + 1, n: n });
-    setHTML($('car-count'), countHtml()); setHTML($('car-info'), carInfo()); setHTML($('stage-word'), wordHtml()); setHTML($('look'), lookScene());
-    paintAmbient(); paintDay();
-    if (!fromStage) FX.stage.go(S.car.i);
-    say(t('smp.' + smp().id + '.name') + ', ' + pos);
-  }
-  // The cover: one large picture before anything else. A window at full height, a sheer in the daylight and two heavy
-  // curtains in the palette's own colour, which draw apart as the page moves on. A photograph takes its place once there is one.
+  // What a page without a graphics card shows behind the film: one drawn picture of the window, standing still.
   var COVER = { pishe: '#1E4F54', toke: '#96553A', nate: '#B4853B' };
   function coverArt() {
     var hex = COVER[S.design] || COVER.pishe, bar = tok('--chrome') || '#143E41';
@@ -3854,142 +3603,224 @@ var FX = (function () {
     return '<div class="cover-win"></div><div class="cover-sheer fab sheer" style="--fab:#F3EEE2;--n:22">' + cv('sheer', '#F3EEE2', 'wave', 22, '', 1.2) + '</div><div class="cover-floor"></div>' +
       drape('l') + drape('r') + '<div class="cover-pelmet fab" style="--fab:' + bar + ';--n:26">' + cv('velvet', bar, 'eyelet', 30, '', 0.5) + '</div><div class="cover-shade"></div>';
   }
-  // Where there is a graphics card the cover is a live window: the same two curtains and the sheer, lit by the daylight
-  // behind them. They part once when the page arrives, further as the page moves on, and each can be pulled by its edge.
-  var CV = { t0: 0, k: 0, pull: [0, 0], mx: 0.5, h: null, look: null, c: 0.64, e: [0.5, 0.78], base: [0.5, 0.78] };
-  function hexf(h) { var c = hx(h); return [c[0] / 255, c[1] / 255, c[2] / 255]; }
-  function coverLook() { // the colours of this palette and form, read once
-    var key = S.design + S.mode;
-    if (!CV.look || CV.look.key !== key) {
-      var dusk = S.mode === 'dark';
-      CV.look = { key: key, dusk: dusk, drape: hexf(COVER[S.design] || COVER.pishe), pel: hexf(tok('--chrome') || '#143E41'),
-        sky0: dusk ? [0.16, 0.20, 0.36] : [0.50, 0.72, 0.93], sky1: dusk ? [0.95, 0.62, 0.40] : [1.0, 0.95, 0.84], glow: dusk ? [1, 0.66, 0.40] : [1, 0.93, 0.76],
-        floor: hexf(dusk ? '#6F6250' : '#CDBDA3'), sheer: hexf('#F3EEE2'), wall: hexf('#ECE6DA') };
+
+  /* The film. One room is painted on the graphics card and stays on the screen; the six parts of the page pass over it,
+     and where the page stands decides where the eye is, how far the curtains are open and what hour it is.
+     open: the heading and the booking button; cloth: the samples and their colours, hung in place; rail: the four rails;
+     steps: how an order goes; day: the room from morning to night; close: the booking call on drawn curtains. */
+  var SHOTS = ['open', 'cloth', 'rail', 'steps', 'day', 'close'];
+  var FILM = { h: null, els: [], caps: [], i: 0, hold: 0, w: 0, shot: 0, cur: null, a: null, b: null, wipe: 0, sheer: 0, back: '#F3EEE2', pull: [0, 0], pullShot: 0, mx: 0.5, t0: 0, last: 0, anc: [], pel: null };
+  function filmGeo(A) { // the room for a picture of this shape: a tall window in the middle, curtains from wall to wall
+    var ww = Math.min(0.6, 0.59 / A), hx0 = 0.02, hx1 = 0.98, half = (hx1 - hx0) / 2;
+    return { ww: ww, hx0: hx0, hx1: hx1, half: half, run: half * 0.87, railY: 0.085, hemY: 0.838, floorY: 0.83, y0: 0.14, y1: 0.81, tall: A < 0.8 };
+  }
+  function filmKey(i, hold, G) { // where the eye is and how the room stands in part i; hold: how far through the part the page is
+    var anc = FILM.anc[i] || [0.5, 0.5, 1], mid = function (o) { return (G.hx0 + 0.5 - o * G.run) / 2; };
+    switch (i) {
+      case 0: return { fx: 0.5, fy: 0.54, z: 1.12, ax: G.tall ? 0.72 : 0.66, ay: 0.5, open: 0.2 + 0.42 * hold, t: 0.1, shade: 0.5, fill: 0 }; // the gap stands to the right of the heading
+      case 1: return { fx: mid(0.4) + 0.05, fy: 0.52, z: G.tall ? 2.3 : 2.0, ax: anc[0], ay: anc[1], open: 0.4, t: 0.1, shade: 0, fill: 1 };
+      case 2: return { fx: mid(0.5) + 0.06, fy: G.railY + 0.012, z: G.tall ? 3.0 : 2.7, ax: anc[0], ay: anc[1], open: 0.5, t: 0.12, shade: 0, fill: 1 };
+      case 3: return { fx: 0.5, fy: 0.5, z: 1.25 * anc[2], ax: anc[0], ay: anc[1], open: 0.82, t: 0.16, shade: 0, fill: 0.3 };
+      case 4: return { fx: 0.5, fy: 0.5, z: anc[2], ax: anc[0], ay: anc[1], open: dayAt(S.car.t).open, t: S.car.t, shade: 0, fill: 0 };
+      default: return { fx: 0.5, fy: 0.54, z: 1.12, ax: 0.5, ay: 0.5, open: 0, t: 1, shade: 0.32, fill: 0 };
     }
-    return CV.look;
   }
-  function coverScene(time) {
-    var cv = $('cover-gl'); if (!cv) return null;
-    var L = coverLook(), W = cv.clientWidth, H = cv.clientHeight || 1, tall = W / H < 0.8;
-    var c = tall ? 0.735 : 0.64, g0 = tall ? 0.25 : 0.2; // the gap stands to the right of the words
-    var a = CV.t0 ? clamp01((time - CV.t0 - 0.35) / 1.9) : 1; a = 1 - Math.pow(1 - a, 3);
-    var k = CV.k, bL = c - g0 / 2, bR = c + g0 / 2, eL = c - g0 / 2 * a, eR = c + g0 / 2 * a;
-    eL += ((tall ? 0.11 : 0.09) - eL) * k + CV.pull[0] * (1 - k) * a; eR += ((tall ? 0.9 : 0.92) - eR) * k + CV.pull[1] * (1 - k) * a;
-    eL = Math.max(0.05, Math.min(c, eL)); eR = Math.min(0.96, Math.max(c, eR));
-    CV.c = c; CV.e = [eL, eR]; CV.base = [bL, bR];
-    var per = tall ? 31 : 48;
-    return { time: time, win: [-0.2, -0.3, 1.2, 0.905], hang: [-0.02, 1.02, -0.06, 0.915], edge: [eL, eR],
-      folds: [Math.max(5, Math.round(c * W / per)), Math.max(4, Math.round((1 - c) * W / per))],
-      deep: [Math.min(2, Math.pow((c + 0.02) / (eL + 0.02), 0.8)), Math.min(2, Math.pow((1.02 - c) / (1.02 - eR), 0.8))], sheerFolds: Math.max(12, Math.round(W / 15)),
-      sun: L.dusk ? [c - 0.03, 0.7] : [c + 0.03 + (CV.mx - 0.5) * 0.1, 0.28], day: L.dusk ? 0.55 : 1, night: L.dusk ? 0.6 : 0,
-      sky0: L.sky0, sky1: L.sky1, glow: L.glow, drape: L.drape, sheer: L.sheer, wall: L.wall, floor: L.floor,
-      floorY: 0.905, amb: L.dusk ? 0.34 : 0.62, look: 'velvet', heading: 'pinch', hasSheer: true, wind: FX.reduced() ? 0 : 1,
-      pelmet: [(stickyTop() + 20) / H, L.pel[0], L.pel[1], L.pel[2]] };
+  function filmWant() { // what should hang: the chosen sample in its colour; while the rail is on show, with that rail and its heading
+    var x = smp(), f = smpFabric(x), r = railById(FILM.shot === 2 ? S.homeRail : x.rail) || STOCKED[0];
+    var head = FILM.shot === 2 ? r.headings[0] : x.heading, kind = r.kind === 'pole' ? 'pole' : r.motorKit ? 'motor' : 'track';
+    return { key: [x.id, f.id, head, kind].join('|'), look: x.look, heading: head, hex: f.hex, rail: kind, back: x.layers === 'double' ? fabricById(x.sheer).hex : '' };
   }
-  function coverHands(cov) { // a curtain is taken by its edge and pulled; a pull up or down is the page being moved, and is left alone
-    var down = null;
-    var end = function () { down = null; cov.classList.remove('is-pull'); };
-    cov.addEventListener('pointerdown', function (ev) {
-      if ((ev.target.closest && ev.target.closest('button, a')) || (ev.pointerType === 'mouse' && ev.button !== 0)) return;
-      var r = cov.getBoundingClientRect(), x = (ev.clientX - r.left) / r.width;
-      down = { id: ev.pointerId, x: ev.clientX, y: ev.clientY, side: x < (CV.e[0] + CV.e[1]) / 2 ? 0 : 1, from: CV.pull.slice(), w: r.width || 1, moved: false };
+  function filmScene(time) {
+    var cv = $('film-gl'); if (!cv) return null;
+    var W = cv.clientWidth, H = cv.clientHeight || 1, G = filmGeo(W / H), still = FX.reduced();
+    var dt = FILM.last ? Math.max(0.001, Math.min(0.05, time - FILM.last)) : 0.016; FILM.last = time;
+    // where the page stands: this part, running into the next one as it leaves
+    var K = filmKey(FILM.i, FILM.hold, G), w = FILM.w;
+    if (w > 0 && FILM.i < SHOTS.length - 1) { var N = filmKey(FILM.i + 1, 0, G); Object.keys(K).forEach(function (k) { K[k] += (N[k] - K[k]) * w; }); }
+    var c = FILM.cur, ease = still || !c ? 1 : 1 - Math.exp(-dt * 6.5); // the picture follows the page softly, so a wheel that moves in steps still gives one movement
+    if (!c) c = FILM.cur = K; else Object.keys(K).forEach(function (k) { c[k] += (K[k] - c[k]) * ease; });
+    // the fabric: a new one runs down the cloth over the one that hangs
+    var want = filmWant();
+    if (!FILM.a) { FILM.a = FILM.b = want; FILM.sheer = want.back ? 1 : 0; }
+    if (want.key !== FILM.b.key) { if (FILM.wipe > 0.5) FILM.a = FILM.b; FILM.b = want; FILM.wipe = still ? 1 : 0.0001; }
+    if (FILM.wipe > 0) { FILM.wipe += dt / 0.85; if (FILM.wipe >= 1) { FILM.a = FILM.b; FILM.wipe = 0; } }
+    if (FILM.b.back) FILM.back = FILM.b.back;
+    FILM.sheer += ((FILM.b.back ? 1 : 0) - FILM.sheer) * (still ? 1 : 1 - Math.exp(-dt * 5));
+    // the curtains: opened by the page, by the first arrival, and by a hand
+    var a = FILM.t0 ? clamp01((time - FILM.t0 - 0.35) / 1.9) : 1; a = 1 - Math.pow(1 - a, 3);
+    if (FILM.pullShot !== FILM.shot) { FILM.pull[0] *= 1 - ease; FILM.pull[1] *= 1 - ease; if (Math.abs(FILM.pull[0]) + Math.abs(FILM.pull[1]) < 0.002) { FILM.pull = [0, 0]; FILM.pullShot = FILM.shot; } }
+    var open = c.open * a, eL = Math.max(G.hx0 + 0.04, Math.min(0.5, 0.5 - open * G.run + FILM.pull[0] * a)), eR = Math.min(G.hx1 - 0.04, Math.max(0.5, 0.5 + open * G.run + FILM.pull[1] * a));
+    var cam = [c.fx - (c.ax - 0.5) / c.z, c.fy - (c.ay - 0.5) / c.z, c.z];
+    FILM.view = { cam: cam, e: [eL, eR], G: G, W: W };
+    var per = G.tall ? 30 : 46, n = Math.max(6, Math.round(G.half * W / per)), squeeze = function (wd) { return Math.min(2, Math.pow(G.half / Math.max(0.02, wd), 0.7)); };
+    var spec = function (s) { var k = s.heading === 'pencil' ? 2 : 1; return { look: s.look, heading: s.heading, color: hexf(s.hex), folds: [n * k, n * k] }; };
+    var tt = clamp01(c.t), d = dayAt(tt), up = tt / 0.72, sunY = up <= 1 ? 0.64 - 0.48 * Math.sin(Math.PI * up) : 0.64 + (up - 1) * 2.2, eve = clamp01((tt - 0.5) / 0.3);
+    if (!FILM.pel || FILM.pel.key !== S.design + S.mode) FILM.pel = { key: S.design + S.mode, c: hexf(tok('--chrome') || '#143E41') };
+    return { time: time, ratio: cv.width / Math.max(1, W), cam: cam, win: [0.5 - G.ww / 2, G.y0, 0.5 + G.ww / 2, G.y1], hang: [G.hx0, G.hx1, G.railY, G.hemY], edge: [eL, eR],
+      deep: [squeeze(eL - G.hx0), squeeze(G.hx1 - eR)], a: spec(FILM.a), b: spec(FILM.b), wipe: FILM.wipe, rail: (FILM.wipe > 0 ? FILM.b : FILM.a).rail,
+      sheer: hexf(FILM.back), sheerFolds: Math.max(12, Math.round((G.hx1 - G.hx0) * W / 14)), sheerAmt: FILM.sheer,
+      sun: [0.5 - G.ww / 2 + (0.16 + 0.68 * up) * G.ww + (FILM.mx - 0.5) * 0.04, G.y0 + sunY * (G.y1 - G.y0)], day: clamp01(1 - (tt - 0.64) / 0.16), night: clamp01((tt - 0.8) / 0.14),
+      sky0: [d.a[0] / 255, d.a[1] / 255, d.a[2] / 255], sky1: [d.b[0] / 255, d.b[1] / 255, d.b[2] / 255], glow: mixc(tt < 0.33 ? [1, 0.9, 0.72] : [1, 0.97, 0.88], [1, 0.62, 0.36], eve),
+      wall: hexf(wallHex()), floor: hexf('#B7A68C'), floorY: G.floorY, amb: 0.66 - 0.38 * clamp01((tt - 0.6) / 0.35), wind: still ? 0 : 1, shadeBottom: c.shade, fill: c.fill,
+      pelmet: [(stickyTop() + 20) / H, FILM.pel.c[0], FILM.pel.c[1], FILM.pel.c[2]], lamp: [1.02, 0.5, 1.5 * clamp01((tt - 0.7) / 0.2), 0.42] };
+  }
+  function filmMeasure() { // where each part's panel leaves the picture free: the eye is put in the middle of that
+    var vh = window.innerHeight, vw = root.clientWidth, top = stickyTop();
+    FILM.caps.forEach(function (el, i) {
+      var p = el.querySelector('.cap-panel');
+      if (!p) { FILM.anc[i] = [0.5, 0.5, 1]; return; }
+      var ph = p.offsetHeight, pw = p.offsetWidth;
+      if (pw > vw * 0.7) { var free = Math.max(vh * 0.28, vh - top - ph); FILM.anc[i] = [0.5, (top + free / 2) / vh, Math.min(1, free / vh * 1.5)]; } // a sheet at the foot: the picture is above it
+      else { var r = p.getBoundingClientRect(); FILM.anc[i] = [(r.right + vw) / 2 / vw, (top + vh) / 2 / vh, 1]; } // a panel at the side: the picture is beside it
     });
-    cov.addEventListener('pointermove', function (ev) {
-      var r = cov.getBoundingClientRect();
-      if (ev.pointerType === 'mouse') { CV.mx = clamp01((ev.clientX - r.left) / (r.width || 1)); if (down && ev.buttons === 0) end(); }
+  }
+  function filmGo(i) { // to part i, a little way in
+    var el = FILM.els[i]; if (!el) return;
+    var y = window.scrollY + el.getBoundingClientRect().top + (i ? el.offsetHeight * 0.08 : 0);
+    try { window.scrollTo({ top: Math.round(y), behavior: FX.reduced() ? 'auto' : 'smooth' }); } catch (e) { window.scrollTo(0, Math.round(y)); }
+  }
+  function paintDay() { // the clock, the line under it and the sentence for this part of the day
+    var tt = S.car.t, part = dayPart(tt);
+    var dl = $('day-line'); if (dl) dl.style.setProperty('--t', clamp01(tt).toFixed(3));
+    var ck = $('day-clock'); if (ck) ck.textContent = dayClock(tt);
+    var cap = $('day-cap'); if (cap && cap.getAttribute('data-part') !== part) { cap.setAttribute('data-part', part); cap.textContent = t('look.cap.' + part); }
+    ['morning', 'noon', 'evening'].forEach(function (v) { var b = $('look-' + v); if (b) b.setAttribute('aria-pressed', String(v === part)); });
+    if (FILM.h) FILM.h.poke();
+  }
+  function setDay(part) { // a button names the hour; the page is moved to where the room stands at that hour
+    if (DAY_AT[part] === undefined) return;
+    var el = FILM.els[4];
+    if (el && !FX.reduced()) {
+      var y = window.scrollY + el.getBoundingClientRect().top + clamp01((DAY_AT[part] - 0.1) / 0.9) * 0.7 * el.offsetHeight;
+      try { window.scrollTo({ top: Math.round(y), behavior: 'smooth' }); } catch (e) { window.scrollTo(0, Math.round(y)); }
+    } else { S.car.t = DAY_AT[part]; paintDay(); }
+    say(t('look.cap.' + part));
+  }
+  function carGo(i) { // another sample: its text and colours take the panel, its cloth runs down the curtains
+    var n = SAMPLES.length; S.car.i = ((i % n) + n) % n;
+    setHTML($('car-count'), countHtml()); setHTML($('car-info'), carInfo()); setHTML($('cloth-art'), clothThumb());
+    if (FILM.h) FILM.h.poke();
+    say(t('smp.' + smp().id + '.name') + ', ' + t('car.count', { i: S.car.i + 1, n: n }));
+  }
+  function clothThumb() { var x = smp(); return clothArt(x.heading, x.look, smpFabric(x).hex, (railById(x.rail) || {}).kind, false); } // the sample as a small drawing, for a page that cannot paint the room
+  function filmHands(stage) { // on the cloth part a sideways stroke turns to the next sample; anywhere else it takes a curtain by its edge
+    var down = null, end = function (ev) {
+      if (down && down.moved && down.shot === 1 && ev && ev.type === 'pointerup' && Math.abs(ev.clientX - down.x) > 44) carGo(S.car.i + (ev.clientX < down.x ? 1 : -1));
+      down = null; stage.classList.remove('is-pull');
+    };
+    stage.addEventListener('pointerdown', function (ev) {
+      if (ev.pointerType === 'mouse' && ev.button !== 0) return;
+      var v = FILM.view; if (!v) return;
+      var r = stage.getBoundingClientRect(), x = v.cam[0] + ((ev.clientX - r.left) / r.width - 0.5) / v.cam[2];
+      down = { id: ev.pointerId, x: ev.clientX, y: ev.clientY, side: x < (v.e[0] + v.e[1]) / 2 ? 0 : 1, from: FILM.pull.slice(), e: v.e.slice(), k: 1 / ((r.width || 1) * v.cam[2]), moved: false, shot: FILM.shot };
+    });
+    stage.addEventListener('pointermove', function (ev) {
+      var r = stage.getBoundingClientRect();
+      if (ev.pointerType === 'mouse') { FILM.mx = clamp01((ev.clientX - r.left) / (r.width || 1)); if (down && ev.buttons === 0) end(); }
       if (!down || ev.pointerId !== down.id) return;
-      var dx = ev.clientX - down.x, dy = ev.clientY - down.y, i = down.side;
+      var dx = ev.clientX - down.x, dy = ev.clientY - down.y, i = down.side, v = FILM.view;
       if (!down.moved) {
         if (Math.abs(dx) < 8 || Math.abs(dx) < 1.2 * Math.abs(dy)) return;
-        down.moved = true; cov.classList.add('is-pull');
-        try { cov.setPointerCapture(down.id); } catch (e) { /* capture is a convenience */ }
+        down.moved = true; stage.classList.add('is-pull');
+        try { stage.setPointerCapture(down.id); } catch (e) { /* capture is a convenience */ }
       }
-      var v = down.from[i] + dx / down.w;
-      CV.pull[i] = i === 0 ? Math.max(0.05 - CV.base[0], Math.min(CV.c - CV.base[0], v)) : Math.min(0.96 - CV.base[1], Math.max(CV.c - CV.base[1], v));
-      if (CV.h) CV.h.poke();
+      if (down.shot === 1 || !v) return;
+      var to = down.e[i] + dx * down.k, G = v.G; // the edge follows the hand, as far as the cloth can go
+      to = i === 0 ? Math.max(G.hx0 + 0.04, Math.min(0.5, to)) : Math.min(G.hx1 - 0.04, Math.max(0.5, to));
+      FILM.pull[i] = down.from[i] + (to - down.e[i]); FILM.pullShot = FILM.shot;
+      if (FILM.h) FILM.h.poke();
     });
-    cov.addEventListener('pointerup', end); cov.addEventListener('pointercancel', end);
-    cov.addEventListener('dragstart', function (ev) { ev.preventDefault(); });
+    stage.addEventListener('pointerup', end); stage.addEventListener('pointercancel', end);
+    stage.addEventListener('dragstart', function (ev) { ev.preventDefault(); });
   }
-  var arrived = false;
-  function homeMount() { // hands the home page to the experience layer once it is in the document
-    var view = $('stage-view'), day = $('day'), tape = $('tape'), closing = $('closing'), strip = $('strip');
-    FX.unwatch(); FX.win.clear(); CV.h = null;
-    if (!view) { FX.stage.unmount(); return; }
-    var firstVisit = !root.classList.contains('intro-done');
-    try { FX.stage.mount(view, S.car.i, stageSpec, function (i) { carGo(i, true); }, !arrived && !root.classList.contains('intro-done')); } catch (e) { view.classList.add('no-canvas'); } // without a drawing surface the striped drawing stays
-    arrived = true;
-    var cover = $('cover');
-    if (cover) { // the live window takes the place of the drawn cover and of the opening curtain
-      CV.k = 0; CV.h = FX.win.mount($('cover-gl'), coverScene, true);
-      cover.classList.toggle('gl', !!CV.h);
-      if (CV.h) {
-        CV.t0 = firstVisit && !FX.reduced() ? performance.now() / 1000 : 0;
-        cover.classList.toggle('first', !!CV.t0); root.classList.add('intro-done'); coverHands(cover);
-      }
+  function filmStand() { // reads where the page stands and tells the picture and the parts that depend on it
+    var film = $('film'); if (!film || !FILM.els.length) return;
+    var n = FILM.els.length, i = 0, u = 0;
+    FILM.els.forEach(function (el, k) { var r = el.getBoundingClientRect(); if (r.top <= 1) { i = k; u = clamp01(-r.top / (r.height || 1)); } });
+    // the first seven tenths of a part belong to it; over the rest the eye travels on to the next, and half-way there the words change
+    var hold = clamp01(u / 0.7), w = i < n - 1 ? clamp01((u - 0.7) / 0.3) : 0, still = FX.reduced();
+    FILM.i = i; FILM.hold = hold; FILM.w = still ? (w > 0.5 ? 1 : 0) : w * w * (3 - 2 * w);
+    var shot = w > (i === n - 2 ? 0.9 : 0.5) ? i + 1 : i; // the last words wait until the curtains have closed behind them
+    if (shot !== FILM.shot) {
+      FILM.shot = S.filmAt = shot;
+      FILM.caps.forEach(function (c, k) { c.classList.toggle('is-on', k === shot); });
+      SHOTS.forEach(function (s, k) { var d = $('film-dot-' + k); if (d) { if (k === shot) d.setAttribute('aria-current', 'step'); else d.removeAttribute('aria-current'); } });
+      film.setAttribute('data-shot', SHOTS[shot]);
     }
-    paintAmbient(); daySet(); paintDay();
-    FX.watch(day, function (r) { // while the room is pinned, the scroll is the clock
-      var pinned = daySet(), sticky = $('day-sticky');
-      if (!pinned || !sticky) return;
-      var range = r.height - sticky.offsetHeight; if (range <= 0) return;
-      var p = clamp01((stickyTop() - r.top) / range);
-      if (Math.abs(p - S.car.t) > 0.0004) { S.car.t = p; paintDay(); }
-    });
-    if (FX.reduced()) return; // the cover's curtains stay where they hang, the tape lies run out, the strip and the closing curtains stand still
-    FX.watch(cover, function (r) { var q = clamp01(-r.top / (r.height * 0.75)); cover.style.setProperty('--q', q.toFixed(3)); cover.classList.toggle('is-off', r.bottom < 0); CV.k = q * q * (3 - 2 * q); if (CV.h) CV.h.poke(); });
-    FX.watch(tape, function (r, vh) { tape.style.setProperty('--q', clamp01((vh * 0.94 - r.top) / (vh * 0.55)).toFixed(3)); });
-    FX.watch(strip, function (r, vh) { strip.style.setProperty('--q', clamp01((vh - r.top) / (vh + r.height)).toFixed(3)); });
-    FX.watch(closing, function (r, vh) { closing.style.setProperty('--q', clamp01((vh - r.top) / (r.height * 0.9)).toFixed(3)); });
+    if (i === 4 && !still) { var tt = 0.1 + 0.9 * hold; if (Math.abs(tt - S.car.t) > 0.0004) { S.car.t = tt; paintDay(); } }
+    var tape = $('tape'); if (tape) { var q = i > 3 ? 1 : i < 3 ? 0 : hold; tape.style.setProperty('--q', q.toFixed(3)); tape.setAttribute('data-step', String(Math.min(4, 1 + Math.floor(q * 4)))); }
+    var cover = $('cover'); if (cover) cover.style.setProperty('--q', (i === 0 ? clamp01(u / 0.6) : 1).toFixed(3));
+    if (FILM.h) FILM.h.poke();
+  }
+  // for the check tools: where the film stands and what hangs in it
+  window.PNfilm = function () {
+    return { gl: !!FILM.h, shot: FILM.shot, hold: FILM.hold, open: FILM.cur ? FILM.cur.open : null, t: S.car.t, a: FILM.a ? FILM.a.key : '', b: FILM.b ? FILM.b.key : '', wipe: FILM.wipe,
+      pull: FILM.pull.slice(), edge: FILM.view ? FILM.view.e.slice() : null, wall: wallHex(), sample: smp().id };
+  };
+  function homeMount() { // hands the home page to the experience layer once it is in the document
+    var film = $('film'), stage = $('film-stage');
+    FX.unwatch(); FX.win.clear(); FILM.h = null; FILM.cur = null; FILM.a = FILM.b = null; FILM.wipe = 0; FILM.last = 0; FILM.pull = [0, 0]; FILM.shot = -1; FILM.caps = [];
+    if (!film) return;
+    FILM.els = Array.prototype.slice.call(film.querySelectorAll('.shot')); FILM.caps = Array.prototype.slice.call(film.querySelectorAll('.cap'));
+    FILM.caps.forEach(function (c, k) { c.addEventListener('focusin', function () { if (FILM.shot !== k) filmGo(k); }); }); // a control reached by keyboard brings its part with it
+    var first = !root.classList.contains('intro-done');
+    FILM.h = FX.win.mount($('film-gl'), filmScene, true);
+    film.classList.toggle('gl', !!FILM.h); film.classList.toggle('no-gl', !FILM.h);
+    if (FILM.h) {
+      FILM.t0 = first && !FX.reduced() && (window.scrollY || 0) < 40 ? performance.now() / 1000 : 0;
+      film.classList.toggle('first', !!FILM.t0); filmHands(stage);
+    }
+    root.classList.add('intro-done');
+    FX.dress(film); filmMeasure(); paintDay(); filmStand();
+    FX.watch(film, filmStand); FX.resized(function () { if ($('film')) { filmMeasure(); filmStand(); } });
+    var strip = $('strip'); if (!FX.reduced()) FX.watch(strip, function (r, vh) { strip.style.setProperty('--q', clamp01((vh - r.top) / (vh + r.height)).toFixed(3)); });
   }
   function viewHome() {
     var arrow = function (id, act, key, d) {
       return '<button class="arrow" id="' + id + '" data-act="' + act + '" aria-label="' + t(key) + '"><svg viewBox="0 0 18 18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="' + d + '"/></svg></button>';
     };
-    var drape = function (side) { return '<div class="closing-drape ' + side + ' fab" aria-hidden="true"><canvas class="cloth" data-look="linen" data-hex="#96553A" data-heading="wave" data-n="7" data-fit="0.23" data-amp="2"></canvas></div>'; };
-    // document order is the order on screen: the rail with its arrows, then the heading, then the sample's text and choices
-    var h = '<section class="cover" id="cover"><canvas class="cover-gl" id="cover-gl" aria-hidden="true"></canvas><div class="cover-art" id="cover-art" aria-hidden="true">' + coverArt() + '</div>' +
-      '<div class="wrap cover-text"><h1>' + t('home.h1') + '</h1><p>' + t('cover.sub') + '</p><div class="btn-row"><button class="btn inv" data-go="book">' + t('home.cta1') + '</button>' +
-      '<button class="btn ghost inv" data-act="cover-see" id="cover-see">' + t('cover.see') + '</button></div></div></section>';
-    h += '<section class="hero" id="hero">' +
-      '<div class="stage-view" id="stage-view"><div class="stage-in"><div class="stage-word" id="stage-word" aria-hidden="true">' + wordHtml() + '</div><div class="stage-floor"></div><div class="stage-spot"></div><div class="stage-rail" aria-hidden="true"></div>' +
-      SAMPLES.map(function (x, i) {
-        return '<div class="slide' + (i === S.car.i ? ' is-cur' : '') + '" id="slide-' + i + '" data-i="' + i + '" data-fab="' + smpFabric(x).hex + '" style="--fab:' + smpFabric(x).hex + ';--n:7' + (i === S.car.i ? '' : ';visibility:hidden') + '" aria-hidden="true"><canvas></canvas></div>';
-      }).join('') + '<div class="stage-light"></div><div class="stage-cursor" aria-hidden="true">' + t('car.drag') + '</div>' +
-      '<div class="stage-nav" role="group" aria-label="' + t('car.label') + '">' + arrow('car-prev', 'car-prev', 'car.prev', 'M11 3L5 9l6 6') +
-      '<span class="stage-count" id="car-count">' + countHtml() + '</span>' + arrow('car-next', 'car-next', 'car.next', 'M7 3l6 6-6 6') + '</div></div></div>' +
-      '<div class="wrap hero-foot"><div class="hero-lead"><h2>' + t('car.label') + '</h2><p>' + t('car.lead') + '</p></div>' +
-      '<div class="hero-car stage-info" id="car-info" role="group" aria-roledescription="' + t('car.role') + '" aria-label="' + t('car.label') + '">' + carInfo() + '</div></div></section>';
-    h += '<section class="day' + (dayPinned() ? ' is-pinned' : '') + '" id="day" style="--wall:' + wallHex() + '"><div class="day-sticky" id="day-sticky">' +
-      '<div class="day-room"><div class="look" id="look" style="--wall:' + wallHex() + '">' + lookScene() + '</div><div class="day-lamp" aria-hidden="true"><i></i></div><div class="day-light" id="day-light"></div><div class="day-glow"></div></div>' +
-      '<div class="day-panel"><p class="day-clock" id="day-clock" aria-hidden="true"></p><div class="day-line" id="day-line" aria-hidden="true"></div><h2>' + t('look.h') + '</h2><p class="day-lead" id="day-lead" data-k="look.t">' + t('look.t') + '</p><p id="day-cap"></p>' +
+    var LEN = [1.2, 1.7, 1.5, 1.9, 2.6, 1.1]; // how many screens of scrolling each part takes
+    var shot = function (i, id, len, body) { return '<section class="cap cap-' + SHOTS[i] + (i === S.filmAt ? ' is-on' : '') + '" id="' + id + '" data-shot="' + i + '">' + body + '</section>'; };
+    // the room, held on the screen for as long as the film runs; nothing in it is read out, the parts that pass over it carry the words
+    var h = '<div class="film" id="film" data-shot="open"><div class="film-stage" id="film-stage" aria-hidden="true"><canvas class="film-gl" id="film-gl"></canvas><div class="cover-art" id="cover-art">' + coverArt() + '</div></div>' +
+      '<div class="film-caps" id="film-caps"><nav class="film-dots" aria-label="' + t('film.nav') + '">' + SHOTS.map(function (s, i) {
+        return '<button class="film-dot" id="film-dot-' + i + '" data-act="film-go" data-i="' + i + '"><span class="sr-only">' + t('film.' + s) + '</span></button>';
+      }).join('') + '</nav>';
+    h += shot(0, 'cover', 1.6, '<div class="wrap cap-free cover-text"><h1>' + t('home.h1') + '</h1><p>' + t('cover.sub') + '</p><div class="btn-row"><button class="btn inv" data-go="book">' + t('home.cta1') + '</button>' +
+      '<button class="btn ghost inv" data-act="cover-see" id="cover-see">' + t('cover.see') + '</button></div></div>');
+    h += shot(1, 'hero', 2.4, '<div class="cap-panel" id="cloth-panel"><div class="cap-head"><h2>' + t('car.label') + '</h2><div class="stage-nav" role="group" aria-label="' + t('car.label') + '">' + arrow('car-prev', 'car-prev', 'car.prev', 'M11 3L5 9l6 6') +
+      '<span class="stage-count" id="car-count">' + countHtml() + '</span>' + arrow('car-next', 'car-next', 'car.next', 'M7 3l6 6-6 6') + '</div></div>' +
+      '<div class="cloth-art" id="cloth-art">' + clothThumb() + '</div>' +
+      '<div class="hero-car stage-info" id="car-info" role="group" aria-roledescription="' + t('car.role') + '" aria-label="' + t('car.label') + '">' + carInfo() + '</div></div>');
+    h += shot(2, 'rails-shot', 2, '<div class="cap-panel"><h2>' + t('home.rails.h') + '</h2><p class="cap-lead">' + t('home.rails.t') + '</p>' +
+      '<div class="rail-tabs" role="group" aria-label="' + t('home.rails.pick') + '">' + STOCKED.map(function (r) {
+        return '<button class="rail-tab" id="hrail-' + r.id + '" data-act="home-rail" data-id="' + r.id + '" aria-pressed="' + (S.homeRail === r.id) + '"><span>' + t('rail.' + r.id) + '</span><small>' + r.mounts.map(function (m) { return t('mount.' + m); }).join(', ') + '</small></button>';
+      }).join('') + '</div><div class="rail-show" id="rail-show">' + railShow() + '</div><button class="link" data-go="rails">' + t('home.rails.link') + '</button></div>');
+    var steps = '';
+    for (var i = 1; i <= 4; i++) steps += '<li data-n="' + i + '"><h3>' + t('home.s' + i) + '</h3><p>' + t('home.s' + i + 't') + '</p></li>';
+    var marks = '';
+    for (var k = 1; k <= 14; k++) marks += '<span style="left:' + (k * 100) + 'px">' + (k * 10) + '</span>';
+    h += shot(3, 'tape', 2.4, '<div class="cap-panel"><h2>' + t('home.how') + '</h2><div class="tape" aria-hidden="true"><div class="tape-strip">' + marks + '</div></div><ol class="steps">' + steps + '</ol></div>');
+    h += shot(4, 'day', 3, '<div class="cap-panel day-panel"><p class="day-clock" id="day-clock" aria-hidden="true"></p><div class="day-line" id="day-line" aria-hidden="true"></div><h2>' + t('look.h') + '</h2><p id="day-cap"></p>' +
       '<div><p class="field-label" id="look-light-label">' + t('look.light') + '</p><div class="seg" role="group" aria-labelledby="look-light-label">' + ['morning', 'noon', 'evening'].map(function (v) {
         return '<button class="seg-btn" id="look-' + v + '" data-act="look-time" data-v="' + v + '" aria-pressed="false">' + t('look.' + v) + '</button>';
       }).join('') + '</div></div>' +
       '<fieldset><legend>' + t('look.wall') + '</legend><div class="swatches">' + WALLS.map(function (w) {
         return '<label class="sw" for="wall-' + w.id + '" title="' + t('wall.' + w.id) + '"><input type="radio" id="wall-' + w.id + '" name="wall" value="' + w.id + '"' + (S.car.wall === w.id ? ' checked' : '') + ' data-f="look-wall" aria-label="' + t('wall.' + w.id) + '"><i style="--c:' + w.hex + '"></i></label>';
-      }).join('') + '</div></fieldset><p class="muted small day-note">' + t('look.note') + '</p></div></div></section>';
-    h += '<section class="wrap band tape-band" id="tape"><h2 class="rv">' + t('home.how') + '</h2><p class="lead rv" style="--d:.08s">' + t('home.sub') + '</p><div class="tape" aria-hidden="true"><div class="tape-strip">';
-    for (var k = 1; k <= 14; k++) h += '<span style="left:' + (k * 100) + 'px">' + (k * 10) + '</span>';
-    h += '</div></div><ol class="steps">';
-    for (var i = 1; i <= 4; i++) h += '<li style="--at:' + ((i - 1) * 0.24 + 0.04).toFixed(2) + '"><h3>' + t('home.s' + i) + '</h3><p>' + t('home.s' + i + 't') + '</p></li>';
-    h += '</ol></section>';
-    h += '<section class="night rails-band"><div class="wrap"><div><h2 class="rv">' + t('home.rails.h') + '</h2><p class="rv" style="--d:.08s">' + t('home.rails.t') + '</p>' +
-      '<div class="rail-tabs rv" style="--d:.16s" role="group" aria-label="' + t('home.rails.pick') + '">' + STOCKED.map(function (r) {
-        return '<button class="rail-tab" id="hrail-' + r.id + '" data-act="home-rail" data-id="' + r.id + '" aria-pressed="' + (S.homeRail === r.id) + '"><span>' + t('rail.' + r.id) + '</span><small>' + r.mounts.map(function (m) { return t('mount.' + m); }).join(', ') + '</small></button>';
-      }).join('') + '</div><button class="btn ghost inv" data-go="rails">' + t('home.rails.link') + '</button></div><div class="rail-show rv" style="--d:.2s" id="rail-show">' + railShow() + '</div></div></section>';
+      }).join('') + '</div></fieldset><p class="muted small day-note">' + t('look.note') + '</p></div>');
+    h += shot(5, 'closing', 1.5, '<div class="cap-free closing-in"><h2>' + t('home.close.h') + '</h2>' +
+      '<div class="btn-row"><button class="btn inv" data-go="book">' + t('home.cta1') + '</button><button class="btn ghost inv" data-go="config">' + t('home.cta2') + '</button></div>' +
+      '<div class="contact"><dl><dt>' + t('home.contact.ig') + '</dt><dd><a href="https://www.instagram.com/perde_nemis/" target="_blank" rel="noopener">@perde_nemis</a></dd>' +
+      '<dt>' + t('home.contact.wa') + '</dt><dd>' + t('home.contact.waNo') + '</dd></dl></div><p>' + t('home.contact.addr') + '</p></div>');
+    h += '</div><div class="film-track" aria-hidden="true">' + LEN.map(function (len, i) { return '<div class="shot" id="shot-' + i + '" style="--len:' + len + '"></div>'; }).join('') + '</div></div>';
+    // after the film: the place for photographs of finished work
     h += '<section class="wrap band strip-band"><h2 class="rv">' + t('home.gallery') + '</h2><p class="muted rv" style="--d:.08s">' + t('home.gallery.note') + '</p></section>' +
       '<div class="strip" id="strip" tabindex="0" role="region" aria-label="' + t('home.strip') + '">' + ['b9', 's1', 'd6', 'b8', 'd5', 'b10', 'd1', 'd8'].map(function (id) {
         var f = fabricById(id);
         return '<div class="tile fab' + (f.type === 'sheer' ? ' sheer' : '') + '" style="--fab:' + f.hex + ';--n:9"><canvas class="cloth" aria-hidden="true" data-look="' + lookOf(f.fam) + '" data-hex="' + f.hex + '" data-heading="wave" data-n="6"></canvas><span>' + esc(fabName(f)) + '</span></div>';
       }).join('') + '</div>';
-    h += '<section class="night closing" id="closing">' + drape('l') + drape('r') + '<div class="closing-in"><h2 class="rv">' + t('home.close.h') + '</h2>' +
-      '<div class="btn-row rv" style="--d:.1s"><button class="btn inv" data-go="book">' + t('home.cta1') + '</button><button class="btn ghost inv" data-go="config">' + t('home.cta2') + '</button></div>' +
-      '<div class="contact rv" style="--d:.18s"><dl><dt>' + t('home.contact.ig') + '</dt><dd><a href="https://www.instagram.com/perde_nemis/" target="_blank" rel="noopener">@perde_nemis</a></dd>' +
-      '<dt>' + t('home.contact.wa') + '</dt><dd>' + t('home.contact.waNo') + '</dd></dl></div><p class="rv" style="--d:.24s">' + t('home.contact.addr') + '</p></div></section>';
     return h;
   }
-
   function viewCatalog() { // one card per fabric; its colours are chosen on the card
     var h = '<div class="view-head"><h1>' + t('cat.h') + '</h1><p>' + t('cat.sub') + '</p></div><div class="filters" role="group" aria-label="' + t('cat.h') + '">';
     ['all', 'sheer', 'blackout', 'decor'].forEach(function (k) {
@@ -4763,7 +4594,7 @@ var FX = (function () {
     var main = $('main');
     main.className = 'view view-' + S.view + (S.view === 'home' ? '' : ' paged');
     setHTML(main, S.view === 'home' ? fn() : paged(fn()));
-    if (S.view === 'home') homeMount(); else { FX.unwatch(); FX.stage.unmount(); }
+    if (S.view === 'home') homeMount(); else { FX.unwatch(); FX.win.clear(); FILM.h = null; }
     if (S.view === 'config') paintSizeErrors();
     setDrawer();
   }
@@ -4773,12 +4604,24 @@ var FX = (function () {
     S.view = view; S.added = false; S.undo = null;
     if (S.menu) setMenu(false);
     if (view !== 'ops') { S.ops.open = null; S.ops.pushed = false; }
-    render();
-    if (!fromHash) setHash(view);
-    try { window.scrollTo(0, 0); } catch (e2) { /* ignore */ }
-    var m = $('main');
-    if (m) { m.classList.remove('is-entering'); void m.offsetWidth; m.classList.add('is-entering'); m.focus({ preventScroll: true }); } // the new view fades in
-    FX.poke();
+    var soft = false, swap = function () {
+      render();
+      if (!fromHash) setHash(view);
+      try { window.scrollTo(0, 0); } catch (e2) { /* ignore */ }
+      var m = $('main');
+      if (m) { m.classList.remove('is-entering'); if (!soft) { void m.offsetWidth; m.classList.add('is-entering'); } m.focus({ preventScroll: true }); } // the new view fades in
+      FX.poke();
+    };
+    // where the browser can hold the old page while the new one is laid out, the new page opens over it like two curtains parting
+    if (document.startViewTransition && !FX.reduced()) {
+      try {
+        soft = true; root.classList.add('vt');
+        var tr = document.startViewTransition(swap), done = function () { root.classList.remove('vt'); };
+        tr.finished.then(done, done);
+        return;
+      } catch (e) { soft = false; root.classList.remove('vt'); }
+    }
+    swap();
   }
   // focusId: one id or a list; the first one that exists and is enabled takes focus
   function refreshOps(focusId, flash) {
@@ -4859,13 +4702,14 @@ var FX = (function () {
         S.wantMount = smc.mount; S.added = false; S.railNote = (modeNote + ' ' + changeNote(Ops.fixRail(S.cfg, S.wantMount))).trim();
         go('config'); break;
       case 'look-time': setDay(el.getAttribute('data-v')); break;
-      case 'cover-see': // from the cover down to the display rail
-        var hs = $('hero'); if (hs) { try { hs.scrollIntoView({ behavior: FX.reduced() ? 'auto' : 'smooth', block: 'start' }); } catch (e3) { hs.scrollIntoView(); } }
-        var cn2 = $('car-next'); if (cn2) cn2.focus({ preventScroll: true }); break;
+      case 'cover-see': // from the opening to the curtains
+        filmGo(1); var cn2 = $('car-next'); if (cn2) cn2.focus({ preventScroll: true }); break;
+      case 'film-go': filmGo(Number(el.getAttribute('data-i')) || 0); break;
       case 'home-rail':
         if (!railById(el.getAttribute('data-id'))) break;
         S.homeRail = el.getAttribute('data-id'); setHTML($('rail-show'), railShow());
         STOCKED.forEach(function (r2) { var tb2 = $('hrail-' + r2.id); if (tb2) tb2.setAttribute('aria-pressed', String(r2.id === S.homeRail)); });
+        if (FILM.h) FILM.h.poke(); filmMeasure();
         say(t('rail.' + S.homeRail)); break;
       case 'est-add':
         if (Pricing.computeWindow(S.cfg).errors.length || S.est.length >= Ops.MAX_WINDOWS) break;
@@ -4969,14 +4813,13 @@ var FX = (function () {
       return;
     }
     switch (f) {
-      case 'car-color': // the curtain on the rail and the room preview take the new colour; nothing else is redrawn
+      case 'car-color': // the new colour runs down the curtains; the panel names it
         var cx = smp(), cf = famFabric(cx.fam, v); S.car.col[cx.id] = cf.id;
-        var sl = $('slide-' + S.car.i); if (sl) { sl.setAttribute('data-fab', cf.hex); sl.style.setProperty('--fab', cf.hex); }
-        FX.stage.recolor(S.car.i); paintAmbient(); setHTML($('stage-word'), wordHtml());
         var cn = $('car-col-name'); if (cn) cn.textContent = colorName(cf);
         var cs0 = $('car-stock'); if (cs0) { cs0.className = (cf.stock ? 'ok' : 'warn') + '-text'; cs0.textContent = stockText(cf); }
-        setHTML($('look'), lookScene()); say(t('car.color') + ': ' + colorName(cf) + '. ' + stockText(cf)); break;
-      case 'look-wall': S.car.wall = v; ['look', 'day'].forEach(function (id2) { var lw = $(id2); if (lw) lw.style.setProperty('--wall', wallHex()); }); break;
+        setHTML($('cloth-art'), clothThumb()); if (FILM.h) FILM.h.poke();
+        say(t('car.color') + ': ' + colorName(cf) + '. ' + stockText(cf)); break;
+      case 'look-wall': S.car.wall = v; if (FILM.h) FILM.h.poke(); break;
       case 'cat-color':
         var kf = famFabric(k, v); S.catCol[k] = kf.id;
         var ka = $('cat-art-' + k), ks = ka && ka.querySelector('canvas.cloth'); if (ks) { ks.setAttribute('data-hex', kf.hex); FX.dress(ka); }
@@ -5127,7 +4970,6 @@ var FX = (function () {
   if (S.view === 'ops' && start.indexOf('ops-') === 0 && orderById(start.slice(4))) S.ops.open = start.slice(4);
   if (!start || (S.view === 'home' && start !== 'home')) { try { history.replaceState(null, '', '#' + S.view); } catch (e) { /* the first Back then leaves the page */ } }
   try { if (S.view === 'ops' || sessionStorage.getItem('pn.intro')) root.classList.add('intro-done'); else sessionStorage.setItem('pn.intro', '1'); } catch (e) { /* it simply plays */ }
-  FX.dress($('intro'));
   render();
   if (S.ops.open) { var oc = $('od-close'); if (oc) oc.focus(); }
   try { // until a form is chosen with the switch, the page follows the phone when its setting changes
