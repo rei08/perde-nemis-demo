@@ -59,6 +59,16 @@ bdi { unicode-bidi: isolate; }
 /* top bar */
 .top { position: relative; z-index: 20; background: var(--bg); box-shadow: 0 1px 14px rgba(110, 96, 82, .13); }
 @media (min-height: 600px) { .top { position: sticky; top: env(safe-area-inset-top, 0px); } }
+/* On the home page the bar stands over the opening photograph, which then fills the whole screen. It is clear, with
+   cream lettering, while the page is at its top, and turns into the usual cream bar once the page is scrolled. */
+.top { transition: background-color .25s ease, box-shadow .25s ease; }
+:root.is-home .top { position: absolute; left: 0; right: 0; top: 0; }
+@media (min-height: 600px) { :root.is-home .top { position: fixed; } }
+:root.is-home.at-top:not(.menu-open) .top { background: transparent; box-shadow: none; }
+:root.is-home.at-top:not(.menu-open) .top :is(.brand, .navlink, .seg-btn, .menu-btn, .seg-btn[aria-pressed="true"]) { color: #FFFDF8; }
+:root.is-home.at-top:not(.menu-open) .top .navlink[aria-current="page"]::before { background: #FFFDF8; }
+:root.is-home.at-top:not(.menu-open) .top :is(.btn.top-cta, .menu-btn) { color: #FFFDF8; border-color: rgba(255, 253, 248, .85); }
+:root.is-home.at-top:not(.menu-open) .top .btn.top-cta:hover { background: rgba(255, 253, 248, .16); }
 .top-row { display: flex; align-items: center; gap: 8px 22px; min-height: 86px; padding-block: 10px; max-width: 1400px; }
 .brand { display: inline-flex; flex-direction: column; align-items: center; flex: none; color: var(--taupe); text-decoration: none; line-height: 1; }
 .brand b { font: 400 1.9rem/1 var(--font-display); letter-spacing: .05em; }
@@ -90,6 +100,26 @@ bdi { unicode-bidi: isolate; }
 :root.menu-open .menu-bars::before { top: 4px; transform: rotate(45deg); }
 :root.menu-open .menu-bars::after { top: 4px; transform: rotate(-45deg); }
 :root.menu-open, :root.menu-open body { overflow: hidden; }
+
+/* The opening curtain: once, when the page loads. Two lengths of cloth meet in the middle with the name over them,
+   then gather to the sides and are gone. It is the one thing on the site that moves by itself. It never takes a
+   click or a tap (the page under it is ready and can be used), it needs no script to finish, and it is left out
+   for anyone who has asked their device for less motion. */
+.curtain { position: fixed; inset: 0; z-index: 300; pointer-events: none; overflow: hidden; --fold: clamp(30px, 5.2vw, 68px); animation: curtainGone .01s linear 1.75s both; }
+.curtain i { position: absolute; top: 0; bottom: 0; width: 50.2%; background-color: #EAE2D6;
+  background-image: linear-gradient(180deg, rgba(255, 253, 248, .42), rgba(255, 253, 248, 0) 30%, rgba(111, 101, 91, .1)),
+    repeating-linear-gradient(90deg, rgba(111, 101, 91, 0) 0, rgba(111, 101, 91, .15) calc(var(--fold) * .34), rgba(255, 253, 248, .6) calc(var(--fold) * .62), rgba(111, 101, 91, 0) var(--fold));
+  animation: curtainPart 1.2s cubic-bezier(.66, 0, .18, 1) .45s both; will-change: transform; }
+.curtain i:first-child { left: 0; transform-origin: 0 50%; box-shadow: inset -1px 0 0 rgba(111, 101, 91, .28); }
+.curtain i:nth-child(2) { right: 0; transform-origin: 100% 50%; box-shadow: inset 1px 0 0 rgba(111, 101, 91, .28); }
+.curtain span { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; color: #6F655B; line-height: 1; animation: curtainName .5s ease .3s both; }
+.curtain b { font: 400 clamp(2.4rem, 9vw, 4.4rem)/1 var(--font-display); letter-spacing: .05em; }
+.curtain small { font: 400 clamp(.74rem, 2.4vw, 1.05rem)/1 var(--font-body); letter-spacing: .5em; margin: .9em -.5em 0 0; }
+@keyframes curtainPart { 72% { opacity: 1; } to { transform: scaleX(.05); opacity: 0; } }
+@keyframes curtainName { to { opacity: 0; } }
+@keyframes curtainGone { to { visibility: hidden; } }
+.curtain.is-off { display: none; }
+@media print { .curtain { display: none; } }
 
 /* the page */
 main { display: block; outline: none; }
@@ -143,16 +173,18 @@ main.is-entering { animation: viewIn .3s ease both; }
 .dots i { width: 14px; height: 14px; border-radius: 50%; background: var(--c); border: 1px solid rgba(78, 78, 78, .22); }
 
 /* home: the opening photograph with the heading over it */
-.hero { position: relative; display: grid; align-items: end; min-height: clamp(470px, 74vh, 680px); color: #FFFDF8; overflow: hidden; }
+.hero { position: relative; display: grid; align-items: end; min-height: max(100vh, 480px); min-height: max(100svh, 480px); color: #FFFDF8; overflow: hidden; } /* the whole screen, on a phone as on a computer */
 .hero-ph { position: absolute; inset: 0; aspect-ratio: auto; background: linear-gradient(100deg, #74695F, #7E7368); } /* deep enough for cream text at 4.5:1 across the whole width, as the scrim over the photograph will be */
 .hero-ph::before { border-color: rgba(255, 253, 248, .5); }
-.hero-ph .ph-in { position: absolute; left: 26px; top: 22px; align-items: flex-start; text-align: left; color: #FFFDF8; padding: 0; max-width: 30ch; }
-.hero-in { position: relative; width: 100%; max-width: 1400px; display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 24px clamp(24px, 6vw, 96px); align-items: end; padding-block: 150px clamp(44px, 10vh, 100px); }
+.hero-ph::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(58, 50, 44, .34), rgba(58, 50, 44, 0) 24%, rgba(58, 50, 44, 0) 52%, rgba(58, 50, 44, .3)); pointer-events: none; } /* the scrim the photograph will need under the bar and under the heading */
+.hero-ph .ph-in { position: absolute; z-index: 1; left: 28px; top: 124px; align-items: flex-start; text-align: left; color: #FFFDF8; padding: 0; max-width: 30ch; }
+.hero-in { position: relative; z-index: 1; width: 100%; max-width: 1400px; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 30px clamp(24px, 6vw, 96px); align-items: end; padding-block: 150px clamp(40px, 9vh, 96px); }
 .hero h1 { font-size: clamp(2.2rem, 1rem + 5vw, 4.6rem); line-height: 1.22; letter-spacing: .01em; }
 .hero h1 span { display: block; }
 .hero h1 .l1 { text-transform: uppercase; }
-.hero-side { display: flex; flex-direction: column; gap: 22px; align-items: flex-start; padding-bottom: 10px; }
-.hero-side p { max-width: 38ch; }
+.hero-side { display: flex; flex-direction: column; gap: 18px; align-items: flex-start; padding-bottom: 10px; }
+.hero-link { color: #FFFDF8; font-size: 1rem; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 6px; padding: 8px 0; }
+.hero-link:hover { text-decoration-thickness: 2px; }
 /* sections */
 .sec { padding-block: clamp(56px, 8vw, 112px); }
 .sec-title { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 12px; margin-bottom: clamp(26px, 4vw, 52px); }
@@ -160,7 +192,6 @@ main.is-entering { animation: viewIn .3s ease both; }
 .sec-title p:not(.eyebrow) { max-width: 46ch; }
 .center { display: flex; justify-content: center; margin-top: clamp(26px, 4vw, 44px); }
 .shop .view-head { margin-bottom: 28px; }
-.about { max-width: 52ch; margin-inline: auto; text-align: center; display: flex; flex-direction: column; gap: 16px; }
 .bigword { overflow: hidden; white-space: nowrap; display: flex; justify-content: center; font: 400 14.2vw/.78 var(--font-display); letter-spacing: .04em; padding-top: .08em; color: transparent; background: linear-gradient(180deg, #B9AFA5, rgba(255, 253, 248, 0) 88%); -webkit-background-clip: text; background-clip: text; -webkit-user-select: none; user-select: none; }
 .sec-head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 14px 28px; margin-bottom: clamp(22px, 3vw, 40px); }
 .sec-head > div { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
@@ -177,11 +208,6 @@ main.is-entering { animation: viewIn .3s ease both; }
 .fcard:hover .fcard-name { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 4px; }
 .fcard-meta { color: var(--ink-2); font-size: .95rem; }
 .fcard .dots { margin-top: 5px; }
-.steps { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 36px clamp(20px, 3vw, 44px); counter-reset: s; text-align: center; }
-.steps li { counter-increment: s; display: flex; flex-direction: column; align-items: center; gap: 10px; }
-.steps li::before { content: counter(s); font: 400 3.4rem/1 var(--font-display); color: var(--taupe); margin-bottom: 6px; }
-.steps h3 { font: 400 1.45rem/1.25 var(--font-body); }
-.steps p { color: var(--ink-2); font-size: .95rem; max-width: 30ch; }
 /* a photograph and a soft panel side by side, edge to edge, between two thin lines */
 .split { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); border-block: 1px solid var(--rule); }
 .split-text { background: var(--soft); display: flex; flex-direction: column; gap: 20px; align-items: flex-start; justify-content: center; padding: clamp(36px, 6vw, 88px) clamp(20px, 6vw, 88px); }
@@ -189,10 +215,6 @@ main.is-entering { animation: viewIn .3s ease both; }
 .split-text h2 { font-size: clamp(1.7rem, .6rem + 3.1vw, 3.75rem); line-height: 1.25; overflow-wrap: break-word; max-width: 100%; }
 .split-text p { font-size: clamp(1.05rem, 1rem + .4vw, 1.3rem); max-width: 36ch; }
 .split-text .btn { margin-top: 10px; }
-.split.rev > .ph { order: 2; }
-.build-list { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 4px 18px; counter-reset: b; color: var(--ink-2); font-size: .95rem; }
-.build-list li { counter-increment: b; }
-.build-list li::before { content: counter(b) '. '; color: var(--taupe); font-weight: 700; }
 .igrid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 36px clamp(14px, 2.4vw, 28px); }
 .icard { display: flex; flex-direction: column; gap: 10px; color: inherit; text-decoration: none; min-width: 0; }
 .icard-title { font: 700 1.22rem/1.3 var(--font-body); margin-top: 2px; }
@@ -297,7 +319,34 @@ table.cal td.done { background: var(--surface-2); color: var(--ink-2); }
 .panel { background: var(--surface); border: var(--bw) solid var(--line); border-radius: var(--r); padding: 18px; display: flex; flex-direction: column; gap: 12px; box-shadow: var(--shadow); min-width: 0; }
 .panel > h2 { font-size: 1.6rem; }
 .form { gap: 18px; }
-.form.book, .form.track { max-width: 640px; }
+.form.track { max-width: 640px; }
+/* booking: where and when beside who on a wide screen, one under the other on a phone */
+.form.book { max-width: none; }
+.book-when, .book-who { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+@media (min-width: 960px) {
+  .form.book { display: grid; grid-template-columns: minmax(0, 1.08fr) minmax(0, 1fr); gap: 20px clamp(32px, 5vw, 76px); align-items: start; padding: 30px 34px 34px; }
+  .form.book > #book-attached { grid-column: 1 / -1; }
+}
+/* the timetable: a day to a row, a time of day to a column, every cell free or taken */
+.tt { width: 100%; border-collapse: collapse; table-layout: fixed; font-variant-numeric: tabular-nums; }
+.tt thead th { padding: 0 3px 8px; text-align: center; font: 700 .86rem/1.2 var(--font-body); color: var(--ink-2); }
+.tt thead th:first-child { width: 33%; text-align: left; }
+.tt tbody th { text-align: left; font-weight: 400; line-height: 1.2; padding: 3px 8px 3px 0; }
+.tt tbody th b { display: block; font-size: .92rem; }
+.tt tbody th span { font-size: .82rem; color: var(--ink-2); }
+.tt td { padding: 3px; }
+.tt tbody + tbody tr:first-child > * { padding-top: 13px; border-top: 1px solid var(--line); }
+.tt tbody:not(:last-child) tr:last-child > * { padding-bottom: 13px; }
+.tt-cell { position: relative; display: flex; cursor: pointer; }
+.tt-cell input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; }
+.tt-cell > span { flex: 1 1 auto; min-height: 44px; display: grid; place-items: center; padding: 4px 2px; border: 1px solid var(--btn-line); border-radius: 10px; background: var(--surface); color: var(--accent); font-size: .84rem; line-height: 1.15; text-align: center; }
+.tt-cell svg { width: 18px; height: 18px; }
+.tt-cell input:not([data-off]):not(:checked):hover + span { background: rgba(142, 132, 121, .1); }
+.tt-cell input:checked + span { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.tt-cell input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 2px; }
+.tt-cell input[data-off] { cursor: not-allowed; }
+.tt-cell.is-taken > span { border-color: var(--line); border-style: dashed; background: var(--surface-2); color: var(--ink-2); text-decoration: line-through; text-decoration-thickness: 1px; }
+@media (min-width: 560px) { .tt thead th:first-child { width: 9.5rem; } .tt td { padding: 3px 4px; } }
 fieldset { border: 0; padding: 0; margin: 0; min-width: 0; display: flex; flex-direction: column; gap: 10px; }
 legend, .field-label { font-weight: 700; padding: 0; font-size: .95rem; margin-bottom: 8px; }
 .field-label { margin: 4px 0 0; }
@@ -351,9 +400,6 @@ input[aria-invalid="true"] { border-color: var(--bad); box-shadow: inset 0 0 0 1
 .est-amt { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; white-space: nowrap; }
 
 /* booking and tracking */
-.days { display: flex; gap: 8px; overflow-x: auto; padding: 2px 2px 8px; scrollbar-width: thin; }
-.days .chip { flex: none; }
-.days .chip-body { flex-direction: column; gap: 0; align-items: flex-start; border-radius: calc(var(--r) * .6); white-space: nowrap; }
 .chosen { font-weight: 700; }
 .done .code { display: flex; flex-direction: column; gap: 2px; }
 .done .code b { font-family: var(--font-data); font-size: 1.7rem; letter-spacing: .04em; }
@@ -430,7 +476,6 @@ ul.plain { list-style: none; padding: 0; display: flex; flex-direction: column; 
 .panel { background: var(--surface); border-color: var(--line); border-radius: 18px; padding: 22px; }
 .chip-body { border-radius: 999px; border-color: var(--btn-line); padding: 9px 18px; }
 .chips.col .chip-body { border-radius: 16px; }
-.days .chip-body { border-radius: 14px; }
 .chip input:checked + .chip-body { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
 .chip input:focus-visible + .chip-body { outline-color: var(--accent); }
 input[type="text"], input[type="tel"], select, textarea { background: var(--bg); border-radius: 10px; }
@@ -516,9 +561,8 @@ table.data thead th { border-bottom-color: var(--rule); }
 }
 @media (max-width: 1000px) { .hero-in { grid-template-columns: minmax(0, 1fr); padding-top: 120px; } }
 @media (max-width: 900px) {
-  .steps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .split { grid-template-columns: minmax(0, 1fr); }
-  .split > .ph, .split.rev > .ph { order: -1; }
+  .split > .ph { order: -1; }
   .ph.fill { min-height: 0; height: auto; aspect-ratio: 4 / 3; }
   .shop { grid-template-columns: minmax(0, 1fr); }
   .shop-side .side-h { display: none; }
@@ -541,13 +585,14 @@ table.data thead th { border-bottom-color: var(--rule); }
   .sec-head .btn { width: 100%; }
 }
 @media (max-width: 560px) {
-  .steps { grid-template-columns: minmax(0, 1fr); }
   .top-row { gap: 8px 10px; min-height: 68px; }
   .brand b { font-size: 1.5rem; }
   .brand span { font-size: .6rem; margin-top: 5px; }
   .btn.top-cta { flex: 0 1 auto; min-width: 0; padding-inline: 14px; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .hero-side .btn-row, .fab-info .btn-row, .split-text .btn { align-self: stretch; }
-  .hero-side .btn { flex: 1 1 100%; }
+  .fab-info .btn-row, .split-text .btn { align-self: stretch; }
+  .hero-side { align-items: stretch; gap: 10px; }
+  .hero-link { align-self: center; min-height: 44px; display: inline-flex; align-items: center; }
+  .hero-ph .ph-in { top: 96px; left: 22px; }
   .foot-in { grid-template-columns: minmax(0, 1fr); }
   .wiz-count { font-size: 2rem; }
   .stepbtn[aria-current="step"] span { display: none; }
@@ -565,13 +610,15 @@ table.data thead th { border-bottom-color: var(--rule); }
   .foot li a { min-height: 44px; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .menu, .menu-bars::before, .menu-bars::after { transition: none; }
+  .menu, .menu-bars::before, .menu-bars::after, .top { transition: none; }
+  .curtain { display: none; }
   main.is-entering { animation: none; }
 }
 </style>
 </head>
 <body>
 
+<div class="curtain" id="curtain" aria-hidden="true"><i></i><i></i><span><b>PERDE</b><small>NEMIS</small></span></div>
 <div class="top" id="page-top">
   <div class="wrap top-row">
     <a class="brand" href="#home" data-go="home" id="brand" aria-label="Perde Nemis"><b>PERDE</b><span>NEMIS</span></a>
@@ -1949,25 +1996,21 @@ var I18N = {
     'panels.2': 'Dy krahë, hapet nga mesi', 'panels.1': 'Një krah, hapet nga njëra anë',
     'zone.A': 'Tiranë', 'zone.B': 'Durrës, Kamëz, Vorë', 'zone.C': 'Qytet tjetër',
 
-    'home.sub': 'Matje falas në shtëpi, qepje sipas masës, shinë e prerë për dritaren tuaj dhe montim nga ekipi ynë.',
     'home.cta1': 'Rezervo matje falas', 'home.cta2': 'Hap konfiguratorin', 
 
-    'home.how': 'Si funksionon',
-    'home.s1': 'Matje falas', 'home.s1t': 'Vijmë, masim çdo dritare dhe kontrollojmë tavanin ose murin për shinën.',
-    'home.s2': 'Zgjedhja dhe oferta', 'home.s2t': 'Zgjidhni pëlhurën, ngjyrën, palosjen dhe shinën. Pas matjes merrni ofertën me çmimin përfundimtar.',
-    'home.s3': 'Qepja dhe prerja', 'home.s3t': 'Perdet qepen dhe shina pritet sipas masës.',
-    'home.s4': 'Montimi', 'home.s4t': 'Ekipi monton shinën, var perdet dhe i rregullon.',
 
-    'home.rails.h': 'Shina është gjysma e punës',
-    'home.rails.t': 'Çdo ofertë përfshin shinën e duhur për palosjen që zgjidhni, të prerë sipas masës dhe të montuar.',
-    'home.rails.link': 'Shiko shinat',
-    
+
+
+
+
+
+
+
+
     'home.contact.wa': 'WhatsApp', 'home.contact.waNo': '+355 6X XXX XXXX (numri shtohet më vonë)',
     'home.contact.addr': 'Adresa dhe orari shtohen më vonë.',
-
     'cat.roomHigh': 'top i gjerë, pa bashkime', 'cat.drops': 'qepet nga disa gjerësi', 
     'cat.inStock': 'Në stok', 'cat.lead': 'Me porosi, {n} ditë pune', 
-
     'rails.d.std': 'Profil alumini me rrëshqitës. Zgjedhja e zakonshme për perde me rrudha.',
     'rails.d.wave': 'Rrëshqitës me hap të njëjtë që e mbajnë valën të barabartë.',
     'rails.d.pole': 'Shufër e dukshme me fundore dekorative, e montuar në mur.',
@@ -1976,7 +2019,6 @@ var I18N = {
 'rails.noDouble': 'vetëm me konsultë',
     'rails.incl': 'Çdo shinë pritet sipas masës dhe vjen me rrëshqitësit ose unazat, tapat fundore ose fundoret dhe fiksuesit standardë.',
     'rails.matrix': 'Cila shinë për cilën palosje', 'rails.yes': 'po', 'rails.no': 'jo', 'rails.use': 'Konfiguro këtë shinë',
-
     'cfg.h': 'Konfiguratori', 'cfg.sub': 'Zgjidhni si e doni perden për një dritare. Çmimin e merrni me ofertë, pas matjes falas.',
     'cfg.window': 'Dritarja', 'cfg.room': 'Dhoma', 'cfg.room.ph': 'p.sh. Dhoma e ndenjes',
     'cfg.width': 'Gjerësia (cm)', 'cfg.height': 'Lartësia (cm)',
@@ -1993,7 +2035,6 @@ var I18N = {
     'line.fabric': '{name}, {m} m', 'line.drops.one': '{n} gjerësi', 'line.drops.other': '{n} gjerësi',
     'line.sewing': 'Qepja ({h}), {m} m', 'line.rail': '{name}, {m} m', 'line.motorKit': 'Motor me telekomandë',
     'line.install': 'Montimi',
-
     'cfg.bom': 'Pjesët e shinës', 'cfg.cut': 'Prerje',
     'part.clip': 'Kapëse tavani', 'part.wallbr': 'Mbajtëse muri për shinë', 'part.glider-std': 'Rrëshqitës standardë', 'part.glider-wave': 'Rrëshqitës për valë', 'part.glider-motor': 'Rrëshqitës për motor',
     'part.endstop': 'Tapa fundore', 'part.bracket-1': 'Mbajtëse shufre, teke', 'part.bracket-2': 'Mbajtëse shufre, dyshe', 'part.ring': 'Unaza', 'part.finial': 'Fundore dekorative', 'part.connector': 'Bashkues shufre', 'part.motorkit': 'Motor', 'part.profile': 'profil',
@@ -2011,11 +2052,10 @@ var I18N = {
     'err.widthInvalid': 'Shkruani gjerësinë në cm, me numër të plotë.', 'err.widthMin': 'Gjerësia duhet të jetë të paktën {n} cm.',
     'err.heightInvalid': 'Shkruani lartësinë në cm, me numër të plotë.', 'err.heightMin': 'Lartësia duhet të jetë të paktën {n} cm.',
     'err.fabric': 'Zgjidhni pëlhurën.', 'err.rail': 'Zgjidhni një shinë që përshtatet.', 'err.config': 'Zgjedhje e pavlefshme.', 'err.nothing': 'Me shinën tuaj duhet të zgjidhni të paktën një perde.',
-
     'book.h': 'Rezervo matje falas', 'book.sub': 'Vijmë në shtëpi, masim çdo dritare dhe konfirmojmë ofertën.',
     'book.name': 'Emri dhe mbiemri', 'book.phone': 'Telefoni', 'book.phone.hint': 'p.sh. 069 123 4567 ose +44 7700 900123',
     'book.email': 'Email (jo i detyrueshëm)', 'book.zone': 'Zona', 'book.address': 'Adresa', 'book.notes': 'Shënime (kati, orari i preferuar)',
-    'book.when': 'Dita dhe orari i matjes', 'book.callback': 'Më telefononi për të caktuar orarin', 'book.taken': 'i zënë',
+    'book.when': 'Zgjidhni ditën dhe orarin', 'book.callback': 'Asnjë orar nuk më përshtatet: më telefononi për ta caktuar', 'book.taken': 'i zënë',
     'book.zoneC': 'Për qytete të tjera ju telefonojmë për të caktuar vizitën. Matja jashtë zonës sonë mund të ketë tarifë; jua themi në telefon, para se të caktojmë vizitën.',
     'book.attached.one': 'Kërkesa e bashkëngjitur: {n} dritare.', 'book.attached.other': 'Kërkesa e bashkëngjitur: {n} dritare.', 'book.noEst': 'Pa dritare të bashkëngjitura. Mund të rezervoni edhe pa to.',
     'book.consent': 'Pranoj që të dhënat e mia të përdoren për të trajtuar këtë kërkesë.',
@@ -2028,14 +2068,11 @@ var I18N = {
     'book.done.pin': 'Për gjurmim përdorni kodin dhe 4 shifrat e fundit të telefonit.',
     'book.done.demo': 'Në demo asgjë nuk dërgohet. Kërkesa shfaqet te tabela e stafit.',
     'book.done.track': 'Gjurmo këtë porosi', 'book.done.new': 'Kërkesë e re',
-
     'track.h': 'Gjurmo porosinë', 'track.sub': 'Shkruani kodin e porosisë dhe 4 shifrat e fundit të telefonit.',
     'track.code': 'Kodi i porosisë', 'track.pin': '4 shifrat e fundit të telefonit', 'track.go': 'Shiko gjendjen',
     'track.notFound': 'Nuk u gjet asnjë porosi me këto të dhëna. Pas disa përpjekjeve të gabuara, kodi bllokohet për një kohë.', 'track.hint': 'Provoni në demo: {code} dhe {pin}',
-
     'track.cancelled': 'Kjo porosi është anuluar.',     'c.lead': 'Kërkesa u mor', 'c.measure_booked': 'Matja u caktua', 'c.measured': 'Po përgatisim ofertën', 'c.quoted': 'Oferta u dërgua', 'c.confirmed': 'Porosia u konfirmua',
     'c.production': 'Në punim', 'c.ready': 'Gati, po caktojmë montimin', 'c.install_booked': 'Montimi u caktua', 'c.installed': 'E montuar', 'c.closed': 'E përfunduar',
-
     'ops.h': 'Operacionet', 'ops.sub': 'Pamja e stafit: porositë, shinat dhe kalendari.',
     'ops.tab.board': 'Tabela', 'ops.tab.stock': 'Stoku i shinave', 'ops.tab.cal': 'Kalendari',
     'ops.today': 'Dita në demo: {date}', 'ops.nextDay': 'Kalo në ditën tjetër',
@@ -2112,13 +2149,10 @@ var I18N = {
     'cfg.mountBack': 'Vendi i montimit u kthye: {v}.',
     'est.saved': 'Ruhet në këtë pajisje për {n} ditë.',
     'book.day': 'Dita',
-    'book.time': 'Orari',
     'book.chosen': 'Zgjodhët: {date}, ora {slot}.',
-    'book.dayFull': 'plot',
     'book.done.copy': 'Kopjo kodin',
     'book.done.copied': 'Kodi u kopjua.',
     'book.done.windows': 'Çfarë kërkuat',
-
     'track.request': 'Kërkesa juaj',
     'track.hold.customer': 'Presim përgjigjen tuaj. Na shkruani ose na telefononi.',
     'track.hold.stock': 'Po presim materialin. Ju njoftojmë sapo të mbërrijë.',
@@ -2165,14 +2199,12 @@ var I18N = {
     'ui.lang.sq': 'Shqip',
     'ui.menu': 'Hap menynë', 'ui.menuClose': 'Mbyll menynë',
     'nav.bookShort': 'Rezervo', 
-
     'ui.lang.en': 'Anglisht',
     'ui.nav': 'Menyja kryesore',
     'mode.short.overhang': 'Dritarja + {n} cm',
     'mode.short.wall': 'Mur më mur',
     'ops.card.measure': 'Matja: {date}',
     'ops.card.install': 'Montimi: {date}',
-    
     'ops.unavailable': 'Nuk përshtaten: {list}',
     'cfg.railNoFit': '{v} nuk i përshtatet kësaj dritareje: {why}.',
     'est.full': 'Një kërkesë mban deri në {n} dritare. Për më shumë, rezervoni matjen.',
@@ -2205,13 +2237,11 @@ var I18N = {
     'stock.shortLine.other': '{code}, dritarja {n}: {sys}, prerje {needs} cm. Mungojnë: {list}.',
     'ops.installDayHint': 'Shënohen ditën e montimit.',
     'ops.fabricFirst': 'Qepja shënohet pasi të vijë pëlhura.',
-
     'car.color': 'Ngjyra',
 
     
 
     
-
     'cfg.incl': 'Çfarë përfshin',
     'cfg.quoteNote': 'Çmimin e merrni me ofertë, pas matjes falas.',
     'rails.dbl.yes': 'po, si shinë dyshe',
@@ -2225,20 +2255,16 @@ var I18N = {
     'track.balance.yes': 'E paguar',
     'track.balance.no': 'Paguhet ditën e montimit',
     'track.amounts': 'Shumat janë në ofertën që ju kemi dërguar.',
-
     'cfg.modeAuto': 'Mënyra e matjes u ndryshua: {v}.',
     'track.quote.expired': 'Ka skaduar. Na shkruani për një ofertë të re.',
     'track.balance.due': 'Ende e papaguar',
     'est.gone': 'Kjo pëlhurë ose ngjyrë nuk ofrohet më. E zgjedhim bashkë në matje.',
-
     'nav.inspire': 'Frymëzime',
     'nav.guides': 'Udhëzues',
 
-    'home.build.h': 'Krijoni porosinë tuaj', 
-    'home.build.t': 'Zgjidhni produktin, modelin ose pëlhurën dhe masat. Kërkesën na e dërgoni nga faqja dhe çmimin e merrni me ofertë, pas matjes falas.', 
+
     'home.insp.t': 'Dhoma që kemi veshur, me pëlhurën dhe shinën e secilës.',
     'home.insp.all': 'Shiko të gjitha',
-    'home.guides.t': 'Përgjigje të shkurtra për pyetjet që na bëhen më shpesh.',
     'cat.colors.one': '{n} ngjyrë',
     'cat.colors.other': '{n} ngjyra',
     'ph.photo': 'Foto',
@@ -2246,7 +2272,6 @@ var I18N = {
     'ph.hung': '{name}, perdja e varur',
     'ph.close': '{name}, pëlhura nga afër',
     'ph.room': '{name}, në dhomë',
-    'ph.build': 'Qepja në punishte',
     'ph.rail': '{name}, nga afër',
     'ph.insp': '{name}, foto {i}',
     'fab.back': 'Të gjitha pëlhurat',
@@ -2280,7 +2305,6 @@ var I18N = {
     'step.rail.t': 'Shina zgjidhet sipas palosjes dhe vendit ku montohet.', 
     'step.size.t': 'Mjaftojnë masa të përafërta. Të saktat i marrim ne, në matjen falas.', 
     'step.summary.t': 'Kontrolloni zgjedhjet dhe shtojeni dritaren te kërkesa.', 
-    
     'step.back': 'Kthehu',
     'step.next': 'Vazhdo',
     'step.nav': 'Hapat',
@@ -2357,18 +2381,15 @@ var I18N = {
     'foot.about': 'Perde me masë në Tiranë: pëlhura, qepje, shina dhe montim.',
     'home.h1a': 'Perde me masë,',
     'home.h1b': 'me shinë dhe montim',
-    'home.eye.about': 'Njihuni me ne',
-    'home.about.h': 'Çfarë bëjmë',
-    'home.about.p1': 'Qepim perde me masë dhe montojmë grila, romane e rolera për shtëpinë tuaj, me shinën e duhur dhe montimin nga ekipi ynë.', 
-    'home.about.p2': 'Zgjidhni një produkt këtu ose ejani vetëm me një ide. Mostrat i sjellim ne, në shtëpinë tuaj.', 
-    'home.eye.how': 'Shërbimi',
+
+
+
+
     'home.eye.insp': 'Punët tona',
-    'home.eye.guides': 'Këshilla',
     'home.book.h': 'Matja është falas',
     'home.book.t': 'Vijmë në shtëpi, masim çdo dritare dhe sjellim mostrat. Çmimin e merrni me ofertë.',
-    
     'ph.visit': 'Matja në shtëpinë e klientit',
-    'ph.wide': 'e gjerë, pritet sipas ekranit',
+    'ph.wide': 'sa gjithë ekrani: në këmbë në telefon, e gjerë në kompjuter',
     'cat.side': 'Kategoritë',
     'fab.card.h': 'Shiheni nga afër, në shtëpi',
     'fab.card.p': 'Në matjen falas sjellim mostra të kësaj pëlhure, që ta shihni në dritën e dhomës suaj.',
@@ -2381,7 +2402,6 @@ var I18N = {
     'home.cats.h': 'Çfarë bëjmë për dritaren tuaj',
     'home.cats.t': 'Pesë lloje produktesh, të gjitha me masë dhe të montuara nga ne.',
     'home.cats.all': 'Shiko produktet',
-    'home.build.mid': 'Modeli ose pëlhura',
     'shop.h': 'Produktet',
     'shop.sub': 'Zgjidhni llojin e produktit për të parë modelet, pëlhurat dhe ngjyrat.',
     'cat.shina.name': 'Shina',
@@ -2443,7 +2463,11 @@ var I18N = {
     'cat.grila.short': 'Grila',
     'cat.perde.short': 'Perde',
     'cat.romane.short': 'Romane',
-    'cat.rolera.short': 'Rolera'
+    'cat.rolera.short': 'Rolera',
+    'book.tt.free': 'E lirë',
+    'book.tt.taken': 'E zënë',
+    'book.tt.yours': 'zgjedhja juaj',
+    'book.tt.cap': 'Oraret e lira dhe të zëna të ditëve në vijim: një ditë për rresht, një orar për kolonë'
   },
   en: {
     'demo.notePublic': 'Demo: models, fabrics, inspiration and availability are samples. The empty frames hold the place of your photographs, in the proportions they will have. The price comes with the quote, after the free measurement.', 
@@ -2459,25 +2483,21 @@ var I18N = {
     'panels.2': 'Two panels, opening from the middle', 'panels.1': 'One panel, opening from one side',
     'zone.A': 'Tirana', 'zone.B': 'Durrës, Kamëz, Vorë', 'zone.C': 'Another city',
 
-    'home.sub': 'A free home measurement, sewing to size, a rail cut for your window and installation by our own team.',
     'home.cta1': 'Book a free measurement', 'home.cta2': 'Open the configurator', 
 
-    'home.how': 'How it works',
-    'home.s1': 'Free measurement', 'home.s1t': 'We visit, measure every window and check the ceiling or wall for the rail.',
-    'home.s2': 'Choice and quote', 'home.s2t': 'You choose the fabric, colour, heading and rail. After the measurement you get a quote with the final price.',
-    'home.s3': 'Sewing and cutting', 'home.s3t': 'Curtains are sewn and the rail is cut to your size.',
-    'home.s4': 'Installation', 'home.s4t': 'The team fits the rail, hangs the curtains and arranges the folds.',
 
-    'home.rails.h': 'The rail is half the job',
-    'home.rails.t': 'Every quote includes the right rail for the heading you choose, cut to size and fitted.',
-    'home.rails.link': 'See the rails',
-    
+
+
+
+
+
+
+
+
     'home.contact.wa': 'WhatsApp', 'home.contact.waNo': '+355 6X XXX XXXX (number to be added)',
     'home.contact.addr': 'Address and opening hours to be added.',
-
     'cat.roomHigh': 'wide roll, no joins', 'cat.drops': 'joined from widths', 
     'cat.inStock': 'In stock', 'cat.lead': 'To order, {n} working days', 
-
     'rails.d.std': 'Aluminium profile with gliders. The usual choice for pleated curtains.',
     'rails.d.wave': 'Gliders at a fixed pitch keep the wave even.',
     'rails.d.pole': 'A visible pole with finials, fixed to the wall.',
@@ -2486,7 +2506,6 @@ var I18N = {
 'rails.noDouble': 'by consultation only',
     'rails.incl': 'Every rail is cut to size and comes with its gliders or rings, end stops or finials and standard fixings.',
     'rails.matrix': 'Which rail for which heading', 'rails.yes': 'yes', 'rails.no': 'no', 'rails.use': 'Configure this rail',
-
     'cfg.h': 'Configurator', 'cfg.sub': 'Choose how you want the curtain for one window. The price comes with your quote, after the free measurement.',
     'cfg.window': 'Window', 'cfg.room': 'Room', 'cfg.room.ph': 'e.g. Living room',
     'cfg.width': 'Width (cm)', 'cfg.height': 'Height (cm)',
@@ -2503,7 +2522,6 @@ var I18N = {
     'line.fabric': '{name}, {m} m', 'line.drops.one': '{n} width', 'line.drops.other': '{n} widths',
     'line.sewing': 'Sewing ({h}), {m} m', 'line.rail': '{name}, {m} m', 'line.motorKit': 'Motor kit with remote',
     'line.install': 'Installation',
-
     'cfg.bom': 'Rail parts', 'cfg.cut': 'Cut',
     'part.clip': 'Ceiling clips', 'part.wallbr': 'Wall brackets for track', 'part.glider-std': 'Standard gliders', 'part.glider-wave': 'Wave gliders', 'part.glider-motor': 'Motor-track gliders',
     'part.endstop': 'End stops', 'part.bracket-1': 'Pole brackets, single', 'part.bracket-2': 'Pole brackets, double', 'part.ring': 'Rings', 'part.finial': 'Finials', 'part.connector': 'Pole connector', 'part.motorkit': 'Motor kit', 'part.profile': 'profile',
@@ -2521,11 +2539,10 @@ var I18N = {
     'err.widthInvalid': 'Enter the width in whole centimetres.', 'err.widthMin': 'Width must be at least {n} cm.',
     'err.heightInvalid': 'Enter the height in whole centimetres.', 'err.heightMin': 'Height must be at least {n} cm.',
     'err.fabric': 'Pick a fabric.', 'err.rail': 'Pick a rail that fits.', 'err.config': 'Invalid choice.', 'err.nothing': 'With your own rail, choose at least one curtain.',
-
     'book.h': 'Book a free measurement', 'book.sub': 'We come to you, measure every window and confirm the quote.',
     'book.name': 'Full name', 'book.phone': 'Phone', 'book.phone.hint': 'e.g. 069 123 4567 or +44 7700 900123',
     'book.email': 'Email (optional)', 'book.zone': 'Area', 'book.address': 'Address', 'book.notes': 'Notes (floor, preferred time)',
-    'book.when': 'Measurement day and time', 'book.callback': 'Call me to arrange a time', 'book.taken': 'taken',
+    'book.when': 'Choose a day and a time', 'book.callback': 'None of these suits me: call me to arrange a time', 'book.taken': 'taken',
     'book.zoneC': 'For other cities we call you to arrange the visit. A measurement outside our area may carry a fee; we tell you on the phone before the visit is arranged.',
     'book.attached.one': 'Request attached: {n} window.', 'book.attached.other': 'Request attached: {n} windows.', 'book.noEst': 'No windows attached. You can book without them.',
     'book.consent': 'I agree that my details are used to handle this request.',
@@ -2538,14 +2555,11 @@ var I18N = {
     'book.done.pin': 'To track it, use the code and the last 4 digits of your phone.',
     'book.done.demo': 'Nothing is sent in the demo. The request appears on the staff board.',
     'book.done.track': 'Track this order', 'book.done.new': 'New request',
-
     'track.h': 'Track your order', 'track.sub': 'Enter the order code and the last 4 digits of your phone.',
     'track.code': 'Order code', 'track.pin': 'Last 4 digits of your phone', 'track.go': 'Check status',
     'track.notFound': 'No order matches these details. After several wrong attempts a code is locked for a while.', 'track.hint': 'Try in the demo: {code} and {pin}',
-
     'track.cancelled': 'This order was cancelled.',     'c.lead': 'Request received', 'c.measure_booked': 'Measurement booked', 'c.measured': 'Preparing your quote', 'c.quoted': 'Quote sent', 'c.confirmed': 'Order confirmed',
     'c.production': 'Being made', 'c.ready': 'Ready, booking installation', 'c.install_booked': 'Installation booked', 'c.installed': 'Installed', 'c.closed': 'Completed',
-
     'ops.h': 'Operations', 'ops.sub': 'Staff view: orders, rails and calendar.',
     'ops.tab.board': 'Board', 'ops.tab.stock': 'Rail stock', 'ops.tab.cal': 'Calendar',
     'ops.today': 'Demo day: {date}', 'ops.nextDay': 'Go to the next day',
@@ -2622,13 +2636,10 @@ var I18N = {
     'cfg.mountBack': 'Mount restored: {v}.',
     'est.saved': 'Kept on this device for {n} days.',
     'book.day': 'Day',
-    'book.time': 'Time',
     'book.chosen': 'You chose: {date}, {slot}.',
-    'book.dayFull': 'full',
     'book.done.copy': 'Copy the code',
     'book.done.copied': 'Code copied.',
     'book.done.windows': 'What you asked for',
-
     'track.request': 'Your request',
     'track.hold.customer': 'We are waiting to hear from you. Write or call us.',
     'track.hold.stock': 'We are waiting for materials and will let you know when they arrive.',
@@ -2675,14 +2686,12 @@ var I18N = {
     'ui.lang.sq': 'Albanian',
     'ui.menu': 'Open the menu', 'ui.menuClose': 'Close the menu',
     'nav.bookShort': 'Book', 
-
     'ui.lang.en': 'English',
     'ui.nav': 'Main menu',
     'mode.short.overhang': 'Window + {n} cm',
     'mode.short.wall': 'Wall to wall',
     'ops.card.measure': 'Visit: {date}',
     'ops.card.install': 'Installation: {date}',
-    
     'ops.unavailable': 'Not available: {list}',
     'cfg.railNoFit': '{v} does not fit this window: {why}.',
     'est.full': 'A request holds up to {n} windows. For more, book a measurement.',
@@ -2715,13 +2724,11 @@ var I18N = {
     'stock.shortLine.other': '{code}, window {n}: {sys}, cut {needs} cm. Missing: {list}.',
     'ops.installDayHint': 'These can be ticked on the installation day.',
     'ops.fabricFirst': 'Sewing can be ticked once the fabric has arrived.',
-
     'car.color': 'Colour',
 
     
 
     
-
     'cfg.incl': 'What it includes',
     'cfg.quoteNote': 'The price comes with your quote, after the free measurement.',
     'rails.dbl.yes': 'yes, as a double rail',
@@ -2735,20 +2742,16 @@ var I18N = {
     'track.balance.yes': 'Paid',
     'track.balance.no': 'Due on installation day',
     'track.amounts': 'The amounts are in the quote we sent you.',
-
     'cfg.modeAuto': 'Width measuring changed: {v}.',
     'track.quote.expired': 'Expired. Write to us for a new one.',
     'track.balance.due': 'Not yet paid',
     'est.gone': 'This fabric or colour is no longer offered. We choose one together at the measurement.',
-
     'nav.inspire': 'Inspiration',
     'nav.guides': 'Guides',
 
-    'home.build.h': 'Build your order', 
-    'home.build.t': 'Choose the product, the model or fabric and the size. You send us the request from the site and get the price as a quote, after the free measurement.', 
+
     'home.insp.t': 'Rooms we have dressed, each with its fabric and rail.',
     'home.insp.all': 'See all',
-    'home.guides.t': 'Short answers to the questions we are asked most.',
     'cat.colors.one': '{n} colour',
     'cat.colors.other': '{n} colours',
     'ph.photo': 'Photo',
@@ -2756,7 +2759,6 @@ var I18N = {
     'ph.hung': '{name}, the curtain hanging',
     'ph.close': '{name}, the cloth close up',
     'ph.room': '{name}, in a room',
-    'ph.build': 'Sewing in the workshop',
     'ph.rail': '{name}, close up',
     'ph.insp': '{name}, photo {i}',
     'fab.back': 'All fabrics',
@@ -2790,7 +2792,6 @@ var I18N = {
     'step.rail.t': 'The rail follows from the heading and from where it is fitted.', 
     'step.size.t': 'Rough sizes are enough. We take the exact ones at the free measurement.', 
     'step.summary.t': 'Check your choices and add the window to your request.', 
-    
     'step.back': 'Back',
     'step.next': 'Continue',
     'step.nav': 'Steps',
@@ -2867,18 +2868,15 @@ var I18N = {
     'foot.about': 'Made-to-measure curtains in Tirana: fabric, sewing, rails and fitting.',
     'home.h1a': 'Curtains to measure,',
     'home.h1b': 'with rail and fitting',
-    'home.eye.about': 'About us',
-    'home.about.h': 'What we do',
-    'home.about.p1': 'We sew curtains to measure and fit blinds, roman blinds and roller blinds for your home, with the right rail and fitting by our own team.', 
-    'home.about.p2': 'Choose a product here or come with only an idea. We bring the samples to your home.', 
-    'home.eye.how': 'The service',
+
+
+
+
     'home.eye.insp': 'Our work',
-    'home.eye.guides': 'Advice',
     'home.book.h': 'The measurement is free',
     'home.book.t': 'We come to you, measure every window and bring the samples. The price comes as a quote.',
-    
     'ph.visit': 'Measuring at the customer\'s home',
-    'ph.wide': 'wide, cropped to the screen',
+    'ph.wide': 'the whole screen: upright on a phone, wide on a computer',
     'cat.side': 'Categories',
     'fab.card.h': 'See it up close, at home',
     'fab.card.p': 'At the free measurement we bring samples of this fabric, so you see it in the light of your own room.',
@@ -2891,7 +2889,6 @@ var I18N = {
     'home.cats.h': 'What we make for your window',
     'home.cats.t': 'Five kinds of product, all made to measure and fitted by us.',
     'home.cats.all': 'See the products',
-    'home.build.mid': 'Model or fabric',
     'shop.h': 'Products',
     'shop.sub': 'Choose a kind of product to see its models, fabrics and colours.',
     'cat.shina.name': 'Rails',
@@ -2953,7 +2950,11 @@ var I18N = {
     'cat.grila.short': 'Blinds',
     'cat.perde.short': 'Curtains',
     'cat.romane.short': 'Roman blinds',
-    'cat.rolera.short': 'Roller blinds'
+    'cat.rolera.short': 'Roller blinds',
+    'book.tt.free': 'Free',
+    'book.tt.taken': 'Taken',
+    'book.tt.yours': 'your choice',
+    'book.tt.cap': 'Free and taken times of the coming days: a day to a row, a time to a column'
   }
 };
 if (typeof module !== 'undefined') module.exports = I18N;
@@ -2969,7 +2970,7 @@ if (typeof module !== 'undefined') module.exports = I18N;
   function defaultCfg() {
     return { width: 240, height: 260, mode: 'overhang', layers: 'sheer', sheerId: 's1', mainId: 'b1', heading: 'wave', rail: 'wave', mount: 'ceiling', shape: 'straight', panels: 2 };
   }
-  function emptyBook() { return { name: '', phone: '', email: '', address: '', notes: '', day: '', slot: '', callback: false, consent: false, hp: '', errors: {}, done: null, copied: false }; }
+  function emptyBook() { return { name: '', phone: '', email: '', address: '', notes: '', slot: '', callback: false, consent: false, hp: '', errors: {}, done: null, copied: false }; }
   function emptyLead() { return { name: '', phone: '', address: '', notes: '', zone: 'A', source: 'phone', err: false }; }
 
   var S = {
@@ -3117,6 +3118,7 @@ if (typeof module !== 'undefined') module.exports = I18N;
   function lc1(v) { return v.charAt(0).toLowerCase() + v.slice(1); } // "Shufër dekorative Ø28" keeps its diameter sign
   var CAM = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l1.6-2.4h6.8L17 8h3v10.5H4z"/><circle cx="12" cy="13" r="3.4"/></svg>';
   var CHEV = '<svg viewBox="0 0 18 18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3l6 6-6 6"/></svg>';
+  var TICK = '<svg viewBox="0 0 18 18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9.5l3.4 3.4L14 5.6"/></svg>';
   var BACK = '<svg viewBox="0 0 18 18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 3L5 9l6 6"/></svg>';
   // An empty, marked frame where a photograph will stand. ratio is the photograph's proportion ("2 / 3"); label says
   // which picture belongs there. opt: {cls, id, hex, note}: hex shows the chosen colour as a round sample in the corner;
@@ -3186,25 +3188,16 @@ if (typeof module !== 'undefined') module.exports = I18N;
   }
 
   function viewHome() {
-    // the opening photograph runs edge to edge and carries the heading, as on the client's reference
-    var h = '<section class="hero">' + photo('16 / 9', t('ph.hero'), { cls: 'hero-ph', note: t('ph.wide') }) + '<div class="wrap hero-in"><h1><span class="l1">' + t('home.h1a') + '</span> <span>' + t('home.h1b') + '</span></h1>' +
-      '<div class="hero-side"><p>' + t('home.sub') + '</p><div class="btn-row"><button class="btn on-photo" data-go="config" id="home-build">' + t('home.cta2') + '</button><button class="btn on-photo" data-go="book" id="home-book">' + t('home.cta1') + '</button></div></div></div></section>';
-    h += '<section class="sec" id="home-about"><div class="wrap">' + secTitle('home.eye.about', t('home.about.h')) + '<div class="about"><p>' + t('home.about.p1') + '</p><p>' + t('home.about.p2') + '</p></div></div></section>' +
-      '<div class="bigword" aria-hidden="true">PERDE NEMIS</div>';
-    h += '<section class="sec" id="home-how"><div class="wrap">' + secTitle('home.eye.how', t('home.how')) + '<ol class="steps">';
-    for (var i = 1; i <= 4; i++) h += '<li><h3>' + t('home.s' + i) + '</h3><p>' + t('home.s' + i + 't') + '</p></li>';
-    h += '</ol></div></section>';
-    h += '<section class="split" id="home-book-band">' + photo('1 / 1', t('ph.visit'), { cls: 'fill' }) + '<div class="split-text"><h2 class="caps">' + t('home.book.h') + '</h2><p>' + t('home.book.t') + '</p>' +
-      '<button class="btn ghost" data-go="book">' + t('home.cta1') + '</button></div></section>';
+    // Four parts and no more: the photograph, the five kinds, three rooms, the free measurement.
+    // The opening photograph fills the whole screen, on a phone too, and carries the heading; the top bar stands over it.
+    var h = '<section class="hero">' + photo('9 / 16', t('ph.hero'), { cls: 'hero-ph', note: t('ph.wide') }) + '<div class="wrap hero-in"><h1><span class="l1">' + t('home.h1a') + '</span> <span>' + t('home.h1b') + '</span></h1>' +
+      '<div class="hero-side"><button class="btn on-photo" data-go="book" id="home-book">' + t('home.cta1') + '</button><a class="hero-link" href="#config" data-go="config" id="home-build">' + t('home.cta2') + '</a></div></div></section>';
     h += '<section class="sec" id="home-cats"><div class="wrap"><div class="sec-head"><div><h2 class="plain-h">' + t('home.cats.h') + '</h2><p>' + t('home.cats.t') + '</p></div>' + more('catalog', 'home.cats.all', 'home-cats-all') + '</div>' +
-      '<div class="cgrid">' + CATEGORIES.map(catTile).join('') + '</div></div></section>';
-    h += '<section class="split rev" id="home-build-band">' + photo('1 / 1', t('ph.build'), { cls: 'fill' }) + '<div class="split-text"><h2 class="caps">' + t('home.build.h') + '</h2><p>' + t('home.build.t') + '</p><ol class="build-list">';
-    ['step.product', 'home.build.mid', 'step.size', 'step.summary'].forEach(function (k) { h += '<li>' + t(k) + '</li>'; });
-    h += '</ol><button class="btn ghost" data-go="config">' + t('home.cta2') + '</button></div></section>';
+      '<div class="cgrid">' + CATEGORIES.map(function (c) { return catTile(c, true); }).join('') + '</div></div></section>';
     h += '<section class="sec" id="home-insp"><div class="wrap">' + secTitle('home.eye.insp', t('insp.h'), t('home.insp.t')) +
       '<div class="igrid row">' + INSPIRE.slice(0, 3).map(inspCard).join('') + '</div><p class="center">' + more('inspire', 'home.insp.all', 'home-insp-all') + '</p></div></section>';
-    h += '<section class="split" id="home-rails">' + photo('1 / 1', t('ph.rail', { name: t('rail.wave') }), { cls: 'fill' }) + '<div class="split-text"><h2 class="caps">' + t('home.rails.h') + '</h2><p>' + t('home.rails.t') + '</p>' + '<a class="btn ghost" href="#shop-shina" data-act="open-cat" data-cat="shina" id="home-rails-link">' + t('home.rails.link') + '</a></div></section>';
-    h += '<section class="sec" id="home-guides"><div class="wrap">' + secTitle('home.eye.guides', t('guides.h'), t('home.guides.t')) + guideList() + '</div></section>';
+    h += '<section class="split" id="home-book-band">' + photo('1 / 1', t('ph.visit'), { cls: 'fill' }) + '<div class="split-text"><h2 class="caps">' + t('home.book.h') + '</h2><p>' + t('home.book.t') + '</p>' +
+      '<button class="btn ghost" data-go="book">' + t('home.cta1') + '</button></div></section>';
     return h;
   }
 
@@ -3234,9 +3227,9 @@ if (typeof module !== 'undefined') module.exports = I18N;
     else d = '<path d="M5 11h58" stroke-width="3"/><path d="M14 13v6M27 13v6M41 13v6M54 13v6"/><circle cx="14" cy="22" r="2.6"/><circle cx="27" cy="22" r="2.6"/><circle cx="41" cy="22" r="2.6"/><circle cx="54" cy="22" r="2.6"/><path d="M8 7v8M60 7v8" opacity=".5"/>';
     return '<svg viewBox="0 0 68 44" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">' + d + '</svg>';
   }
-  function catTile(c) { // one of the five kinds, as a tile that opens its page
+  function catTile(c, bare) { // one of the five kinds, as a tile that opens its page; on the home page the photograph and the name only
     return '<a class="ctile" href="#shop-' + c + '" data-act="open-cat" data-cat="' + c + '" id="cat-tile-' + c + '">' + photo('4 / 5', t('ph.cat', { name: catName(c) })) +
-      '<span class="fcard-name">' + catName(c) + '</span><span class="fcard-meta">' + t('cat.' + c + '.text') + '</span></a>';
+      '<span class="fcard-name">' + catName(c) + '</span>' + (bare === true ? '' : '<span class="fcard-meta">' + t('cat.' + c + '.text') + '</span>') + '</a>';
   }
   function blindCard(b) { // a model of blind in a list
     return '<a class="fcard" href="#item-' + b.id + '" data-act="open-item" data-id="' + b.id + '" id="item-card-' + b.id + '">' + photo('2 / 3', t('ph.fitted', { name: blindName(b) })) +
@@ -3657,36 +3650,45 @@ if (typeof module !== 'undefined') module.exports = I18N;
     h += '<ol class="visit" aria-label="' + t('visit.h') + '">' + [1, 2, 3].map(function (i) { return '<li><h2 class="h3">' + t('visit.' + i + '.h') + '</h2><p>' + t('visit.' + i + '.p') + '</p></li>'; }).join('') + '</ol>';
     function err(k) { return '<p class="field-err" id="book-' + k + '-err">' + (b.errors[k] ? t('book.e.' + b.errors[k]) : '') + '</p>'; }
     function aria(k, extra) { return ' aria-describedby="' + (extra ? extra + ' ' : '') + 'book-' + k + '-err"' + (b.errors[k] ? ' aria-invalid="true"' : ''); }
+    // where and when first (the timetable depends on the area), then who
     h += '<form class="panel form book" id="book-form" novalidate><p class="' + (S.est.length ? 'note' : 'muted') + '" id="book-attached">' + attachedText() + '</p>' +
-      '<label class="field" for="book-name"><span>' + t('book.name') + '</span><input type="text" id="book-name" maxlength="80" autocomplete="name" value="' + esc(b.name) + '" data-f="b-name"' + aria('name') + '>' + err('name') + '</label>' +
+      '<div class="book-when"><label class="field" for="book-zone"><span>' + t('book.zone') + '</span><select id="book-zone" data-f="b-zone">' + zoneOptions(S.zone) + '</select></label>' +
+      '<div id="book-slots">' + slotsHtml() + '</div></div>' +
+      '<div class="book-who"><label class="field" for="book-name"><span>' + t('book.name') + '</span><input type="text" id="book-name" maxlength="80" autocomplete="name" value="' + esc(b.name) + '" data-f="b-name"' + aria('name') + '>' + err('name') + '</label>' +
       '<label class="field" for="book-phone"><span>' + t('book.phone') + '</span><input type="tel" id="book-phone" maxlength="24" autocomplete="tel" value="' + esc(b.phone) + '" data-f="b-phone"' + aria('phone', 'book-phone-hint') + '><small id="book-phone-hint">' + t('book.phone.hint') + '</small>' + err('phone') + '</label>' +
       '<label class="field" for="book-email"><span>' + t('book.email') + '</span><input type="text" inputmode="email" id="book-email" maxlength="120" autocomplete="email" value="' + esc(b.email) + '" data-f="b-email"' + aria('email') + '>' + err('email') + '</label>' +
-      '<label class="field" for="book-zone"><span>' + t('book.zone') + '</span><select id="book-zone" data-f="b-zone">' + zoneOptions(S.zone) + '</select></label>' +
       '<label class="field" for="book-address"><span>' + t('book.address') + '</span><input type="text" id="book-address" maxlength="120" autocomplete="street-address" value="' + esc(b.address) + '" data-f="b-address"' + aria('address') + '>' + err('address') + '</label>' +
       '<label class="field" for="book-notes"><span>' + t('book.notes') + '</span><textarea id="book-notes" rows="2" maxlength="300" data-f="b-notes">' + esc(b.notes) + '</textarea></label>' +
       '<label class="hp" aria-hidden="true">Website<input type="text" id="book-website" tabindex="-1" autocomplete="off" data-f="b-hp"></label>' +
-      '<div id="book-slots">' + slotsHtml() + '</div>' +
       '<label class="check" for="book-consent"><input type="checkbox" id="book-consent"' + (b.consent ? ' checked' : '') + ' data-f="b-consent"' + aria('consent') + '><span>' + t('book.consent') + '</span></label>' + err('consent') +
-      '<button class="btn" type="submit">' + t('book.submit') + '</button></form>';
+      '<button class="btn" type="submit">' + t('book.submit') + '</button></div></form>';
     return h;
   }
   function attachedText() { return S.est.length ? tn('book.attached', S.est.length) : t('book.noEst'); }
-  function slotsHtml() { // days as one strip, then the three times of the chosen day
+  // The coming working days as a timetable: a day to a row, a time of day to a column, every cell free or taken.
+  // A new week starts a new part of the table. The cells are one group of radio buttons, so one time is chosen.
+  function slotsHtml() {
     var b = S.book, zoneC = S.zone === 'C', off = zoneC || b.callback;
     var h = '<fieldset aria-describedby="book-slot-err"><legend>' + t('book.when') + '</legend>';
     if (zoneC) h += '<p class="note">' + t('book.zoneC') + '</p>';
     else {
-      var days = Ops.freeMeasureSlots(st), cur = null;
-      days.forEach(function (d) { d.any = d.slots.some(function (s) { return s.free; }); if (d.date === b.day) cur = d; });
-      if (!cur) { cur = days.filter(function (d) { return d.any; })[0] || days[0]; b.day = cur.date; }
-      h += '<label class="check" for="book-callback"><input type="checkbox" id="book-callback"' + (b.callback ? ' checked' : '') + ' data-f="b-callback"><span>' + t('book.callback') + '</span></label>';
-      h += '<p class="field-label" id="book-day-label">' + t('book.day') + '</p><div class="days' + (off ? ' is-dim' : '') + '" role="radiogroup" aria-labelledby="book-day-label">' + days.map(function (d) {
-        return radio('bday', d.date, cur.date === d.date, fmtDate(d.date), { extra: d.any ? '' : t('book.dayFull'), off: off || !d.any, aria: fmtDate(d.date, 'day') });
-      }).join('') + '</div><p class="field-label" id="book-time-label">' + t('book.time') + '</p><div class="chips' + (off ? ' is-dim' : '') + '" role="radiogroup" aria-labelledby="book-time-label">' + cur.slots.map(function (s) {
-        var v = cur.date + '|' + s.slot;
-        return radio('slot', v, !off && b.slot === v, t('slot.' + s.slot), { extra: s.free ? '' : t('book.taken'), off: off || !s.free, id: s.slot, aria: fmtDate(cur.date, 'day') + ', ' + t('slot.' + s.slot) });
-      }).join('') + '</div>';
+      var days = Ops.freeMeasureSlots(st), prev = 7;
+      h += '<table class="tt' + (off ? ' is-dim' : '') + '" id="book-table"><caption class="sr-only">' + t('book.tt.cap') + '</caption><thead><tr><th scope="col">' + t('book.day') + '</th>' + Ops.MEASURE_SLOTS.map(function (x) {
+        return '<th scope="col"><span aria-hidden="true">' + x.replace('-', '–') + '</span><span class="sr-only">' + t('slot.' + x) + '</span></th>';
+      }).join('') + '</tr></thead>';
+      days.forEach(function (d, n) {
+        var dt = Ops.parse(d.date), wd = (dt.getDay() + 6) % 7; // Monday first
+        if (n === 0 || wd < prev) h += (n ? '</tbody>' : '') + '<tbody>';
+        prev = wd;
+        h += '<tr><th scope="row"><b>' + WDL[S.lang][dt.getDay()] + '</b><span>' + dt.getDate() + ' ' + MO[S.lang][dt.getMonth()] + '</span></th>' + d.slots.map(function (x) {
+          var v = d.date + '|' + x.slot, on = !off && b.slot === v, id = 'slot-' + d.date + '-' + x.slot, word = t(x.free ? 'book.tt.free' : 'book.tt.taken');
+          return '<td><label class="tt-cell' + (x.free ? '' : ' is-taken') + '" for="' + id + '"><input type="radio" name="slot" id="' + id + '" value="' + v + '"' + (on ? ' checked' : '') + (off || !x.free ? ' aria-disabled="true" data-off="1"' : '') +
+            ' data-f="slot" aria-label="' + esc(fmtDate(d.date, 'day') + ', ' + t('slot.' + x.slot) + ', ' + (on ? t('book.tt.yours') : word)) + '"><span>' + (on ? TICK : word) + '</span></label></td>';
+        }).join('') + '</tr>';
+      });
+      h += '</tbody></table>';
       if (!off && b.slot) h += '<p class="chosen">' + t('book.chosen', { date: fmtDate(b.slot.split('|')[0], 'day'), slot: t('slot.' + b.slot.split('|')[1]) }) + '</p>';
+      h += '<label class="check" for="book-callback"><input type="checkbox" id="book-callback"' + (b.callback ? ' checked' : '') + ' data-f="b-callback"><span>' + t('book.callback') + '</span></label>';
     }
     return h + '<p class="field-err" id="book-slot-err">' + (b.errors.slot ? t('book.e.' + b.errors.slot) : '') + '</p></fieldset>';
   }
@@ -3734,7 +3736,7 @@ if (typeof module !== 'undefined') module.exports = I18N;
     say(t('book.done') + '. ' + t('book.done.code') + ': ' + done.code);
   }
   function focusFirstError() {
-    var order = ['name', 'phone', 'email', 'address', 'slot', 'consent'], b = S.book;
+    var order = ['slot', 'name', 'phone', 'email', 'address', 'consent'], b = S.book; // the order they stand on the page
     for (var i = 0; i < order.length; i++) {
       if (!b.errors[order[i]]) continue;
       var el = order[i] === 'slot' ? (document.querySelector('#book-slots input[name=slot]:not([data-off])') || $('book-callback')) : $('book-' + order[i]);
@@ -4224,10 +4226,12 @@ if (typeof module !== 'undefined') module.exports = I18N;
     var fn = { home: viewHome, catalog: viewCatalog, fabric: viewFabric, item: viewItem, inspire: viewInspire, guides: viewGuides, config: viewConfig, book: viewBook, track: viewTrack, ops: viewOps }[S.view];
     var main = $('main');
     main.className = 'view view-' + S.view;
+    root.classList.toggle('is-home', S.view === 'home'); atTop(); // on the home page the top bar stands over the photograph until the page is scrolled
     setHTML(main, S.view === 'home' || S.view === 'config' ? fn() : '<div class="wrap view-body">' + fn() + '</div>'); // the home page and the builder lay out their own full-width bands
     if (S.view === 'config') paintSizeErrors();
     setDrawer();
   }
+  function atTop() { var y = 0; try { y = window.scrollY || root.scrollTop || 0; } catch (e) { y = 0; } root.classList.toggle('at-top', y < 24); }
   function setHash(h) { try { if (location.hash.replace('#', '') !== h) location.hash = h; } catch (e) { /* hash not available */ } }
   // param: which kind of product, fabric, blind, room or guide. Without one, the shop shows the five kinds, "Inspiration"
   // and "Guides" their lists, and a fabric's or blind's page the one last opened.
@@ -4244,6 +4248,7 @@ if (typeof module !== 'undefined') module.exports = I18N;
     render();
     if (!fromHash) setHash(hashFor());
     try { window.scrollTo(0, 0); } catch (e2) { /* ignore */ }
+    atTop();
     var m = $('main');
     if (m) { m.classList.remove('is-entering'); void m.offsetWidth; m.classList.add('is-entering'); m.focus({ preventScroll: true }); } // the new view fades in
   }
@@ -4494,7 +4499,6 @@ if (typeof module !== 'undefined') module.exports = I18N;
       case 'b-consent': S.book.consent = el.checked; clearFixed('consent'); break;
       case 'b-callback': S.book.callback = el.checked; delete S.book.errors.slot; setHTML($('book-slots'), slotsHtml()); break;
       case 'b-zone': S.zone = v; saveEst(); delete S.book.errors.slot; setHTML($('book-slots'), slotsHtml()); setHTML($('book-attached'), attachedText()); break;
-      case 'bday': S.book.day = v; if (S.book.slot.split('|')[0] !== v) S.book.slot = ''; setHTML($('book-slots'), slotsHtml()); break;
       case 'slot':
         S.book.slot = v; delete S.book.errors.slot; setHTML($('book-slots'), slotsHtml());
         say(t('book.chosen', { date: fmtDate(v.split('|')[0], 'day'), slot: t('slot.' + v.split('|')[1]) })); break;
@@ -4595,6 +4599,7 @@ if (typeof module !== 'undefined') module.exports = I18N;
     var ph = parseHash(v);
     if (VIEWS.indexOf(ph.view) >= 0 && hashFor() !== v) go(ph.view, true, ph.param);
   });
+  window.addEventListener('scroll', atTop, { passive: true });
   window.addEventListener('resize', function () {
     var top = $('page-top');
     if (top) root.style.setProperty('--top-h', (getComputedStyle(top).position === 'sticky' ? top.offsetHeight : 0) + 'px');
@@ -4616,6 +4621,13 @@ if (typeof module !== 'undefined') module.exports = I18N;
   if (!start || (start.indexOf('ops-') !== 0 && hashFor() !== start)) { try { history.replaceState(null, '', '#' + hashFor()); } catch (e) { /* the first Back then leaves the page */ } }
   render();
   if (S.ops.open) { var oc = $('od-close'); if (oc) oc.focus(); }
+  // The opening curtain plays by itself (styles only). Here it is only cleared away afterwards, and left out for staff.
+  var cur = $('curtain');
+  if (cur) {
+    var curOff = function () { if (cur.parentNode) cur.parentNode.removeChild(cur); };
+    if (S.view === 'ops') curOff();
+    else { cur.addEventListener('animationend', function (ev) { if (ev.target === cur) curOff(); }); setTimeout(curOff, 2600); }
+  }
 })();
 </script>
 
