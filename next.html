@@ -166,6 +166,11 @@ main.is-entering { animation: viewIn .3s ease both; }
 .sec-head > div { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
 .sec-head p { color: var(--ink-2); max-width: 50ch; font-size: .95rem; }
 .fgrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 30px 14px; }
+/* the five kinds of product, as tiles */
+.cgrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 30px 14px; }
+.ctile { display: flex; flex-direction: column; gap: 6px; color: inherit; text-decoration: none; min-width: 0; }
+.ctile .ph { margin-bottom: 6px; }
+.ctile:hover .fcard-name { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 4px; }
 .fcard { display: flex; flex-direction: column; gap: 12px; color: inherit; text-decoration: none; min-width: 0; }
 .fcard-body { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
 .fcard-name { font: 700 1.22rem/1.3 var(--font-body); }
@@ -221,7 +226,10 @@ main.is-entering { animation: viewIn .3s ease both; }
 .side-h { font: 400 1.45rem/1.2 var(--font-body); color: var(--ink); text-transform: none; }
 .filters { display: flex; flex-wrap: wrap; gap: 8px; }
 .tag { border: var(--bw) solid var(--btn-line); background: transparent; border-radius: var(--r-btn); padding: 8px 16px; cursor: pointer; font-weight: 500; font-size: .93rem; color: var(--ink); }
-.tag[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.tag[aria-pressed="true"], .tag[aria-current="page"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+a.tag { text-decoration: none; display: inline-flex; align-items: center; }
+.filters.kinds { margin-bottom: 26px; }
+.shop-main { min-width: 0; }
 .tag.small { padding: 4px 11px; font-size: .8rem; white-space: nowrap; background: var(--surface); }
 .tag.small b { font-variant-numeric: tabular-nums; margin-left: 4px; }
 .fab-page, .insp-page { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-areas: 'media head' 'media info'; grid-template-rows: auto 1fr; gap: 18px clamp(24px, 4.4vw, 60px); align-items: start; }
@@ -248,6 +256,7 @@ main.is-entering { animation: viewIn .3s ease both; }
 
 /* rails, inspiration, guides */
 .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 36px clamp(14px, 2.4vw, 28px); }
+.grid.rails + p { margin-top: 1.8rem; }
 .card { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
 .card-body { display: flex; flex-direction: column; gap: 8px; flex: 1; align-items: flex-start; }
 .card-body .specs { margin-block: 4px 8px; align-self: stretch; }
@@ -456,6 +465,7 @@ table.data thead th { border-bottom-color: var(--rule); }
 #cfg-form .chips.col .chip-body { text-align: left; }
 #cfg-form .note, #cfg-form .alert { max-width: 560px; }
 .hcards { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; width: 100%; }
+.hcards.five { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .hcard { position: relative; display: flex; cursor: pointer; min-width: 0; }
 .hcard input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; }
 .hcard-body { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 26px 14px 20px; border: var(--bw) solid var(--btn-line); border-radius: 18px; text-align: center; }
@@ -479,18 +489,18 @@ table.data thead th { border-bottom-color: var(--rule); }
 .review h3 { font: 400 1.25rem/1.3 var(--font-body); }
 .wiz-sum { padding-block: 34px 72px; display: flex; flex-direction: column; gap: 14px; }
 .wiz-sum h2 { font: 400 1.45rem/1.2 var(--font-body); color: var(--ink); }
-.sum { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0 28px; border-top: 1px solid var(--line); }
+.sum { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 0 28px; border-top: 1px solid var(--line); }
 .sum li { display: flex; flex-direction: column; gap: 2px; align-items: flex-start; padding: 14px 0; border-bottom: 1px solid var(--line); font-size: .95rem; min-width: 0; }
 .sum small { color: var(--ink-2); font-size: .74rem; text-transform: uppercase; letter-spacing: .07em; }
 .sum span { overflow-wrap: anywhere; }
 
-@media (min-width: 700px) { .fgrid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 40px 20px; } }
-@media (min-width: 1000px) { .fgrid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 46px 22px; } .shop .fgrid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+@media (min-width: 700px) { .fgrid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 40px 20px; } .cgrid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 40px 20px; } }
+@media (min-width: 1000px) { .fgrid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 46px 22px; } .cgrid { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 46px 20px; } .hcards.five { grid-template-columns: repeat(5, minmax(0, 1fr)); } }
 @media (min-width: 901px) {
   /* beside the list, the kinds of fabric are a plain column of links */
   .shop-side .filters { flex-direction: column; align-items: flex-start; gap: 0; }
   .shop-side .tag { border: 0; border-radius: 0; padding: 7px 0; background: none; color: var(--ink-2); font-size: 1rem; }
-  .shop-side .tag[aria-pressed="true"] { background: none; color: var(--ink); font-weight: 700; }
+  .shop-side .tag[aria-current="page"] { background: none; color: var(--ink); font-weight: 700; }
 }
 @media (max-width: 1180px) {
   /* the menu becomes a full screen of large links; the bar keeps the name, the booking button and the menu button */
@@ -518,8 +528,7 @@ table.data thead th { border-bottom-color: var(--rule); }
   .pg-info .insp-photos.pg-second { display: flex; }
   .foot-in { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .foot-in > div:first-child { grid-column: 1 / -1; }
-  .hcards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .sum { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .hcards, .hcards.five { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .stepbtn span { display: none; }
   .stepbtn[aria-current="step"] span { display: inline; }
 }
@@ -544,7 +553,6 @@ table.data thead th { border-bottom-color: var(--rule); }
   .stepbtn[aria-current="step"] span { display: none; }
   .stepbtn { padding-inline: 5px; }
   .cfg-bar .btn { min-width: 0; flex: 1 1 0; padding-inline: 14px; }
-  .sum { grid-template-columns: minmax(0, 1fr); }
   .sizes { grid-template-columns: minmax(0, 1fr); }
 }
 @media (max-width: 480px) { .editor { grid-template-columns: minmax(0, 1fr); } }
@@ -687,8 +695,39 @@ var GUIDES = [
   { id: 'palosja', n: 4, headings: true },
   { id: 'drita',   n: 4 }
 ];
-// The fabrics shown first on the home page.
-var HOME_FABRICS = ['liri', 'dimout', 'kadife', 'liritr'];
+// The fabrics shown first where a short row of curtains is wanted.
+
+// The five kinds of product the business offers, in the owner's order. "perde" are the fabrics above and "shina" the
+// rails; the other three are blinds made to measure, listed in BLINDS.
+var CATEGORIES = ['shina', 'grila', 'perde', 'romane', 'rolera'];
+var BLIND_KINDS = ['grila', 'romane', 'rolera'];
+var BLIND_MOUNTS = ['inside', 'outside']; // inside the window recess, or over the window on the wall or ceiling
+var BLIND_SIDES = ['right', 'left'];      // the side the chain or cord hangs on
+// SAMPLES: these models, colours and size limits stand in for the real range. Sizes in cm: a blind below the smallest
+// size cannot be made; one above the largest is a consultation case (made in two parts, or another model).
+var BLINDS = [
+  { id: 'ven25',  cat: 'grila',  sq: 'Veneciane alumini 25 mm', en: 'Aluminium venetian 25 mm', minW: 40, maxW: 240, minH: 40, maxH: 260,
+    colors: [{ id: 'w', sq: 'e bardhë', en: 'white', hex: '#F4F3EF' }, { id: 's', sq: 'argjend', en: 'silver', hex: '#C3C5C7' }, { id: 'a', sq: 'antracit', en: 'anthracite', hex: '#45484D' }] },
+  { id: 'ven50',  cat: 'grila',  sq: 'Veneciane druri 50 mm', en: 'Wooden venetian 50 mm', minW: 50, maxW: 240, minH: 50, maxH: 260,
+    colors: [{ id: 'l', sq: 'dru i çelët', en: 'light oak', hex: '#C9A77C' }, { id: 'n', sq: 'arrë', en: 'walnut', hex: '#7A5638' }, { id: 'w', sq: 'e bardhë', en: 'white', hex: '#F2EEE6' }] },
+  { id: 'vert',   cat: 'grila',  sq: 'Vertikale', en: 'Vertical blind', minW: 60, maxW: 400, minH: 60, maxH: 300,
+    colors: [{ id: 'w', sq: 'e bardhë', en: 'white', hex: '#F3F1EA' }, { id: 'b', sq: 'bezhë', en: 'beige', hex: '#D9CBB4' }, { id: 'g', sq: 'gri', en: 'grey', hex: '#A9A9A4' }] },
+  { id: 'romliri', cat: 'romane', sq: 'Romane liri', en: 'Linen roman blind', minW: 40, maxW: 240, minH: 40, maxH: 280,
+    colors: [{ id: 'n', sq: 'natyral', en: 'natural', hex: '#B9A88C' }, { id: 'w', sq: 'e bardhë', en: 'white', hex: '#F3F0E8' }, { id: 'g', sq: 'gri e ngrohtë', en: 'warm grey', hex: '#A0978A' }] },
+  { id: 'romtyl',  cat: 'romane', sq: 'Romane tyl', en: 'Sheer roman blind', minW: 40, maxW: 240, minH: 40, maxH: 280,
+    colors: [{ id: 'i', sq: 'fildish', en: 'ivory', hex: '#EFE9DC' }, { id: 's', sq: 'rërë', en: 'sand', hex: '#DDCFB6' }] },
+  { id: 'romblack', cat: 'romane', sq: 'Romane blackout', en: 'Blackout roman blind', minW: 40, maxW: 240, minH: 40, maxH: 280,
+    colors: [{ id: 'b', sq: 'bezhë', en: 'beige', hex: '#C8B79E' }, { id: 'g', sq: 'grafit', en: 'graphite', hex: '#4A4E55' }, { id: 'p', sq: 'petrol', en: 'deep teal', hex: '#24555A' }] },
+  { id: 'rolblack', cat: 'rolera', sq: 'Rolera blackout', en: 'Blackout roller blind', minW: 40, maxW: 280, minH: 40, maxH: 300,
+    colors: [{ id: 'w', sq: 'e bardhë', en: 'white', hex: '#F4F2EC' }, { id: 'b', sq: 'bezhë', en: 'beige', hex: '#D6C7AF' }, { id: 'g', sq: 'gri', en: 'grey', hex: '#A3A39E' }, { id: 'a', sq: 'grafit', en: 'graphite', hex: '#4A4E55' }] },
+  { id: 'rolscreen', cat: 'rolera', sq: 'Rolera screen', en: 'Screen roller blind', minW: 40, maxW: 280, minH: 40, maxH: 300,
+    colors: [{ id: 'w', sq: 'e bardhë', en: 'white', hex: '#F1F0EC' }, { id: 's', sq: 'gri guri', en: 'stone grey', hex: '#CBC9C0' }, { id: 'r', sq: 'rërë', en: 'sand', hex: '#DDCFB6' }] },
+  { id: 'zebra',  cat: 'rolera', sq: 'Zebra ditë-natë', en: 'Day-night (zebra) blind', minW: 40, maxW: 240, minH: 40, maxH: 260,
+    colors: [{ id: 'w', sq: 'e bardhë', en: 'white', hex: '#F3F2EE' }, { id: 'b', sq: 'bezhë', en: 'beige', hex: '#D8CBB6' }, { id: 'g', sq: 'gri', en: 'grey', hex: '#B4B4AF' }] }
+];
+function blindById(id) { for (var i = 0; i < BLINDS.length; i++) if (BLINDS[i].id === id) return BLINDS[i]; return null; }
+function blindsOf(cat) { return BLINDS.filter(function (b) { return b.cat === cat; }); }
+function blindColor(b, id) { if (!b) return null; for (var i = 0; i < b.colors.length; i++) if (b.colors[i].id === id) return b.colors[i]; return null; }
 
 // Stock-keeping units for rail parts. Gliders differ per system, fixings per mount, pole brackets per layer count.
 var PART_IDS = ['clip', 'wallbr', 'glider-std', 'glider-wave', 'glider-motor', 'endstop', 'bracket-1', 'bracket-2', 'ring', 'finial', 'connector', 'motorkit'];
@@ -696,7 +735,7 @@ var PART_IDS = ['clip', 'wallbr', 'glider-std', 'glider-wave', 'glider-motor', '
 function fabricById(id) { for (var i = 0; i < FABRICS.length; i++) if (FABRICS[i].id === id) return FABRICS[i]; return null; }
 function railById(id) { for (var i = 0; i < RAILS.length; i++) if (RAILS[i].id === id) return RAILS[i]; return null; }
 
-if (typeof module !== 'undefined') module.exports = { PARAMS: PARAMS, HEADINGS: HEADINGS, MODES: MODES, LAYERS: LAYERS, MOUNTS: MOUNTS, SHAPES: SHAPES, ZONES: ZONES, PHONE_COUNTRIES: PHONE_COUNTRIES, RAILS: RAILS, FABRICS: FABRICS, FAMILIES: FAMILIES, SAMPLES: SAMPLES, INSPIRE: INSPIRE, GUIDES: GUIDES, HOME_FABRICS: HOME_FABRICS, familyOf: familyOf, PART_IDS: PART_IDS, fabricById: fabricById, railById: railById };
+if (typeof module !== 'undefined') module.exports = { PARAMS: PARAMS, HEADINGS: HEADINGS, MODES: MODES, LAYERS: LAYERS, MOUNTS: MOUNTS, SHAPES: SHAPES, ZONES: ZONES, PHONE_COUNTRIES: PHONE_COUNTRIES, RAILS: RAILS, FABRICS: FABRICS, FAMILIES: FAMILIES, SAMPLES: SAMPLES, INSPIRE: INSPIRE, GUIDES: GUIDES, CATEGORIES: CATEGORIES, BLIND_KINDS: BLIND_KINDS, BLIND_MOUNTS: BLIND_MOUNTS, BLIND_SIDES: BLIND_SIDES, BLINDS: BLINDS, blindById: blindById, blindsOf: blindsOf, blindColor: blindColor, familyOf: familyOf, PART_IDS: PART_IDS, fabricById: fabricById, railById: railById };
 /* ---------- Pricing engine: pure functions, shared by estimator and back office ---------- */
 var Pricing = (function () {
   var D = (typeof module !== 'undefined' && typeof require === 'function') ? require('./20-data.js') : null;
@@ -923,7 +962,22 @@ var Pricing = (function () {
     return e;
   }
 
-  return { ceilTo: ceilTo, railLength: railLength, channelCount: channelCount, railIssues: railIssues, needsConsult: needsConsult, railOptions: railOptions,
+  // A blind made to measure (venetian or vertical, roman, roller). No formula prices these yet: the check says whether
+  // the request can be taken as it stands. errors stop it; consult means the office looks at it before quoting.
+  var getBlind = D ? D.blindById : blindById, getBlindColor = D ? D.blindColor : blindColor;
+  var BL = D ? D : { BLIND_MOUNTS: BLIND_MOUNTS, BLIND_SIDES: BLIND_SIDES };
+  function checkBlind(b) {
+    var r = { ok: false, errors: [], consult: [] };
+    if (!b || typeof b !== 'object') { r.errors.push('config'); return r; }
+    var m = getBlind(b.model);
+    if (!m || !getBlindColor(m, b.color) || !oneOf(BL.BLIND_MOUNTS, b.mount) || !oneOf(BL.BLIND_SIDES, b.side)) { r.errors.push('config'); return r; }
+    if (!isInt(b.width)) r.errors.push('widthInvalid'); else if (b.width < m.minW) r.errors.push('widthMin'); else if (b.width > m.maxW) r.consult.push('blindWidth');
+    if (!isInt(b.height)) r.errors.push('heightInvalid'); else if (b.height < m.minH) r.errors.push('heightMin'); else if (b.height > m.maxH) r.consult.push('blindHeight');
+    r.ok = !r.errors.length && !r.consult.length;
+    return r;
+  }
+
+  return { checkBlind: checkBlind, ceilTo: ceilTo, railLength: railLength, channelCount: channelCount, railIssues: railIssues, needsConsult: needsConsult, railOptions: railOptions,
            firstCompatibleRail: firstCompatibleRail, mountOptions: mountOptions, modeOptions: modeOptions, layerRoles: layerRoles, computeLayer: computeLayer,
            computeWindow: computeWindow, computeEstimate: computeEstimate, bom: bom, shapeOf: shapeOf, panelsOf: panelsOf };
 })();
@@ -1112,6 +1166,12 @@ var Ops = (function () {
   }
 
   // Internal constructor. `force` (sample data only) skips the calendar checks.
+  // A blind as it is kept on an order: only known fields, checked. Returns null for one that cannot be taken.
+  function makeExtra(x) {
+    if (!x || typeof x !== 'object') return null;
+    var e = { room: cleanText(x.room, 40), model: x.model, color: x.color, width: x.width, height: x.height, mount: x.mount, side: x.side };
+    return PR.checkBlind(e).errors.length ? null : e;
+  }
   function createOrder(st, input) {
     input = input || {};
     var phone = normalizePhone(input.phone, false);
@@ -1120,15 +1180,17 @@ var Ops = (function () {
     var name = cleanText(input.name, 80);
     if (visibleLength(name) < 3) return { ok: false, error: 'name' };
     var wins = Array.isArray(input.windows) ? input.windows : [];
-    if (wins.length > MAX_WINDOWS) return { ok: false, error: 'tooMany' };
+    var extras = Array.isArray(input.extras) ? input.extras : [];
+    if (wins.length + extras.length > MAX_WINDOWS) return { ok: false, error: 'tooMany' };
     var o = {
       id: 'O' + (++st.seq.order), code: nextCode(st), status: 'lead', hold: null, suspect: !!input.suspect, source: SOURCES.indexOf(input.source) >= 0 ? input.source : 'web',
       customer: { name: name, phone: phone, email: cleanText(input.email, 120), zone: input.zone, address: cleanText(input.address, 120), notes: cleanText(input.notes, 300) },
-      createdAt: st.today, windows: [], measure: null, install: null, travelManual: null, discount: 0,
+      createdAt: st.today, windows: [], extras: [], measure: null, install: null, travelManual: null, discount: 0,
       quote: null, quotes: [], accepted: false, longLeadAgreed: false, payments: [], confirmSeq: 0, confirmedAt: null, promised: null,
       signoff: false, installedAt: null, guaranteeUntil: null, cancelled: null, log: []
     };
     wins.forEach(function (w) { if (w && typeof w === 'object') o.windows.push(makeWindow(w.cfg, w.room)); });
+    extras.forEach(function (x) { var e = makeExtra(x); if (e) o.extras.push(e); }); // blinds: kept as asked for, priced by hand
     st.orders.push(o);
     log(st, o, 'created');
     if (input.measure && typeof input.measure === 'object') {
@@ -1151,16 +1213,18 @@ var Ops = (function () {
     if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) return { ok: false, error: 'email' };
     if (input.consent !== true) return { ok: false, error: 'consent' };
     var wins = Array.isArray(input.windows) ? input.windows : [];
-    if (wins.length > MAX_WINDOWS) return { ok: false, error: 'tooMany' };
+    var extras = Array.isArray(input.extras) ? input.extras : [];
+    if (wins.length + extras.length > MAX_WINDOWS) return { ok: false, error: 'tooMany' };
     for (var i = 0; i < wins.length; i++) {
       if (!wins[i] || typeof wins[i] !== 'object' || PR.computeWindow(makeWindow(wins[i].cfg, '').cfg).errors.indexOf('config') >= 0) return { ok: false, error: 'config' };
     }
+    for (var j = 0; j < extras.length; j++) if (!makeExtra(extras[j])) return { ok: false, error: 'config' };
     var measure = (input.measure && typeof input.measure === 'object') ? input.measure : null;
     var hasVisit = st.orders.some(function (o) { return active(o) && idx(o) <= 1 && o.measure && o.customer.phone === phone; });
     // A slot is held only when the zone takes online bookings, the request is not flagged, and this phone holds no other visit.
     if (P.travel[input.zone] === null || input.suspect === true || hasVisit) measure = null;
     var asked = !!(input.measure && typeof input.measure === 'object');
-    var r = createOrder(st, { name: input.name, phone: phone, email: email, zone: input.zone, address: input.address, notes: input.notes, source: 'web', windows: wins, measure: measure, suspect: input.suspect === true, isPublic: true });
+    var r = createOrder(st, { name: input.name, phone: phone, email: email, zone: input.zone, address: input.address, notes: input.notes, source: 'web', windows: wins, extras: extras, measure: measure, suspect: input.suspect === true, isPublic: true });
     if (r.ok) { r.callback = !measure; r.notHeld = asked && !measure && P.travel[input.zone] !== null; } // a time was picked but not booked
     return r;
   }
@@ -1739,7 +1803,7 @@ var Ops = (function () {
     STATES: STATES, MEASURE_SLOTS: MEASURE_SLOTS, INSTALL_SLOTS: INSTALL_SLOTS, TEAMS: TEAMS, SUBSTRATES: SUBSTRATES, HOLDS: HOLDS, SOURCES: SOURCES, HOLIDAYS: HOLIDAYS, HORIZON: HORIZON, MAX_WINDOWS: MAX_WINDOWS,
     iso: iso, parse: parse, validDate: validDate, addDays: addDays, addYears: addYears, addWorkdays: addWorkdays, daysBetween: daysBetween, isWorkday: isWorkday, workdaysFrom: workdaysFrom, businessToday: businessToday,
     cleanText: cleanText, normalizePhone: normalizePhone, last4: last4, normCode: normCode, normInvoice: normInvoice, seededRandom: seededRandom,
-    newState: newState, seedStock: seedStock, createOrder: createOrder, createPublicBooking: createPublicBooking, createStaffLead: createStaffLead, setContact: setContact, defaultCfg: defaultCfg, fixRail: fixRail,
+    newState: newState, seedStock: seedStock, makeExtra: makeExtra, createOrder: createOrder, createPublicBooking: createPublicBooking, createStaffLead: createStaffLead, setContact: setContact, defaultCfg: defaultCfg, fixRail: fixRail,
     measureTaken: measureTaken, installTaken: installTaken, setMeasure: setMeasure, setInstall: setInstall, freeMeasureSlots: freeMeasureSlots, overdue: overdue, pastPromised: pastPromised, nextDay: nextDay,
     editable: editable, addWindow: addWindow, removeWindow: removeWindow, setWindowField: setWindowField, setVerified: setVerified, setManual: setManual, setTravel: setTravel, setDiscount: setDiscount, maxDiscount: maxDiscount,
     estimate: estimate, paid: paid, paidSum: paidSum, quoteExpired: quoteExpired, quoteExpiring: quoteExpiring, needsFabric: needsFabric, deliveryFrom: deliveryFrom, leadWorkdays: leadWorkdays, installDay: installDay, pieceLen: pieceLen,
@@ -1872,9 +1936,9 @@ if (typeof module !== 'undefined') module.exports = Seed;
 /* Keys ending in .one / .other are chosen by count. Numbers in sentences come from parameters, never from the text. */
 var I18N = {
   sq: {
-    'demo.notePublic': 'Demo: pëlhurat, frymëzimet dhe disponueshmëria janë shembuj. Kornizat bosh mbajnë vendin e fotove tuaja, në përmasat që do të kenë. Çmimi jepet me ofertë, pas matjes falas.', 
-    'demo.note': 'Demo: porositë, stoku dhe frymëzimet janë shembuj. Kornizat bosh mbajnë vendin e fotove tuaja. Faqet publike nuk shfaqin çmime; ato i sheh vetëm stafi. Në këtë demo lista e çmimeve është brenda faqes; në faqen e vërtetë mbetet në server.', 
-    'nav.home': 'Kryefaqja', 'nav.catalog': 'Pëlhurat', 'nav.rails': 'Shinat', 'nav.config': 'Krijo perden', 'nav.book': 'Rezervo matje', 'nav.track': 'Gjurmo porosinë', 'nav.ops': 'Stafi',
+    'demo.notePublic': 'Demo: modelet, pëlhurat, frymëzimet dhe disponueshmëria janë shembuj. Kornizat bosh mbajnë vendin e fotove tuaja, në përmasat që do të kenë. Çmimi jepet me ofertë, pas matjes falas.', 
+    'demo.note': 'Demo: porositë, stoku, modelet dhe frymëzimet janë shembuj. Kornizat bosh mbajnë vendin e fotove tuaja. Faqet publike nuk shfaqin çmime; ato i sheh vetëm stafi. Në këtë demo lista e çmimeve është brenda faqes; në faqen e vërtetë mbetet në server.', 
+    'nav.home': 'Kryefaqja', 'nav.catalog': 'Produktet', 'nav.config': 'Konfiguratori', 'nav.book': 'Rezervo matje', 'nav.track': 'Gjurmo porosinë', 'nav.ops': 'Stafi',
     'ui.lang': 'Gjuha', 
     'type.sheer': 'Tyl', 'type.blackout': 'Blackout dhe dim-out', 'type.decor': 'Dekorative', 'type.all': 'Të gjitha',
     'heading.wave': 'Valë', 'heading.pinch': 'Pala treshe', 'heading.pencil': 'Rrudha me shirit', 'heading.eyelet': 'Unaza metalike',
@@ -1886,7 +1950,7 @@ var I18N = {
     'zone.A': 'Tiranë', 'zone.B': 'Durrës, Kamëz, Vorë', 'zone.C': 'Qytet tjetër',
 
     'home.sub': 'Matje falas në shtëpi, qepje sipas masës, shinë e prerë për dritaren tuaj dhe montim nga ekipi ynë.',
-    'home.cta1': 'Rezervo matje falas', 'home.cta2': 'Krijo perden tuaj', 
+    'home.cta1': 'Rezervo matje falas', 'home.cta2': 'Hap konfiguratorin', 
 
     'home.how': 'Si funksionon',
     'home.s1': 'Matje falas', 'home.s1t': 'Vijmë, masim çdo dritare dhe kontrollojmë tavanin ose murin për shinën.',
@@ -1901,11 +1965,9 @@ var I18N = {
     'home.contact.wa': 'WhatsApp', 'home.contact.waNo': '+355 6X XXX XXXX (numri shtohet më vonë)',
     'home.contact.addr': 'Adresa dhe orari shtohen më vonë.',
 
-    'cat.h': 'Pëlhurat', 'cat.sub': 'Hapni një pëlhurë për të parë ngjyrat dhe hollësitë e saj.', 
     'cat.roomHigh': 'top i gjerë, pa bashkime', 'cat.drops': 'qepet nga disa gjerësi', 
     'cat.inStock': 'Në stok', 'cat.lead': 'Me porosi, {n} ditë pune', 
 
-    'rails.h': 'Shina dhe shufra', 'rails.sub': 'Shina zgjidhet sipas palosjes, shtresave dhe vendit të montimit.',
     'rails.d.std': 'Profil alumini me rrëshqitës. Zgjedhja e zakonshme për perde me rrudha.',
     'rails.d.wave': 'Rrëshqitës me hap të njëjtë që e mbajnë valën të barabartë.',
     'rails.d.pole': 'Shufër e dukshme me fundore dekorative, e montuar në mur.',
@@ -1913,9 +1975,9 @@ var I18N = {
     'rails.mount': 'Montohet', 'rails.headings': 'Palosjet', 'rails.max': 'Gjatësia më e madhe','rails.double': 'Dy shtresa',
 'rails.noDouble': 'vetëm me konsultë',
     'rails.incl': 'Çdo shinë pritet sipas masës dhe vjen me rrëshqitësit ose unazat, tapat fundore ose fundoret dhe fiksuesit standardë.',
-    'rails.matrix': 'Cila shinë për cilën palosje', 'rails.yes': 'po', 'rails.no': 'jo', 'rails.use': 'Përdor këtë shinë',
+    'rails.matrix': 'Cila shinë për cilën palosje', 'rails.yes': 'po', 'rails.no': 'jo', 'rails.use': 'Konfiguro këtë shinë',
 
-    'cfg.h': 'Krijo perden tuaj', 'cfg.sub': 'Zgjidhni si e doni perden për një dritare. Çmimin e merrni me ofertë, pas matjes falas.',
+    'cfg.h': 'Konfiguratori', 'cfg.sub': 'Zgjidhni si e doni perden për një dritare. Çmimin e merrni me ofertë, pas matjes falas.',
     'cfg.window': 'Dritarja', 'cfg.room': 'Dhoma', 'cfg.room.ph': 'p.sh. Dhoma e ndenjes',
     'cfg.width': 'Gjerësia (cm)', 'cfg.height': 'Lartësia (cm)',
     'cfg.mode': 'Si është matur gjerësia', 'cfg.mode.overhang': 'Dritarja; shtojmë {n} cm në çdo anë', 'cfg.mode.wall': 'Mur më mur',
@@ -2144,18 +2206,12 @@ var I18N = {
     'ops.installDayHint': 'Shënohen ditën e montimit.',
     'ops.fabricFirst': 'Qepja shënohet pasi të vijë pëlhura.',
 
-    
     'car.color': 'Ngjyra',
 
     
 
     
 
-    
-
-    
-
-    
     'cfg.incl': 'Çfarë përfshin',
     'cfg.quoteNote': 'Çmimin e merrni me ofertë, pas matjes falas.',
     'rails.dbl.yes': 'po, si shinë dyshe',
@@ -2175,14 +2231,11 @@ var I18N = {
     'track.balance.due': 'Ende e papaguar',
     'est.gone': 'Kjo pëlhurë ose ngjyrë nuk ofrohet më. E zgjedhim bashkë në matje.',
 
-    
-
     'nav.inspire': 'Frymëzime',
     'nav.guides': 'Udhëzues',
-    'home.fab.t': 'Tyl për ditën, perde të trasha për natën. Çdo pëlhurë vjen në disa ngjyra.',
-    'home.fab.all': 'Shiko të gjitha pëlhurat',
-    'home.build.h': 'Krijoni perden tuaj', 
-    'home.build.t': 'Zgjidhni pëlhurën, palosjen, shinën dhe masat. Kërkesën na e dërgoni nga faqja dhe çmimin e merrni me ofertë, pas matjes falas.',
+
+    'home.build.h': 'Krijoni porosinë tuaj', 
+    'home.build.t': 'Zgjidhni produktin, modelin ose pëlhurën dhe masat. Kërkesën na e dërgoni nga faqja dhe çmimin e merrni me ofertë, pas matjes falas.', 
     'home.insp.t': 'Dhoma që kemi veshur, me pëlhurën dhe shinën e secilës.',
     'home.insp.all': 'Shiko të gjitha',
     'home.guides.t': 'Përgjigje të shkurtra për pyetjet që na bëhen më shpesh.',
@@ -2197,7 +2250,7 @@ var I18N = {
     'ph.rail': '{name}, nga afër',
     'ph.insp': '{name}, foto {i}',
     'fab.back': 'Të gjitha pëlhurat',
-    'fab.use': 'Krijo perde me këtë pëlhurë',
+    'fab.use': 'Krijo perde me këtë pëlhurë', 
     'fab.price': 'Çmimi jepet me ofertë, pas matjes falas.',
     'fab.specs': 'Hollësi',
     'fab.spec.type': 'Lloji',
@@ -2217,17 +2270,17 @@ var I18N = {
     'fab.liritr.text': 'Liri me peshë dhe fije të dukshme. Bie drejt dhe rri mirë me unaza ose me pala.',
     'fab.zhakard.text': 'Pëlhurë me motiv të endur, për dhomën e ndenjes.',
     'step.of': 'Hapi {i} nga {n}',
-    'step.1': 'Pëlhura',
-    'step.2': 'Palosja',
-    'step.3': 'Shina',
-    'step.4': 'Masat',
-    'step.5': 'Përmbledhja',
-    'step.1.t': 'Çfarë do të varet në dritare dhe në cilën ngjyrë.',
-    'step.2.t': 'Palosja është mënyra si mblidhet pëlhura në krye. Ajo vendos si bie perdja.',
-    'step.3.t': 'Shina zgjidhet sipas palosjes dhe vendit ku montohet.',
-    'step.4.t': 'Mjaftojnë masa të përafërta. Të saktat i marrim ne, në matjen falas.',
-    'step.5.t': 'Kontrolloni zgjedhjet dhe shtojeni dritaren te kërkesa.',
-    'step.1.none': 'Vetëm shinë: montojmë shinën për perdet që keni tashmë.',
+    'step.fabric': 'Pëlhura', 
+    'step.heading': 'Palosja', 
+    'step.rail': 'Shina', 
+    'step.size': 'Masat', 
+    'step.summary': 'Përmbledhja', 
+    'step.fabric.t': 'Çfarë do të varet në dritare dhe në cilën ngjyrë.', 
+    'step.heading.t': 'Palosja është mënyra si mblidhet pëlhura në krye. Ajo vendos si bie perdja.', 
+    'step.rail.t': 'Shina zgjidhet sipas palosjes dhe vendit ku montohet.', 
+    'step.size.t': 'Mjaftojnë masa të përafërta. Të saktat i marrim ne, në matjen falas.', 
+    'step.summary.t': 'Kontrolloni zgjedhjet dhe shtojeni dritaren te kërkesa.', 
+    
     'step.back': 'Kthehu',
     'step.next': 'Vazhdo',
     'step.nav': 'Hapat',
@@ -2306,30 +2359,96 @@ var I18N = {
     'home.h1b': 'me shinë dhe montim',
     'home.eye.about': 'Njihuni me ne',
     'home.about.h': 'Çfarë bëjmë',
-    'home.about.p1': 'Qepim perde me masë për shtëpinë tuaj: nga tyli i lehtë te perdet e trasha, me shinën e duhur dhe montimin nga ekipi ynë.',
-    'home.about.p2': 'Zgjidhni një pëlhurë këtu ose ejani vetëm me një ide. Mostrat i sjellim ne, në shtëpinë tuaj.',
+    'home.about.p1': 'Qepim perde me masë dhe montojmë grila, romane e rolera për shtëpinë tuaj, me shinën e duhur dhe montimin nga ekipi ynë.', 
+    'home.about.p2': 'Zgjidhni një produkt këtu ose ejani vetëm me një ide. Mostrat i sjellim ne, në shtëpinë tuaj.', 
     'home.eye.how': 'Shërbimi',
     'home.eye.insp': 'Punët tona',
     'home.eye.guides': 'Këshilla',
     'home.book.h': 'Matja është falas',
     'home.book.t': 'Vijmë në shtëpi, masim çdo dritare dhe sjellim mostrat. Çmimin e merrni me ofertë.',
-    'home.fab.h': 'Disa nga pëlhurat tona',
+    
     'ph.visit': 'Matja në shtëpinë e klientit',
     'ph.wide': 'e gjerë, pritet sipas ekranit',
     'cat.side': 'Kategoritë',
     'fab.card.h': 'Shiheni nga afër, në shtëpi',
     'fab.card.p': 'Në matjen falas sjellim mostra të kësaj pëlhure, që ta shihni në dritën e dhomës suaj.',
-    'step.1.q': 'Zgjidhni PËLHURËN dhe ngjyrën',
-    'step.2.q': 'Zgjidhni PALOSJEN që ju pëlqen',
-    'step.3.q': 'Zgjidhni SHINËN dhe vendin e saj',
-    'step.4.q': 'Shkruani MASAT e dritares',
-    'step.5.q': 'Kontrolloni KËRKESËN tuaj',
-    'foot.say': 'Na gjeni në Instagram dhe në WhatsApp'
+    'step.fabric.q': 'Zgjidhni PËLHURËN dhe ngjyrën', 
+    'step.heading.q': 'Zgjidhni PALOSJEN që ju pëlqen', 
+    'step.rail.q': 'Zgjidhni SHINËN dhe vendin e saj', 
+    'step.size.q': 'Shkruani MASAT e dritares', 
+    'step.summary.q': 'Kontrolloni KËRKESËN tuaj', 
+    'foot.say': 'Na gjeni në Instagram dhe në WhatsApp',
+    'home.cats.h': 'Çfarë bëjmë për dritaren tuaj',
+    'home.cats.t': 'Pesë lloje produktesh, të gjitha me masë dhe të montuara nga ne.',
+    'home.cats.all': 'Shiko produktet',
+    'home.build.mid': 'Modeli ose pëlhura',
+    'shop.h': 'Produktet',
+    'shop.sub': 'Zgjidhni llojin e produktit për të parë modelet, pëlhurat dhe ngjyrat.',
+    'cat.shina.name': 'Shina',
+    'cat.grila.name': 'Grila',
+    'cat.perde.name': 'Perde',
+    'cat.romane.name': 'Romane',
+    'cat.rolera.name': 'Perde me mekanizëm (rolera)',
+    'cat.shina.text': 'Shina dhe shufra për çdo palosje, të prera sipas masës dhe të montuara.',
+    'cat.grila.text': 'Veneciane dhe vertikale, që e drejtojnë dritën me një lëvizje.',
+    'cat.perde.text': 'Tyl, dim-out, blackout dhe pëlhura dekorative, të qepura sipas masës.',
+    'cat.romane.text': 'Pëlhurë që ngrihet në pala të rregullta. Zënë pak vend dhe rrinë mirë në çdo dritare.',
+    'cat.rolera.text': 'Rolera blackout, screen dhe zebra ditë-natë, që ngrihen me zinxhir.',
+    'cat.shina.hint': 'Vetëm shina, për perdet që keni',
+    'cat.grila.hint': 'Veneciane dhe vertikale',
+    'cat.perde.hint': 'Tyl dhe perde të trasha',
+    'cat.romane.hint': 'Ngrihen në pala',
+    'cat.rolera.hint': 'Rolera dhe zebra',
+    'ph.cat': '{name}, foto e llojit',
+    'ph.fitted': '{name}, e montuar në dritare',
+    'bl.ven25.text': 'Fletë alumini 25 mm që kthehen për të lënë sa dritë doni. Lahen lehtë; të mira për kuzhinë dhe banjë.',
+    'bl.ven50.text': 'Fletë druri 50 mm. Pamje e ngrohtë, me fletë të gjera që mbyllin mirë.',
+    'bl.vert.text': 'Shirita vertikalë për dritare të gjera dhe dyer ballkoni. Hapen anash si perde.',
+    'bl.romliri.text': 'Romane me pamje liri, që zbut dritën dhe ngrihet në pala të buta.',
+    'bl.romtyl.text': 'Romane e tejdukshme, për privatësi gjatë ditës pa e humbur dritën.',
+    'bl.romblack.text': 'Romane me astar blackout, për dhomën e gjumit.',
+    'bl.rolblack.text': 'Rolerë që e errëson dhomën plotësisht. E thjeshtë dhe e pastër në pamje.',
+    'bl.rolscreen.text': 'Pëlhurë screen: ul shkëlqimin e diellit dhe lë të shihet jashtë.',
+    'bl.zebra.text': 'Dy shtresa me shirita, që rrëshqasin për të kaluar nga dritë në errësim.',
+    'bl.mount': 'Ku montohet',
+    'bl.mount.inside': 'Brenda hapësirës së dritares',
+    'bl.mount.outside': 'Mbi dritare, në mur ose tavan',
+    'bl.side': 'Nga cila anë komandohet',
+    'bl.side.right': 'Zinxhiri djathtas',
+    'bl.side.left': 'Zinxhiri majtas',
+    'bl.width.hint.inside': 'Gjerësia e hapësirës së dritares, nga muri në mur.',
+    'bl.width.hint.outside': 'Gjerësia që doni të mbulohet: zakonisht dritarja dhe 10 cm në çdo anë.',
+    'bl.height.hint.inside': 'Lartësia e hapësirës së dritares.',
+    'bl.height.hint.outside': 'Nga vendi ku montohet deri ku doni të zbresë.',
+    'bl.spec.width': 'Gjerësia',
+    'bl.spec.height': 'Lartësia',
+    'bl.range': 'nga {a} deri në {b} cm',
+    'bl.incl.made': 'me masë',
+    'bl.incl.mech': 'Mekanizmi me zinxhir',
+    'consult.blindWidth': 'gjerësia është mbi {n} cm',
+    'consult.blindHeight': 'lartësia është mbi {n} cm',
+    'item.use': 'Konfiguro këtë model',
+    'item.more': 'Modele të tjera të këtij lloji',
+    'item.card.p': 'Në matjen falas sjellim mostra të këtij modeli, që ta shihni në dritaren tuaj.',
+    'step.product': 'Produkti',
+    'step.product.q': 'Zgjidhni PRODUKTIN',
+    'step.product.t': 'Çdo produkt bëhet sipas masës së dritares suaj.',
+    'step.model': 'Modeli',
+    'step.model.q': 'Zgjidhni MODELIN dhe ngjyrën',
+    'step.model.t': 'Ngjyrat e sakta i shihni te mostrat që sjellim në matje.',
+    'step.heading.own': 'Tregoni palosjen e perdeve që keni, që shina t’u përshtatet.',
+    'ops.extras': 'Grila, romane dhe rolera në kërkesë',
+    'ops.extras.note': 'Çmohen me dorë. Në këtë demo nuk hyjnë në totalin e ofertës.',
+    'cat.shina.short': 'Shina',
+    'cat.grila.short': 'Grila',
+    'cat.perde.short': 'Perde',
+    'cat.romane.short': 'Romane',
+    'cat.rolera.short': 'Rolera'
   },
   en: {
-    'demo.notePublic': 'Demo: fabrics, inspiration and availability are samples. The empty frames hold the place of your photographs, in the proportions they will have. The price comes with the quote, after the free measurement.', 
-    'demo.note': 'Demo: orders, stock and inspiration are samples. The empty frames hold the place of your photographs. The public pages show no prices; only staff see them. In this demo the price list sits inside the page; on the real site it stays on the server.', 
-    'nav.home': 'Home', 'nav.catalog': 'Fabrics', 'nav.rails': 'Rails', 'nav.config': 'Build your curtain', 'nav.book': 'Book measurement', 'nav.track': 'Track order', 'nav.ops': 'Staff',
+    'demo.notePublic': 'Demo: models, fabrics, inspiration and availability are samples. The empty frames hold the place of your photographs, in the proportions they will have. The price comes with the quote, after the free measurement.', 
+    'demo.note': 'Demo: orders, stock, models and inspiration are samples. The empty frames hold the place of your photographs. The public pages show no prices; only staff see them. In this demo the price list sits inside the page; on the real site it stays on the server.', 
+    'nav.home': 'Home', 'nav.catalog': 'Products', 'nav.config': 'Configurator', 'nav.book': 'Book measurement', 'nav.track': 'Track order', 'nav.ops': 'Staff',
     'ui.lang': 'Language', 
     'type.sheer': 'Sheer', 'type.blackout': 'Blackout and dim-out', 'type.decor': 'Decorative', 'type.all': 'All',
     'heading.wave': 'Wave', 'heading.pinch': 'Pinch pleat', 'heading.pencil': 'Pencil pleat', 'heading.eyelet': 'Eyelet',
@@ -2341,7 +2460,7 @@ var I18N = {
     'zone.A': 'Tirana', 'zone.B': 'Durrës, Kamëz, Vorë', 'zone.C': 'Another city',
 
     'home.sub': 'A free home measurement, sewing to size, a rail cut for your window and installation by our own team.',
-    'home.cta1': 'Book a free measurement', 'home.cta2': 'Build your curtain', 
+    'home.cta1': 'Book a free measurement', 'home.cta2': 'Open the configurator', 
 
     'home.how': 'How it works',
     'home.s1': 'Free measurement', 'home.s1t': 'We visit, measure every window and check the ceiling or wall for the rail.',
@@ -2356,11 +2475,9 @@ var I18N = {
     'home.contact.wa': 'WhatsApp', 'home.contact.waNo': '+355 6X XXX XXXX (number to be added)',
     'home.contact.addr': 'Address and opening hours to be added.',
 
-    'cat.h': 'Fabrics', 'cat.sub': 'Open a fabric to see its colours and details.', 
     'cat.roomHigh': 'wide roll, no joins', 'cat.drops': 'joined from widths', 
     'cat.inStock': 'In stock', 'cat.lead': 'To order, {n} working days', 
 
-    'rails.h': 'Rails and poles', 'rails.sub': 'The rail is chosen by heading, layers and where it is fixed.',
     'rails.d.std': 'Aluminium profile with gliders. The usual choice for pleated curtains.',
     'rails.d.wave': 'Gliders at a fixed pitch keep the wave even.',
     'rails.d.pole': 'A visible pole with finials, fixed to the wall.',
@@ -2368,9 +2485,9 @@ var I18N = {
     'rails.mount': 'Mount', 'rails.headings': 'Headings', 'rails.max': 'Longest rail','rails.double': 'Double',
 'rails.noDouble': 'by consultation only',
     'rails.incl': 'Every rail is cut to size and comes with its gliders or rings, end stops or finials and standard fixings.',
-    'rails.matrix': 'Which rail for which heading', 'rails.yes': 'yes', 'rails.no': 'no', 'rails.use': 'Use this rail',
+    'rails.matrix': 'Which rail for which heading', 'rails.yes': 'yes', 'rails.no': 'no', 'rails.use': 'Configure this rail',
 
-    'cfg.h': 'Build your curtain', 'cfg.sub': 'Choose how you want the curtain for one window. The price comes with your quote, after the free measurement.',
+    'cfg.h': 'Configurator', 'cfg.sub': 'Choose how you want the curtain for one window. The price comes with your quote, after the free measurement.',
     'cfg.window': 'Window', 'cfg.room': 'Room', 'cfg.room.ph': 'e.g. Living room',
     'cfg.width': 'Width (cm)', 'cfg.height': 'Height (cm)',
     'cfg.mode': 'How the width was measured', 'cfg.mode.overhang': 'Window only (we add {n} cm each side)', 'cfg.mode.wall': 'Wall to wall',
@@ -2599,18 +2716,12 @@ var I18N = {
     'ops.installDayHint': 'These can be ticked on the installation day.',
     'ops.fabricFirst': 'Sewing can be ticked once the fabric has arrived.',
 
-    
     'car.color': 'Colour',
 
     
 
     
 
-    
-
-    
-
-    
     'cfg.incl': 'What it includes',
     'cfg.quoteNote': 'The price comes with your quote, after the free measurement.',
     'rails.dbl.yes': 'yes, as a double rail',
@@ -2630,14 +2741,11 @@ var I18N = {
     'track.balance.due': 'Not yet paid',
     'est.gone': 'This fabric or colour is no longer offered. We choose one together at the measurement.',
 
-    
-
     'nav.inspire': 'Inspiration',
     'nav.guides': 'Guides',
-    'home.fab.t': 'Sheers for the day, heavier curtains for the night. Every fabric comes in several colours.',
-    'home.fab.all': 'See all fabrics',
-    'home.build.h': 'Build your curtain', 
-    'home.build.t': 'Choose the fabric, the heading, the rail and the size. You send us the request from the site and get the price as a quote, after the free measurement.',
+
+    'home.build.h': 'Build your order', 
+    'home.build.t': 'Choose the product, the model or fabric and the size. You send us the request from the site and get the price as a quote, after the free measurement.', 
     'home.insp.t': 'Rooms we have dressed, each with its fabric and rail.',
     'home.insp.all': 'See all',
     'home.guides.t': 'Short answers to the questions we are asked most.',
@@ -2652,7 +2760,7 @@ var I18N = {
     'ph.rail': '{name}, close up',
     'ph.insp': '{name}, photo {i}',
     'fab.back': 'All fabrics',
-    'fab.use': 'Build a curtain with this fabric',
+    'fab.use': 'Build a curtain with this fabric', 
     'fab.price': 'The price comes as a quote, after the free measurement.',
     'fab.specs': 'Details',
     'fab.spec.type': 'Type',
@@ -2672,17 +2780,17 @@ var I18N = {
     'fab.liritr.text': 'Linen with weight and a visible thread. It falls straight and sits well on eyelets or pleats.',
     'fab.zhakard.text': 'A fabric with a woven pattern, for the living room.',
     'step.of': 'Step {i} of {n}',
-    'step.1': 'Fabric',
-    'step.2': 'Heading',
-    'step.3': 'Rail',
-    'step.4': 'Size',
-    'step.5': 'Summary',
-    'step.1.t': 'What hangs at the window, and in which colour.',
-    'step.2.t': 'The heading is how the cloth is gathered at the top. It decides how the curtain falls.',
-    'step.3.t': 'The rail follows from the heading and from where it is fitted.',
-    'step.4.t': 'Rough sizes are enough. We take the exact ones at the free measurement.',
-    'step.5.t': 'Check your choices and add the window to your request.',
-    'step.1.none': 'Rail only: we fit the rail for curtains you already have.',
+    'step.fabric': 'Fabric', 
+    'step.heading': 'Heading', 
+    'step.rail': 'Rail', 
+    'step.size': 'Size', 
+    'step.summary': 'Summary', 
+    'step.fabric.t': 'What hangs at the window, and in which colour.', 
+    'step.heading.t': 'The heading is how the cloth is gathered at the top. It decides how the curtain falls.', 
+    'step.rail.t': 'The rail follows from the heading and from where it is fitted.', 
+    'step.size.t': 'Rough sizes are enough. We take the exact ones at the free measurement.', 
+    'step.summary.t': 'Check your choices and add the window to your request.', 
+    
     'step.back': 'Back',
     'step.next': 'Continue',
     'step.nav': 'Steps',
@@ -2761,25 +2869,91 @@ var I18N = {
     'home.h1b': 'with rail and fitting',
     'home.eye.about': 'About us',
     'home.about.h': 'What we do',
-    'home.about.p1': 'We sew curtains to measure for your home: from light sheers to heavy curtains, with the right rail and fitting by our own team.',
-    'home.about.p2': 'Choose a fabric here or come with only an idea. We bring the samples to your home.',
+    'home.about.p1': 'We sew curtains to measure and fit blinds, roman blinds and roller blinds for your home, with the right rail and fitting by our own team.', 
+    'home.about.p2': 'Choose a product here or come with only an idea. We bring the samples to your home.', 
     'home.eye.how': 'The service',
     'home.eye.insp': 'Our work',
     'home.eye.guides': 'Advice',
     'home.book.h': 'The measurement is free',
     'home.book.t': 'We come to you, measure every window and bring the samples. The price comes as a quote.',
-    'home.fab.h': 'Some of our fabrics',
+    
     'ph.visit': 'Measuring at the customer\'s home',
     'ph.wide': 'wide, cropped to the screen',
     'cat.side': 'Categories',
     'fab.card.h': 'See it up close, at home',
     'fab.card.p': 'At the free measurement we bring samples of this fabric, so you see it in the light of your own room.',
-    'step.1.q': 'Choose the FABRIC and its colour',
-    'step.2.q': 'Choose the HEADING you prefer',
-    'step.3.q': 'Choose the RAIL and where it goes',
-    'step.4.q': 'Enter the SIZE of your window',
-    'step.5.q': 'Check your REQUEST',
-    'foot.say': 'Find us on Instagram and on WhatsApp'
+    'step.fabric.q': 'Choose the FABRIC and its colour', 
+    'step.heading.q': 'Choose the HEADING you prefer', 
+    'step.rail.q': 'Choose the RAIL and where it goes', 
+    'step.size.q': 'Enter the SIZE of your window', 
+    'step.summary.q': 'Check your REQUEST', 
+    'foot.say': 'Find us on Instagram and on WhatsApp',
+    'home.cats.h': 'What we make for your window',
+    'home.cats.t': 'Five kinds of product, all made to measure and fitted by us.',
+    'home.cats.all': 'See the products',
+    'home.build.mid': 'Model or fabric',
+    'shop.h': 'Products',
+    'shop.sub': 'Choose a kind of product to see its models, fabrics and colours.',
+    'cat.shina.name': 'Rails',
+    'cat.grila.name': 'Blinds',
+    'cat.perde.name': 'Curtains',
+    'cat.romane.name': 'Roman blinds',
+    'cat.rolera.name': 'Roller blinds',
+    'cat.shina.text': 'Tracks and poles for every heading, cut to size and fitted.',
+    'cat.grila.text': 'Venetian and vertical blinds, which steer the light with one move.',
+    'cat.perde.text': 'Sheers, dim-out, blackout and decorative fabrics, sewn to measure.',
+    'cat.romane.text': 'Fabric that lifts in even folds. They take little room and suit any window.',
+    'cat.rolera.text': 'Blackout, screen and day-night roller blinds, raised by a chain.',
+    'cat.shina.hint': 'The rail alone, for curtains you have',
+    'cat.grila.hint': 'Venetian and vertical',
+    'cat.perde.hint': 'Sheers and heavy curtains',
+    'cat.romane.hint': 'Lift in folds',
+    'cat.rolera.hint': 'Roller and zebra',
+    'ph.cat': '{name}, a photo for this kind',
+    'ph.fitted': '{name}, fitted at a window',
+    'bl.ven25.text': '25 mm aluminium slats that turn to let in as much light as you want. Easy to wipe; good for kitchens and bathrooms.',
+    'bl.ven50.text': '50 mm wooden slats. A warm look, with wide slats that close well.',
+    'bl.vert.text': 'Vertical strips for wide windows and balcony doors. They draw to the side like a curtain.',
+    'bl.romliri.text': 'A roman blind with the look of linen, which softens the light and lifts in soft folds.',
+    'bl.romtyl.text': 'A sheer roman blind, for privacy by day without losing the light.',
+    'bl.romblack.text': 'A roman blind with a blackout lining, for the bedroom.',
+    'bl.rolblack.text': 'A roller blind that darkens the room fully. Simple and clean in look.',
+    'bl.rolscreen.text': 'Screen fabric: it cuts the glare of the sun and still lets you see out.',
+    'bl.zebra.text': 'Two layers of stripes that slide past each other to go from light to dark.',
+    'bl.mount': 'Where it is fitted',
+    'bl.mount.inside': 'Inside the window recess',
+    'bl.mount.outside': 'Over the window, on the wall or ceiling',
+    'bl.side': 'Which side it is worked from',
+    'bl.side.right': 'Chain on the right',
+    'bl.side.left': 'Chain on the left',
+    'bl.width.hint.inside': 'The width of the window recess, from wall to wall.',
+    'bl.width.hint.outside': 'The width you want covered: usually the window and 10 cm on each side.',
+    'bl.height.hint.inside': 'The height of the window recess.',
+    'bl.height.hint.outside': 'From where it is fitted down to where you want it to reach.',
+    'bl.spec.width': 'Width',
+    'bl.spec.height': 'Height',
+    'bl.range': 'from {a} to {b} cm',
+    'bl.incl.made': 'made to measure',
+    'bl.incl.mech': 'The chain mechanism',
+    'consult.blindWidth': 'the width is over {n} cm',
+    'consult.blindHeight': 'the height is over {n} cm',
+    'item.use': 'Configure this model',
+    'item.more': 'Other models of this kind',
+    'item.card.p': 'At the free measurement we bring samples of this model, so you see it at your own window.',
+    'step.product': 'Product',
+    'step.product.q': 'Choose the PRODUCT',
+    'step.product.t': 'Every product is made to the size of your window.',
+    'step.model': 'Model',
+    'step.model.q': 'Choose the MODEL and its colour',
+    'step.model.t': 'You see the true colours on the samples we bring to the measurement.',
+    'step.heading.own': 'Tell us the heading of the curtains you have, so the rail suits them.',
+    'ops.extras': 'Blinds, roman blinds and roller blinds in the request',
+    'ops.extras.note': 'Priced by hand. In this demo they are not part of the quote total.',
+    'cat.shina.short': 'Rails',
+    'cat.grila.short': 'Blinds',
+    'cat.perde.short': 'Curtains',
+    'cat.romane.short': 'Roman blinds',
+    'cat.rolera.short': 'Roller blinds'
   }
 };
 if (typeof module !== 'undefined') module.exports = I18N;
@@ -2788,9 +2962,8 @@ if (typeof module !== 'undefined') module.exports = I18N;
   'use strict';
   var root = document.documentElement;
   var PUBLIC_ONLY = window.PN_PUBLIC === true; // a copy for showing to customers: the staff view is left out
-  var VIEWS = ['home', 'catalog', 'fabric', 'config', 'rails', 'inspire', 'guides', 'book', 'track', 'ops'].filter(function (v) { return v !== 'ops' || !PUBLIC_ONLY; });
-  var NAV = ['catalog', 'config', 'rails', 'inspire', 'guides', 'track', 'ops'].filter(function (v) { return VIEWS.indexOf(v) >= 0; }); // the links in the bar; booking is its button
-  var STEPS = 5; // the builder: fabric, heading, rail, size, summary
+  var VIEWS = ['home', 'catalog', 'fabric', 'item', 'config', 'inspire', 'guides', 'book', 'track', 'ops'].filter(function (v) { return v !== 'ops' || !PUBLIC_ONLY; });
+  var NAV = ['catalog', 'config', 'inspire', 'guides', 'track', 'ops'].filter(function (v) { return VIEWS.indexOf(v) >= 0; }); // the links in the bar; booking is its button
   var KEEP_DAYS = 30, KEEP_MS = KEEP_DAYS * 86400000; // how long a window of the request stays in this browser
 
   function defaultCfg() {
@@ -2801,9 +2974,9 @@ if (typeof module !== 'undefined') module.exports = I18N;
 
   var S = {
     lang: 'sq', view: 'home', menu: false,
-    cfg: defaultCfg(), wantMount: 'ceiling', room: '', railNote: '', step: 1, added: false, wa: null,
-    fab: FAMILIES[0], fabCol: {}, insp: '', guide: '',
-    est: [], undo: null, zone: 'A', cat: 'all', lastCode: '',
+    kind: 'perde', cfg: defaultCfg(), blind: defaultBlind(), wantMount: 'ceiling', room: '', railNote: '', step: 1, added: false, wa: null,
+    cat: '', ftype: 'all', fab: FAMILIES[0], fabCol: {}, item: BLINDS[0].id, itemCol: {}, insp: '', guide: '',
+    est: [], undo: null, zone: 'A', lastCode: '',
     book: emptyBook(),
     track: { code: '', pin: '', result: undefined },
     ops: { tab: 'board', open: null, pushed: false, err: {}, drafts: {}, notes: {}, confirm: null, contact: null, flash: '', sizeLogged: {}, lastCard: null, leadOpen: false, lead: emptyLead() }
@@ -2821,8 +2994,9 @@ if (typeof module !== 'undefined') module.exports = I18N;
         var ok = data && Array.isArray(data.est) && ZONES.indexOf(data.zone) >= 0;
         if (ok) {
           S.est = data.est.filter(function (x) { // every line carries its own date
-            return x && typeof x.at === 'number' && x.at <= now && now - x.at < KEEP_MS && x.cfg && Pricing.computeWindow(x.cfg).errors.indexOf('config') < 0;
-          }).slice(0, Ops.MAX_WINDOWS).map(function (x) { return { room: Ops.cleanText(x.room, 40), cfg: x.cfg, at: x.at }; });
+            if (!x || typeof x.at !== 'number' || x.at > now || now - x.at >= KEEP_MS) return false;
+            return x.cfg ? Pricing.computeWindow(x.cfg).errors.indexOf('config') < 0 : !!x.blind && Pricing.checkBlind(x.blind).errors.indexOf('config') < 0;
+          }).slice(0, Ops.MAX_WINDOWS).map(function (x) { var room = Ops.cleanText(x.room, 40); return x.cfg ? { room: room, cfg: x.cfg, at: x.at } : { room: room, blind: x.blind, at: x.at }; });
           S.zone = data.zone;
         }
         if (!ok || !S.est.length) localStorage.removeItem('pn.est'); // nothing stale is left behind
@@ -3022,25 +3196,111 @@ if (typeof module !== 'undefined') module.exports = I18N;
     h += '</ol></div></section>';
     h += '<section class="split" id="home-book-band">' + photo('1 / 1', t('ph.visit'), { cls: 'fill' }) + '<div class="split-text"><h2 class="caps">' + t('home.book.h') + '</h2><p>' + t('home.book.t') + '</p>' +
       '<button class="btn ghost" data-go="book">' + t('home.cta1') + '</button></div></section>';
-    h += '<section class="sec" id="home-fabrics"><div class="wrap"><div class="sec-head"><div><h2 class="plain-h">' + t('home.fab.h') + '</h2><p>' + t('home.fab.t') + '</p></div>' + more('catalog', 'home.fab.all', 'home-fab-all') + '</div>' +
-      '<div class="fgrid">' + HOME_FABRICS.map(fabCard).join('') + '</div></div></section>';
+    h += '<section class="sec" id="home-cats"><div class="wrap"><div class="sec-head"><div><h2 class="plain-h">' + t('home.cats.h') + '</h2><p>' + t('home.cats.t') + '</p></div>' + more('catalog', 'home.cats.all', 'home-cats-all') + '</div>' +
+      '<div class="cgrid">' + CATEGORIES.map(catTile).join('') + '</div></div></section>';
     h += '<section class="split rev" id="home-build-band">' + photo('1 / 1', t('ph.build'), { cls: 'fill' }) + '<div class="split-text"><h2 class="caps">' + t('home.build.h') + '</h2><p>' + t('home.build.t') + '</p><ol class="build-list">';
-    for (var k = 1; k <= STEPS; k++) h += '<li>' + t('step.' + k) + '</li>';
+    ['step.product', 'home.build.mid', 'step.size', 'step.summary'].forEach(function (k) { h += '<li>' + t(k) + '</li>'; });
     h += '</ol><button class="btn ghost" data-go="config">' + t('home.cta2') + '</button></div></section>';
     h += '<section class="sec" id="home-insp"><div class="wrap">' + secTitle('home.eye.insp', t('insp.h'), t('home.insp.t')) +
       '<div class="igrid row">' + INSPIRE.slice(0, 3).map(inspCard).join('') + '</div><p class="center">' + more('inspire', 'home.insp.all', 'home-insp-all') + '</p></div></section>';
-    h += '<section class="split" id="home-rails">' + photo('1 / 1', t('ph.rail', { name: t('rail.wave') }), { cls: 'fill' }) + '<div class="split-text"><h2 class="caps">' + t('home.rails.h') + '</h2><p>' + t('home.rails.t') + '</p>' + more('rails', 'home.rails.link') + '</div></section>';
+    h += '<section class="split" id="home-rails">' + photo('1 / 1', t('ph.rail', { name: t('rail.wave') }), { cls: 'fill' }) + '<div class="split-text"><h2 class="caps">' + t('home.rails.h') + '</h2><p>' + t('home.rails.t') + '</p>' + '<a class="btn ghost" href="#shop-shina" data-act="open-cat" data-cat="shina" id="home-rails-link">' + t('home.rails.link') + '</a></div></section>';
     h += '<section class="sec" id="home-guides"><div class="wrap">' + secTitle('home.eye.guides', t('guides.h'), t('home.guides.t')) + guideList() + '</div></section>';
     return h;
   }
 
-  function viewCatalog() { // every fabric as a card; its colours and details are on its own page
-    var h = '<div class="shop"><aside class="shop-side" aria-label="' + t('cat.side') + '"><h2 class="side-h">' + t('cat.side') + '</h2><div class="filters" role="group" aria-label="' + t('cat.side') + '">';
-    ['all', 'sheer', 'blackout', 'decor'].forEach(function (k) {
-      h += '<button class="tag" id="cat-' + k + '" data-act="cat-filter" data-type="' + k + '" aria-pressed="' + (S.cat === k) + '">' + t('type.' + k) + '</button>';
+  /* ----- the five kinds of product; blinds as products ----- */
+  function isBlindKind(k) { return BLIND_KINDS.indexOf(k) >= 0; }
+  function catName(c) { return t('cat.' + c + '.name'); }
+  function catShort(c) { return t('cat.' + c + '.short'); } // where room is tight: "Rolera" for "Perde me mekanizëm (rolera)"
+  function blindName(b) { return b ? b[S.lang] : ''; }
+  function bColorName(c) { return c ? (S.lang === 'sq' ? c.sq : c.en) : ''; }
+  function blindSummary(b) { // plain text; escape at the call site
+    var m = blindById(b.model);
+    return [fmtN(b.width) + ' × ' + fmtN(b.height) + ' cm', catShort(m.cat), blindName(m) + ', ' + bColorName(blindColor(m, b.color)), t('bl.mount.' + b.mount), t('bl.side.' + b.side)].join(' · ');
+  }
+  function blindIssues(calc, b) { // what is wrong with a blind as asked for, or why the office has to look at it
+    var m = blindById(b.model) || {};
+    if (calc.errors.length) return calc.errors.map(function (e) { return e === 'widthMin' ? t('err.widthMin', { n: m.minW }) : e === 'heightMin' ? t('err.heightMin', { n: m.minH }) : t('err.' + e); }).join(' ');
+    if (calc.consult.length) return t('consult.title', { why: calc.consult.map(function (k) { return t('consult.' + k, { n: k === 'blindWidth' ? m.maxW : m.maxH }); }).join(', ') });
+    return '';
+  }
+  // one of the five kinds as a small line drawing, for the builder's first question: a diagram, not a picture
+  function catIcon(k) {
+    var d = '';
+    if (k === 'perde') d = '<path d="M6 7h56"/><path d="M14 7v22a5 5 0 0 0 10 0V15a5 5 0 0 1 10 0v14a5 5 0 0 0 10 0V15a5 5 0 0 1 10 0v22"/>';
+    else if (k === 'romane') d = '<path d="M10 7h48"/><path d="M12 7v12h44V7"/><path d="M12 19q22 7 44 0M12 26q22 7 44 0M12 33q22 7 44 0"/>';
+    else if (k === 'rolera') d = '<rect x="9" y="5" width="50" height="7" rx="3.5"/><path d="M14 12v24h40V12"/><path d="M11 36h46" stroke-width="2.4"/><path d="M60 12v15" stroke-dasharray="1.5 2.5"/>';
+    else if (k === 'grila') d = '<path d="M10 6h48" stroke-width="2.4"/><path d="M12 13h44M12 19h44M12 25h44M12 31h44M12 37h44"/><path d="M22 6v31M46 6v31" opacity=".5"/>';
+    else d = '<path d="M5 11h58" stroke-width="3"/><path d="M14 13v6M27 13v6M41 13v6M54 13v6"/><circle cx="14" cy="22" r="2.6"/><circle cx="27" cy="22" r="2.6"/><circle cx="41" cy="22" r="2.6"/><circle cx="54" cy="22" r="2.6"/><path d="M8 7v8M60 7v8" opacity=".5"/>';
+    return '<svg viewBox="0 0 68 44" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">' + d + '</svg>';
+  }
+  function catTile(c) { // one of the five kinds, as a tile that opens its page
+    return '<a class="ctile" href="#shop-' + c + '" data-act="open-cat" data-cat="' + c + '" id="cat-tile-' + c + '">' + photo('4 / 5', t('ph.cat', { name: catName(c) })) +
+      '<span class="fcard-name">' + catName(c) + '</span><span class="fcard-meta">' + t('cat.' + c + '.text') + '</span></a>';
+  }
+  function blindCard(b) { // a model of blind in a list
+    return '<a class="fcard" href="#item-' + b.id + '" data-act="open-item" data-id="' + b.id + '" id="item-card-' + b.id + '">' + photo('2 / 3', t('ph.fitted', { name: blindName(b) })) +
+      '<span class="fcard-body"><span class="fcard-name">' + esc(blindName(b)) + '</span><span class="fcard-meta">' + catShort(b.cat) + ', ' + tn('cat.colors', b.colors.length) + '</span>' + dots(b.colors) + '</span></a>';
+  }
+  function bSwatch(name, b, c, checked, field) { // one colour of a blind as a round sample
+    var id = name + '-' + b.id + '-' + c.id;
+    return '<label class="sw" for="' + id + '" title="' + esc(bColorName(c)) + '"><input type="radio" id="' + id + '" name="' + name + '" value="' + c.id + '"' + (checked ? ' checked' : '') +
+      ' data-f="' + field + '" data-k="' + b.id + '" aria-label="' + esc(bColorName(c)) + '"><i style="--c:' + c.hex + '"></i></label>';
+  }
+  function shopSide() { // the five kinds as a column of links beside the list, as on the client's reference
+    return '<aside class="shop-side"><h2 class="side-h">' + t('cat.side') + '</h2><nav class="filters" aria-label="' + t('cat.side') + '">' + CATEGORIES.map(function (c) {
+      return '<a class="tag" id="side-' + c + '" href="#shop-' + c + '" data-act="open-cat" data-cat="' + c + '"' + (S.cat === c ? ' aria-current="page"' : '') + '>' + catShort(c) + '</a>';
+    }).join('') + '</nav></aside>';
+  }
+  function railsBody() { // the rail systems, what each carries, and the heading-by-rail table
+    var h = '<div class="grid rails" id="cat-grid">';
+    STOCKED.forEach(function (r) {
+      h += '<article class="card rail-card">' + photo('3 / 2', t('ph.rail', { name: t('rail.' + r.id) })) + '<div class="card-body"><h2 class="card-title">' + t('rail.' + r.id) + '</h2><p>' + t('rails.d.' + r.id) + '</p>' + railSpecs(r) +
+        '<button class="btn ghost small" data-act="use-rail" data-id="' + r.id + '" id="rail-use-' + r.id + '">' + t('rails.use') + '</button></div></article>';
     });
-    return h + '</div></aside><div><div class="view-head"><h1>' + t('cat.h') + '</h1><p>' + t('cat.sub') + '</p></div><div class="fgrid" id="cat-grid">' +
-      FAMILIES.filter(function (fam) { return S.cat === 'all' || familyOf(fam)[0].type === S.cat; }).map(fabCard).join('') + '</div></div></div>';
+    h += '</div><p class="muted">' + t('rails.incl') + '</p>';
+    h += '<section class="band"><h2 class="plain-h">' + t('rails.matrix') + '</h2><div class="scroll-x" tabindex="0" role="region" aria-label="' + t('rails.matrix') + '"><table class="data matrix sticky-col"><thead><tr><th scope="col">' + t('cfg.heading') + '</th>' +
+      STOCKED.map(function (r) { return '<th scope="col">' + t('rail.' + r.id) + '</th>'; }).join('') + '</tr></thead><tbody>';
+    HEADINGS.forEach(function (hd) {
+      h += '<tr><th scope="row">' + t('heading.' + hd) + '</th>' + STOCKED.map(function (r) {
+        var ok = r.headings.indexOf(hd) >= 0;
+        return '<td class="' + (ok ? 'yes' : 'no') + '">' + (ok ? '✓ ' + t('rails.yes') : '– ' + t('rails.no')) + '</td>';
+      }).join('') + '</tr>';
+    });
+    return h + '</tbody></table></div></section>';
+  }
+  // The shop: with no kind chosen, the five kinds as tiles; with one, its products beside the column of kinds.
+  function viewCatalog() {
+    var c = S.cat;
+    if (!c) return '<div class="view-head"><h1>' + t('shop.h') + '</h1><p>' + t('shop.sub') + '</p></div><div class="cgrid" id="cat-tiles">' + CATEGORIES.map(catTile).join('') + '</div>';
+    var h = '<div class="shop">' + shopSide() + '<div class="shop-main"><div class="view-head"><h1 id="shop-name">' + catName(c) + '</h1><p>' + t('cat.' + c + '.text') + '</p></div>';
+    if (c === 'perde') {
+      h += '<div class="filters kinds" role="group" aria-label="' + t('fab.spec.type') + '">' + ['all', 'sheer', 'blackout', 'decor'].map(function (k) {
+        return '<button class="tag" id="cat-' + k + '" data-act="cat-filter" data-type="' + k + '" aria-pressed="' + (S.ftype === k) + '">' + t('type.' + k) + '</button>';
+      }).join('') + '</div><div class="fgrid" id="cat-grid">' + FAMILIES.filter(function (fam) { return S.ftype === 'all' || familyOf(fam)[0].type === S.ftype; }).map(fabCard).join('') + '</div>';
+    } else if (c === 'shina') h += railsBody();
+    else h += '<div class="fgrid" id="cat-grid">' + blindsOf(c).map(blindCard).join('') + '</div>';
+    return h + '</div></div>';
+  }
+  // A model of blind: its photographs in the colour on show, its colours, and the way into the builder.
+  function itemSecond(b, c) { var name = blindName(b) + ', ' + bColorName(c); return photo('1 / 1', t('ph.rail', { name: name }), { cls: 'ph-sec' }) + photo('1 / 1', t('ph.room', { name: name }), { cls: 'ph-sec' }); }
+  function itemGallery(b, c) { return photo('1 / 1', t('ph.fitted', { name: blindName(b) + ', ' + bColorName(c) }), { hex: c.hex, id: 'item-main' }) + itemSecond(b, c); }
+  function viewItem() {
+    var b = blindById(S.item), c = blindColor(b, S.itemCol[b.id]) || b.colors[0];
+    var h = '<p class="crumb"><a href="#shop-' + b.cat + '" data-act="open-cat" data-cat="' + b.cat + '" id="item-back">' + BACK + catName(b.cat) + '</a></p><div class="fab-page"><div class="pg-head"><p class="kind">' + catName(b.cat) + '</p><h1 id="item-name">' + esc(blindName(b)) + '</h1></div>' +
+      '<div class="fab-gallery pg-media" id="item-gallery">' + itemGallery(b, c) + '</div><div class="fab-info pg-info"><p class="lead">' + t('bl.' + b.id + '.text') + '</p>' +
+      '<fieldset><legend class="sw-name">' + t('car.color') + ': <b id="item-col-name">' + esc(bColorName(c)) + '</b></legend><div class="swatches">' +
+      b.colors.map(function (x) { return bSwatch('itemcol', b, x, x.id === c.id, 'item-color'); }).join('') + '</div></fieldset>' +
+      '<button class="btn" data-act="use-item" data-id="' + b.id + '" id="item-use">' + t('item.use') + '</button><p class="muted small">' + t('fab.price') + '</p>' +
+      '<div class="soft-card"><h2>' + t('fab.card.h') + '</h2><p>' + t('item.card.p') + '</p><button class="btn ghost" data-go="book" id="item-book">' + t('home.cta1') + '</button></div>' +
+      '<h2 class="plain-h">' + t('fab.specs') + '</h2><dl class="specs lined"><dt>' + t('fab.spec.type') + '</dt><dd>' + catName(b.cat) + '</dd>' +
+      '<dt>' + t('bl.spec.width') + '</dt><dd>' + t('bl.range', { a: b.minW, b: b.maxW }) + '</dd><dt>' + t('bl.spec.height') + '</dt><dd>' + t('bl.range', { a: b.minH, b: b.maxH }) + '</dd>' +
+      '<dt>' + t('bl.mount') + '</dt><dd>' + BLIND_MOUNTS.map(function (m) { return t('bl.mount.' + m); }).join('; ') + '</dd>' +
+      '<dt>' + t('fab.spec.colors') + '</dt><dd>' + b.colors.map(function (x) { return esc(bColorName(x)); }).join(', ') + '</dd></dl>' +
+      '<div class="fab-gallery pg-second" id="item-second">' + itemSecond(b, c) + '</div></div></div>';
+    var others = blindsOf(b.cat).filter(function (x) { return x.id !== b.id; });
+    if (others.length) h += '<section><div class="sec-head"><div><h2 class="plain-h">' + t('item.more') + '</h2></div></div><div class="fgrid">' + others.map(blindCard).join('') + '</div></section>';
+    return h;
   }
 
   // Three photographs of the colour on show: hung, close up, in a room. On a phone the two smaller ones stand after the
@@ -3049,7 +3309,7 @@ if (typeof module !== 'undefined') module.exports = I18N;
   function fabGallery(f) { return photo('1 / 1', t('ph.hung', { name: fabName(f) }), { hex: f.hex, id: 'fab-main' }) + fabSecond(f); }
   function viewFabric() {
     var fam = S.fab, list = familyOf(fam), f = famFabric(fam, S.fabCol[fam]);
-    var h = '<p class="crumb"><a href="#catalog" data-go="catalog" id="fab-back">' + BACK + t('fab.back') + '</a></p><div class="fab-page"><div class="pg-head"><p class="kind">' + t('type.' + f.type) + '</p><h1 id="fab-name">' + esc(f[S.lang]) + '</h1></div>' +
+    var h = '<p class="crumb"><a href="#shop-perde" data-act="open-cat" data-cat="perde" id="fab-back">' + BACK + t('fab.back') + '</a></p><div class="fab-page"><div class="pg-head"><p class="kind">' + t('type.' + f.type) + '</p><h1 id="fab-name">' + esc(f[S.lang]) + '</h1></div>' +
       '<div class="fab-gallery pg-media" id="fab-gallery">' + fabGallery(f) + '</div><div class="fab-info pg-info"><p class="lead">' + t('fab.' + fam + '.text') + '</p>' +
       '<fieldset><legend class="sw-name">' + t('car.color') + ': <b id="fab-col-name">' + esc(colorName(f)) + '</b></legend><div class="swatches">' +
       list.map(function (c) { return swatch('fabcol', c, c.id === f.id, 'fab-color', fam); }).join('') + '</div></fieldset>' + stockHtml(f, 'fab-stock') +
@@ -3070,24 +3330,6 @@ if (typeof module !== 'undefined') module.exports = I18N;
       '<dt>' + t('rails.max') + '</dt><dd>' + r.maxLen + ' cm</dd>' +
       '<dt>' + t('rails.double') + '</dt><dd>' + (r.layers.indexOf(2) >= 0 ? t('rails.dbl.yes') : t('rails.noDouble')) + '</dd></dl>';
   }
-  function viewRails() {
-    var h = '<div class="view-head"><h1>' + t('rails.h') + '</h1><p>' + t('rails.sub') + '</p></div><div class="grid rails">';
-    STOCKED.forEach(function (r) {
-      h += '<article class="card rail-card">' + photo('3 / 2', t('ph.rail', { name: t('rail.' + r.id) })) + '<div class="card-body"><h2 class="card-title">' + t('rail.' + r.id) + '</h2><p>' + t('rails.d.' + r.id) + '</p>' + railSpecs(r) +
-        '<button class="btn ghost small" data-act="use-rail" data-id="' + r.id + '" id="rail-use-' + r.id + '">' + t('rails.use') + '</button></div></article>';
-    });
-    h += '</div><p class="muted">' + t('rails.incl') + '</p>';
-    h += '<section class="band"><h2 class="plain-h">' + t('rails.matrix') + '</h2><div class="scroll-x" tabindex="0" role="region" aria-label="' + t('rails.matrix') + '"><table class="data matrix sticky-col"><thead><tr><th scope="col">' + t('cfg.heading') + '</th>' +
-      STOCKED.map(function (r) { return '<th scope="col">' + t('rail.' + r.id) + '</th>'; }).join('') + '</tr></thead><tbody>';
-    HEADINGS.forEach(function (hd) {
-      h += '<tr><th scope="row">' + t('heading.' + hd) + '</th>' + STOCKED.map(function (r) {
-        var ok = r.headings.indexOf(hd) >= 0;
-        return '<td class="' + (ok ? 'yes' : 'no') + '">' + (ok ? '✓ ' + t('rails.yes') : '– ' + t('rails.no')) + '</td>';
-      }).join('') + '</tr>';
-    });
-    return h + '</tbody></table></div></section>';
-  }
-
   /* ----- inspiration: rooms, each with what hangs in it ----- */
   function viewInspire() {
     var r = S.insp ? byId(INSPIRE, S.insp) : null;
@@ -3097,8 +3339,8 @@ if (typeof module !== 'undefined') module.exports = I18N;
     var two = x.layers === 'double', rest = ph.slice(ph.indexOf('</figure>') + 9); // on a phone the later photographs stand after the text
     return '<p class="crumb"><a href="#inspire" data-go="inspire" id="insp-back">' + BACK + t('insp.back') + '</a></p><div class="insp-page"><div class="pg-head"><h1>' + title + '</h1></div><div class="insp-photos pg-media">' + ph + '</div>' +
       '<div class="fab-info pg-info"><p class="lead">' + t('insp.' + r.id + '.text') + '</p>' +
-      '<h2 class="plain-h">' + t('insp.what') + '</h2><dl class="specs lined"><dt>' + t('step.1') + '</dt><dd>' + esc(fabName(f)) + (two ? '; ' + esc(fabName(fabricById(x.sheer))) : '') + '</dd>' +
-      '<dt>' + t('step.2') + '</dt><dd>' + t('heading.' + x.heading) + '</dd><dt>' + t('step.3') + '</dt><dd>' + t('rail.' + x.rail) + ', ' + lc1(t('mount.' + x.mount)) + '</dd></dl>' +
+      '<h2 class="plain-h">' + t('insp.what') + '</h2><dl class="specs lined"><dt>' + t('step.fabric') + '</dt><dd>' + esc(fabName(f)) + (two ? '; ' + esc(fabName(fabricById(x.sheer))) : '') + '</dd>' +
+      '<dt>' + t('step.heading') + '</dt><dd>' + t('heading.' + x.heading) + '</dd><dt>' + t('step.rail') + '</dt><dd>' + t('rail.' + x.rail) + ', ' + lc1(t('mount.' + x.mount)) + '</dd></dl>' +
       '<div class="btn-row"><button class="btn" data-act="insp-use" data-id="' + r.id + '" id="insp-use">' + t('insp.use') + '</button>' +
       '<a class="btn ghost" href="#fabric-' + x.fam + '" data-act="open-fabric" data-fam="' + x.fam + '" data-col="' + f.id + '" id="insp-fabric">' + t('insp.fabric') + '</a></div><p class="muted small">' + t('fab.price') + '</p><div class="insp-photos pg-second">' + rest + '</div></div></div>';
   }
@@ -3120,7 +3362,30 @@ if (typeof module !== 'undefined') module.exports = I18N;
     return h + '</' + (g.ordered ? 'ol' : 'ul') + '><div class="article-end"><p>' + t('guides.cta') + '</p><div class="btn-row"><button class="btn" data-go="book">' + t('home.cta1') + '</button><button class="btn ghost" data-go="config">' + t('home.cta2') + '</button></div></div></article>';
   }
 
-  /* ----- the builder: one window in five steps (fabric, heading, rail, size, summary), no prices ----- */
+  /* ----- the builder: one product for one window, one question to a screen, no prices ----- */
+  // The steps depend on the product: a curtain asks for fabric, heading, rail and size; a rail alone skips the fabric;
+  // a blind (venetian or vertical, roman, roller) asks for its model and colour, then its size.
+  var PATHS = { perde: ['product', 'fabric', 'heading', 'rail', 'size', 'summary'], shina: ['product', 'heading', 'rail', 'size', 'summary'], blind: ['product', 'model', 'bsize', 'summary'] };
+  function path() { return PATHS[isBlindKind(S.kind) ? 'blind' : S.kind] || PATHS.perde; }
+  function stepKey() { return path()[S.step - 1]; }
+  function stepWord(k) { return k === 'bsize' ? 'size' : k; }   // a blind's size step is named and worded as the curtain's
+  function stepIndex(k) { var p = path(), i = p.indexOf(k); if (i < 0 && k === 'size') i = p.indexOf('bsize'); return i < 0 ? 1 : i + 1; }
+  function curCheck() { return isBlindKind(S.kind) ? Pricing.checkBlind(S.blind) : Pricing.computeWindow(S.cfg); }
+  function curIssues(calc) { return isBlindKind(S.kind) ? blindIssues(calc, S.blind) : issuesText(calc); }
+  function defaultBlind(model) { var m = blindById(model) || BLINDS[0]; return { model: m.id, color: m.colors[0].id, width: 120, height: 160, mount: 'inside', side: 'right' }; }
+  function setKind(k) { // the product being built. A rail alone is a curtain window without a curtain.
+    if (CATEGORIES.indexOf(k) < 0) return;
+    S.kind = k; S.added = false;
+    if (isBlindKind(k)) {
+      var m = blindById(S.blind.model);
+      if (!m || m.cat !== k) { var keep = S.blind; S.blind = defaultBlind(blindsOf(k)[0].id); ['width', 'height', 'mount', 'side'].forEach(function (f) { S.blind[f] = keep[f]; }); } // the sizes typed so far are kept
+    } else {
+      if (k === 'shina') { if (S.cfg.layers !== 'none') S.layersWas = S.cfg.layers; S.cfg.layers = 'none'; } // the curtain chosen so far comes back with the product
+      else if (S.cfg.layers === 'none') S.cfg.layers = S.layersWas || 'sheer';
+      settle('layers');
+    }
+    if (S.step > path().length) S.step = path().length;
+  }
   // Keeps the window valid after a change and says what changed. A mount or rail the customer picks becomes
   // the preference, so an automatic change of mount is undone as soon as the choice is possible again.
   function settle(changedField) {
@@ -3145,86 +3410,117 @@ if (typeof module !== 'undefined') module.exports = I18N;
   function notes() { // what an automatic correction changed, and a choice no rail can carry
     return (S.railNote ? '<p class="note" id="cfg-note">' + esc(S.railNote) + '</p>' : '') + (!S.cfg.rail ? '<p class="alert" id="cfg-norail">' + t('cfg.noRail') + '</p>' : '');
   }
-  function stepStatic() { // the two size fields are written once, so typing in them is never interrupted
-    var c = S.cfg;
-    if (S.step !== 4) return '';
+  function stepStatic() { // the size fields are written once, so typing in them is never interrupted
+    var k = stepKey(), blind = k === 'bsize', v = blind ? S.blind : S.cfg;
+    if (k !== 'size' && !blind) return '';
     return '<label class="field line" for="cfg-room"><span>' + t('cfg.room') + '</span><input type="text" id="cfg-room" maxlength="40" autocomplete="off" placeholder="' + t('cfg.room.ph') + '" value="' + esc(S.room) + '" data-f="room"></label>' +
-      '<fieldset><div class="sizes"><label class="field" for="cfg-width"><span>' + t('cfg.width') + '</span><input type="text" inputmode="numeric" id="cfg-width" maxlength="5" autocomplete="off" value="' + (isNaN(c.width) ? '' : c.width) + '" data-f="width" aria-describedby="cfg-width-hint cfg-size-err"></label>' +
-      '<label class="field" for="cfg-height"><span>' + t('cfg.height') + '</span><input type="text" inputmode="numeric" id="cfg-height" maxlength="5" autocomplete="off" value="' + (isNaN(c.height) ? '' : c.height) + '" data-f="height" aria-describedby="cfg-height-hint cfg-size-err"></label></div>' +
+      '<fieldset><div class="sizes"><label class="field" for="cfg-width"><span>' + t('cfg.width') + '</span><input type="text" inputmode="numeric" id="cfg-width" maxlength="5" autocomplete="off" value="' + (isNaN(v.width) ? '' : v.width) + '" data-f="' + (blind ? 'bwidth' : 'width') + '" aria-describedby="cfg-width-hint cfg-size-err"></label>' +
+      '<label class="field" for="cfg-height"><span>' + t('cfg.height') + '</span><input type="text" inputmode="numeric" id="cfg-height" maxlength="5" autocomplete="off" value="' + (isNaN(v.height) ? '' : v.height) + '" data-f="' + (blind ? 'bheight' : 'height') + '" aria-describedby="cfg-height-hint cfg-size-err"></label></div>' +
       '<p class="field-err" id="cfg-size-err"></p>' +
-      '<p class="muted small" id="cfg-width-hint">' + t('cfg.width.hint') + '</p><p class="muted small" id="cfg-height-hint"></p></fieldset>';
+      '<p class="muted small" id="cfg-width-hint">' + (blind ? '' : t('cfg.width.hint')) + '</p><p class="muted small" id="cfg-height-hint"></p></fieldset>';
   }
   function stepDyn() { // the choices of the step on show; redrawn whenever one of them changes what the others allow
-    var c = S.cfg, h = '';
-    if (S.step === 1) {
-      h += '<fieldset><legend>' + t('cfg.layers') + '</legend><div class="chips">' + LAYERS.map(function (k) { return radio('layers', k, c.layers === k, t('layers.' + k)); }).join('') + '</div></fieldset>';
+    var c = S.cfg, k = stepKey(), h = '';
+    if (k === 'product') {
+      h += '<fieldset><legend class="sr-only">' + t('step.product') + '</legend><div class="hcards five">' + CATEGORIES.map(function (x) {
+        return '<label class="hcard" for="kind-' + x + '"><input type="radio" id="kind-' + x + '" name="kind" value="' + x + '"' + (S.kind === x ? ' checked' : '') + ' data-f="kind" aria-describedby="kind-' + x + '-d">' +
+          '<span class="hcard-body">' + catIcon(x) + '<b>' + catShort(x) + '</b><small id="kind-' + x + '-d">' + t('cat.' + x + '.hint') + '</small></span></label>';
+      }).join('') + '</div></fieldset>';
+    } else if (k === 'fabric') {
+      h += '<fieldset><legend>' + t('cfg.layers') + '</legend><div class="chips">' + LAYERS.filter(function (x) { return x !== 'none'; }).map(function (x) { return radio('layers', x, c.layers === x, t('layers.' + x)); }).join('') + '</div></fieldset>';
       if (c.layers === 'sheer' || c.layers === 'double') h += fabField('sheer', ['sheer'], c.sheerId);
       if (c.layers === 'main' || c.layers === 'double') h += fabField('main', ['blackout', 'decor'], c.mainId);
-      if (c.layers === 'none') h += '<p class="muted">' + t('step.1.none') + '</p>';
       h += notes();
-    } else if (S.step === 2) {
-      h += '<fieldset><legend class="sr-only">' + t(c.layers === 'none' ? 'cfg.heading.own' : 'cfg.heading') + '</legend><div class="hcards">' + HEADINGS.map(function (k) {
-        return '<label class="hcard" for="heading-' + k + '"><input type="radio" id="heading-' + k + '" name="heading" value="' + k + '"' + (c.heading === k ? ' checked' : '') + ' data-f="heading" aria-describedby="heading-' + k + '-d">' +
-          '<span class="hcard-body">' + headIcon(k) + '<b>' + t('heading.' + k) + '</b><small id="heading-' + k + '-d">' + t('heading.d.' + k) + '</small></span></label>';
+    } else if (k === 'heading') {
+      h += '<fieldset><legend class="sr-only">' + t(c.layers === 'none' ? 'cfg.heading.own' : 'cfg.heading') + '</legend><div class="hcards">' + HEADINGS.map(function (x) {
+        return '<label class="hcard" for="heading-' + x + '"><input type="radio" id="heading-' + x + '" name="heading" value="' + x + '"' + (c.heading === x ? ' checked' : '') + ' data-f="heading" aria-describedby="heading-' + x + '-d">' +
+          '<span class="hcard-body">' + headIcon(x) + '<b>' + t('heading.' + x) + '</b><small id="heading-' + x + '-d">' + t('heading.d.' + x) + '</small></span></label>';
       }).join('') + '</div></fieldset>';
-      if (c.layers !== 'none') h += '<fieldset><legend>' + t('cfg.panels') + '</legend><div class="chips">' + radio('panels', '2', c.panels === 2, t('panels.2')) + radio('panels', '1', c.panels === 1, t('panels.1')) + '</div></fieldset>';
+      if (c.layers === 'none') h += '<p class="muted small">' + t('step.heading.own') + '</p>';
+      else h += '<fieldset><legend>' + t('cfg.panels') + '</legend><div class="chips">' + radio('panels', '2', c.panels === 2, t('panels.2')) + radio('panels', '1', c.panels === 1, t('panels.1')) + '</div></fieldset>';
       h += notes();
-    } else if (S.step === 3) {
+    } else if (k === 'rail') {
       h += cfgMount() + '<fieldset><legend>' + t('cfg.rail') + '</legend><div class="chips col">' + Pricing.railOptions(c).map(function (o) {
         var extra = '';
         if (o.issues.length) extra = o.issues.map(function (i) { return t('issue.' + i); }).join('; ');
         else if (o.consult) extra = t('issue.consult');
         return radio('rail', o.rail.id, c.rail === o.rail.id, t('rail.' + o.rail.id), { extra: extra, off: o.issues.length > 0 });
       }).join('') + '</div></fieldset>' + notes();
-    } else if (S.step === 4) {
+    } else if (k === 'size') {
       h += '<fieldset><legend>' + t('cfg.mode') + '</legend><div class="chips">' + Pricing.modeOptions(c).map(function (m) {
         return radio('mode', m.mode, c.mode === m.mode, t('cfg.mode.' + m.mode, { n: PARAMS.overhang }), { extra: m.ok ? '' : t('issue.wallToWall'), off: !m.ok });
       }).join('') + '</div>' + (c.rail === 'own' ? '<p class="muted small">' + t('cfg.ownWidth') + '</p>' : '') + '</fieldset>';
-      h += '<fieldset><legend>' + t('cfg.shape') + '</legend><div class="chips">' + SHAPES.map(function (k) { return radio('shape', k, c.shape === k, t('shape.' + k)); }).join('') + '</div></fieldset>' + notes();
+      h += '<fieldset><legend>' + t('cfg.shape') + '</legend><div class="chips">' + SHAPES.map(function (x) { return radio('shape', x, c.shape === x, t('shape.' + x)); }).join('') + '</div></fieldset>' + notes();
+    } else if (k === 'model') {
+      var b = S.blind, m = blindById(b.model), col = blindColor(m, b.color);
+      h += '<fieldset><legend class="sr-only">' + t('step.model') + '</legend><div class="chips">' + blindsOf(S.kind).map(function (x) { return radio('bmodel', x.id, b.model === x.id, esc(blindName(x))); }).join('') + '</div>' +
+        '<p class="small" id="bmodel-text">' + t('bl.' + m.id + '.text') + '</p></fieldset>' +
+        '<fieldset><legend id="bcol-label">' + t('car.color') + ': <b>' + esc(bColorName(col)) + '</b></legend><div class="swatches" role="radiogroup" aria-labelledby="bcol-label">' +
+        m.colors.map(function (x) { return bSwatch('bcol', m, x, x.id === b.color, 'bcolor'); }).join('') + '</div></fieldset>';
+    } else if (k === 'bsize') {
+      var bc = Pricing.checkBlind(S.blind);
+      h += '<fieldset><legend>' + t('bl.mount') + '</legend><div class="chips">' + BLIND_MOUNTS.map(function (x) { return radio('bmount', x, S.blind.mount === x, t('bl.mount.' + x)); }).join('') + '</div></fieldset>' +
+        '<fieldset><legend>' + t('bl.side') + '</legend><div class="chips">' + BLIND_SIDES.map(function (x) { return radio('bside', x, S.blind.side === x, t('bl.side.' + x)); }).join('') + '</div></fieldset>' +
+        (!bc.errors.length && bc.consult.length ? '<p class="note" id="cfg-note">' + esc(blindIssues(bc, S.blind)) + '</p>' : '');
     } else {
       h += '<div class="review"><div class="sub" id="cfg-price">' + cfgPrice() + '</div><div class="sub" id="est-out" tabindex="-1">' + estHtml() + '</div></div>';
     }
     return h;
   }
   function paintSizeErrors() { // the message sits under the two size fields, and the fields are marked
-    var calc = Pricing.computeWindow(S.cfg), msg = { width: '', height: '' };
+    var blind = isBlindKind(S.kind), m = blind ? blindById(S.blind.model) : null, calc = curCheck(), msg = { width: '', height: '' };
     calc.errors.forEach(function (e) {
       var f = e.indexOf('width') === 0 ? 'width' : e.indexOf('height') === 0 ? 'height' : '';
       if (!f) return;
       var el = $('cfg-' + f), raw = el ? el.value : '';
-      msg[f] = (e === f + 'Invalid' && /[.,]/.test(raw)) ? t('err.sizeMetres') : errText(e);
+      msg[f] = (e === f + 'Invalid' && /[.,]/.test(raw)) ? t('err.sizeMetres') : blind && e === f + 'Min' ? t('err.' + e, { n: f === 'width' ? m.minW : m.minH }) : errText(e);
     });
     ['width', 'height'].forEach(function (f) {
       var el = $('cfg-' + f); if (!el) return;
       if (msg[f]) el.setAttribute('aria-invalid', 'true'); else el.removeAttribute('aria-invalid');
     });
     var box = $('cfg-size-err'); if (box) box.textContent = msg.width === msg.height ? msg.width : [msg.width, msg.height].filter(Boolean).join(' ');
-    var hint = $('cfg-height-hint'); if (hint) hint.textContent = t('cfg.height.hint.' + (S.cfg.mount === 'wall' ? 'wall' : 'ceiling'));
+    var hint = $('cfg-height-hint'); if (hint) hint.textContent = blind ? t('bl.height.hint.' + S.blind.mount) : t('cfg.height.hint.' + (S.cfg.mount === 'wall' ? 'wall' : 'ceiling'));
+    var wh = $('cfg-width-hint'); if (wh && blind) wh.textContent = t('bl.width.hint.' + S.blind.mount);
   }
   function barText(calc) {
     return calc.ok ? t('cfg.bar', { n: fmtLen(Pricing.railLength(S.cfg)) }) : calc.errors.length ? t('cfg.bar.none') : t('cfg.bar.consult');
   }
   var ARROW = '<svg viewBox="0 0 18 18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 9H3M7 5L3 9l4 4"/></svg>';
   function barHtml() { // back and forward stay within reach on every screen; on the last step the forward button adds the window
-    var calc = Pricing.computeWindow(S.cfg), full = S.est.length >= Ops.MAX_WINDOWS, last = S.step === STEPS;
+    var calc = curCheck(), full = S.est.length >= Ops.MAX_WINDOWS, last = S.step === path().length;
     return (S.step > 1 ? '<button type="button" class="btn ghost" data-act="step-back" id="cfg-back">' + ARROW + t('step.back') + '</button>' : '<span></span>') +
       (last ? '<button type="button" class="btn" data-act="est-add" id="cfg-add"' + (calc.errors.length || full || S.added ? ' disabled' : '') + '>' + t('cfg.add') + '</button>'
         : '<button type="button" class="btn" data-act="step-next" id="cfg-next">' + t('step.next') + '</button>');
   }
-  function cfgPrice() { // what this window takes: fabric, sewing, rail and fitting. Amounts belong to the quote, not to this page.
-    var c = S.cfg, calc = Pricing.computeWindow(c), h = '<h3>' + t('cfg.price') + '</h3><p>' + esc(cfgSummary(c)) + '</p>';
-    if (calc.ok) {
-      h += '<h3>' + t('cfg.incl') + '</h3><ul class="incl">' + calc.lines.map(function (l) { return '<li>' + lineLabel(l, c) + '</li>'; }).join('') + '</ul>';
-      if (calc.layers.length) h += '<p class="muted small">' + t('cfg.fullnessNote', { f: fmtN(PARAMS.fullness10[c.heading] / 10, 1) }) + '</p>';
-      h += '<p class="muted small">' + t('cfg.quoteNote') + '</p>'; // the rail's cuts and parts are the workshop's business, not the customer's
+  function cfgPrice() { // what this window takes, without amounts: those belong to the quote, not to this page
+    var c = S.cfg, h = '<h3>' + t('cfg.price') + '</h3>';
+    if (isBlindKind(S.kind)) {
+      var b = S.blind, m = blindById(b.model), bc = Pricing.checkBlind(b);
+      if (bc.errors.length) h += '<p class="alert">' + esc(blindIssues(bc, b)) + '</p>';
+      else {
+        h += '<p>' + esc(blindSummary(b)) + '</p><h3>' + t('cfg.incl') + '</h3><ul class="incl"><li>' + esc(blindName(m) + ', ' + bColorName(blindColor(m, b.color))) + ', ' + t('bl.incl.made') + '</li><li>' + t('bl.incl.mech') + '</li><li>' + t('line.install') + '</li></ul>';
+        if (bc.consult.length) h += '<p class="note">' + esc(blindIssues(bc, b)) + '</p>';
+        h += '<p class="muted small">' + t('cfg.quoteNote') + '</p>';
+      }
     } else {
-      h += '<p class="' + (calc.errors.length ? 'alert' : 'note') + '">' + esc(issuesText(calc)) + '</p>';
+      var calc = Pricing.computeWindow(c);
+      h += '<p>' + esc(cfgSummary(c)) + '</p>';
+      if (calc.ok) {
+        h += '<h3>' + t('cfg.incl') + '</h3><ul class="incl">' + calc.lines.map(function (l) { return '<li>' + lineLabel(l, c) + '</li>'; }).join('') + '</ul>';
+        if (calc.layers.length) h += '<p class="muted small">' + t('cfg.fullnessNote', { f: fmtN(PARAMS.fullness10[c.heading] / 10, 1) }) + '</p>';
+        h += '<p class="muted small">' + t('cfg.quoteNote') + '</p>'; // the rail's cuts and parts are the workshop's business, not the customer's
+      } else {
+        h += '<p class="' + (calc.errors.length ? 'alert' : 'note') + '">' + esc(issuesText(calc)) + '</p>';
+      }
     }
     if (S.added) h += '<p class="note" id="cfg-added">' + t('cfg.added') + '</p><div class="btn-row"><button type="button" class="btn ghost small" data-act="step-again" id="cfg-again">' + t('step.again') + '</button></div>';
     if (S.est.length >= Ops.MAX_WINDOWS) h += '<p class="note">' + t('est.full', { n: Ops.MAX_WINDOWS }) + '</p>';
     return h;
   }
-  function estCalc() { return Pricing.computeEstimate(S.est.map(function (x) { return x.cfg; }), S.zone); }
+  // The request is one list: curtain windows ({room, cfg}) and blinds ({room, blind}), in the order they were added.
+  function winsOf(items) { return items.filter(function (x) { return x.cfg; }); }
+  function estCalc() { return Pricing.computeEstimate(winsOf(S.est).map(function (x) { return x.cfg; }), S.zone); }
   function totalLabel(e) { return t(e.travelByQuote ? 'tot.totalExTravel' : PARAMS.vatRegistered ? 'tot.total' : 'tot.totalNoVat'); }
   function totalsRows(e) { // staff only: the public pages show no amounts
     var h = '';
@@ -3240,14 +3536,21 @@ if (typeof module !== 'undefined') module.exports = I18N;
   }
   function waText() {
     var lines = [t('est.wa.head')];
-    S.est.forEach(function (x, i) { lines.push((i + 1) + '. ' + (x.room || t('est.window', { n: i + 1 })) + ': ' + cfgSummary(x.cfg)); });
+    S.est.forEach(function (x, i) { lines.push((i + 1) + '. ' + (x.room || t('est.window', { n: i + 1 })) + ': ' + (x.blind ? blindSummary(x.blind) : cfgSummary(x.cfg))); });
     return lines.join('\n').replace(/ /g, ' ');
   }
-  function estListHtml(items, e, removable) { // the windows of a request, without amounts
-    var h = '<ul class="est-list">';
+  function estListHtml(items, e, removable) { // what a request asks for, without amounts; e is the estimate of its curtain windows
+    var h = '<ul class="est-list">', k = 0;
     items.forEach(function (x, i) {
-      var w = e.windows[i], name = bdi(x.room || t('est.window', { n: i + 1 }));
-      h += '<li><div><b>' + name + '</b><span class="muted">' + esc(cfgSummary(x.cfg)) + '</span>' + (w.ok ? '' : '<span class="note">' + esc(w.errors.indexOf('fabric') >= 0 ? t('est.gone') : issuesText(w)) + '</span>') + '</div>' +
+      var name = bdi(x.room || t('est.window', { n: i + 1 })), text, note = '';
+      if (x.blind) {
+        var bc = Pricing.checkBlind(x.blind), gone = bc.errors.indexOf('config') >= 0;
+        text = gone ? '' : blindSummary(x.blind); note = gone ? t('est.gone') : bc.ok ? '' : blindIssues(bc, x.blind);
+      } else {
+        var w = e.windows[k++];
+        text = cfgSummary(x.cfg); note = w.ok ? '' : (w.errors.indexOf('fabric') >= 0 ? t('est.gone') : issuesText(w));
+      }
+      h += '<li><div><b>' + name + '</b><span class="muted">' + esc(text) + '</span>' + (note ? '<span class="note">' + esc(note) + '</span>' : '') + '</div>' +
         (removable ? '<div class="est-amt"><button class="link" id="est-rm-' + i + '" data-act="est-remove" data-i="' + i + '" aria-label="' + t('est.remove') + ': ' + esc(x.room || t('est.window', { n: i + 1 })) + '">' + t('est.remove') + '</button></div>' : '') + '</li>';
     });
     return h + '</ul>';
@@ -3257,30 +3560,44 @@ if (typeof module !== 'undefined') module.exports = I18N;
     var undo = S.undo ? '<p class="note">' + t('est.removed') + ' <button class="link" data-act="est-undo" id="est-undo">' + t('est.undo') + '</button></p>' : '';
     if (!S.est.length) return h + '<p class="muted">' + t('est.empty') + '</p>' + undo;
     h += estListHtml(S.est, e, true) + undo;
-    if (e.consultCount) h += '<p class="note">' + tn('est.consultNote', e.consultCount) + '</p>';
+    var consult = e.consultCount + S.est.filter(function (x) { return x.blind && Pricing.checkBlind(x.blind).consult.length; }).length;
+    if (consult) h += '<p class="note">' + tn('est.consultNote', consult) + '</p>';
     h += '<p class="muted small">' + t('cfg.quoteNote') + ' ' + t('est.saved', { n: KEEP_DAYS }) + '</p><div class="btn-row"><button class="btn" data-go="book">' + t('est.book') + '</button><button class="btn ghost small" data-act="wa-copy" id="wa-copy">' + t('est.wa') + '</button></div>';
     if (S.wa === 'copied') h += '<p class="note">' + t('est.wa.copied') + '</p>';
     if (S.wa === 'manual') h += '<label class="field" for="wa-text"><span>' + t('est.wa.manual') + '</span><textarea id="wa-text" rows="5" readonly>' + esc(waText()) + '</textarea></label>';
     return h;
   }
   function sumHtml() { // the choices so far, each with a way back to its step
-    var c = S.cfg, calc = Pricing.computeWindow(c);
-    var okSize = typeof c.width === 'number' && c.width >= PARAMS.minWidth && typeof c.height === 'number' && c.height >= PARAMS.minHeight;
-    var cloth = t('layers.' + c.layers) + Pricing.layerRoles(c).map(function (r) { var x = fabricById(r === 'sheer' ? c.sheerId : c.mainId); return x ? '. ' + esc(fabName(x)) : ''; }).join('');
-    var row = function (i, v) { return '<li><small>' + t('step.' + i) + '</small><span id="sum-' + i + '">' + v + '</span><button type="button" class="link" data-act="step-go" data-i="' + i + '" id="sum-go-' + i + '" aria-label="' + t('step.edit') + ': ' + t('step.' + i) + '">' + t('step.edit') + '</button></li>'; };
-    return '<h2>' + t('step.sum') + '</h2><ul class="sum">' + row(1, cloth) + row(2, t('heading.' + c.heading)) +
-      row(3, c.rail ? t('rail.' + c.rail) + ', ' + lc1(t('mount.' + c.mount)) : '–') +
-      row(4, okSize ? fmtN(c.width) + ' × ' + fmtN(c.height) + ' cm' + (calc.ok ? '. ' + t('cfg.railLen', { n: fmtLen(Pricing.railLength(c)) }) : '') : '–') + '</ul>' +
-      (S.est.length ? '<p class="small"><button type="button" class="link" data-act="step-go" data-i="' + STEPS + '" id="sum-est">' + tn('est.count', S.est.length) + '</button></p>' : '') +
+    var c = S.cfg, rows = [['product', catShort(S.kind)]];
+    if (isBlindKind(S.kind)) {
+      var b = S.blind, m = blindById(b.model), bc = Pricing.checkBlind(b);
+      rows.push(['model', esc(blindName(m) + ', ' + bColorName(blindColor(m, b.color)))]);
+      rows.push(['size', (bc.errors.length ? '' : fmtN(b.width) + ' × ' + fmtN(b.height) + ' cm. ') + t('bl.mount.' + b.mount)]);
+    } else {
+      var calc = Pricing.computeWindow(c);
+      var okSize = typeof c.width === 'number' && c.width >= PARAMS.minWidth && typeof c.height === 'number' && c.height >= PARAMS.minHeight;
+      if (S.kind === 'perde') rows.push(['fabric', t('layers.' + c.layers) + Pricing.layerRoles(c).map(function (r) { var x = fabricById(r === 'sheer' ? c.sheerId : c.mainId); return x ? '. ' + esc(fabName(x)) : ''; }).join('')]);
+      rows.push(['heading', t('heading.' + c.heading)]);
+      rows.push(['rail', c.rail ? t('rail.' + c.rail) + ', ' + lc1(t('mount.' + c.mount)) : '–']);
+      rows.push(['size', okSize ? fmtN(c.width) + ' × ' + fmtN(c.height) + ' cm' + (calc.ok ? '. ' + t('cfg.railLen', { n: fmtLen(Pricing.railLength(c)) }) : '') : '–']);
+    }
+    return '<h2>' + t('step.sum') + '</h2><ul class="sum">' + rows.map(function (r) {
+      return '<li><small>' + t('step.' + r[0]) + '</small><span id="sum-' + r[0] + '">' + r[1] + '</span><button type="button" class="link" data-act="step-go" data-i="' + stepIndex(r[0]) + '" id="sum-go-' + r[0] + '" aria-label="' + t('step.edit') + ': ' + t('step.' + r[0]) + '">' + t('step.edit') + '</button></li>';
+    }).join('') + '</ul>' +
+      (S.est.length ? '<p class="small"><button type="button" class="link" data-act="step-go" data-i="' + path().length + '" id="sum-est">' + tn('est.count', S.est.length) + '</button></p>' : '') +
       '<p class="muted small">' + t('cfg.quoteNote') + '</p>';
   }
-  function stepperHtml() { // the large count, as on the client's reference, and the five steps to jump between
-    var h = '<span class="wiz-count" id="cfg-count" aria-hidden="true">' + S.step + '/' + STEPS + '</span><ol class="stepper" aria-label="' + t('step.nav') + '">';
-    for (var i = 1; i <= STEPS; i++) h += '<li><button type="button" class="stepbtn' + (i < S.step ? ' is-done' : '') + '" data-act="step-go" data-i="' + i + '" id="step-' + i + '"' + (i === S.step ? ' aria-current="step"' : '') + '><i aria-hidden="true">' + i + '</i><span>' + t('step.' + i) + '</span></button></li>';
+  function stepperHtml() { // the large count, as on the client's reference, and the steps of this product to jump between
+    var p = path(), h = '<span class="wiz-count" id="cfg-count" aria-hidden="true">' + S.step + '/' + p.length + '</span><ol class="stepper" aria-label="' + t('step.nav') + '">';
+    p.forEach(function (k, n) {
+      var i = n + 1;
+      h += '<li><button type="button" class="stepbtn' + (i < S.step ? ' is-done' : '') + '" data-act="step-go" data-i="' + i + '" data-key="' + k + '" id="step-' + stepWord(k) + '"' + (i === S.step ? ' aria-current="step"' : '') + '><i aria-hidden="true">' + i + '</i><span>' + t('step.' + stepWord(k)) + '</span></button></li>';
+    });
     return h + '</ol>';
   }
   function formInner() { // one question to a screen: the question, a line of help, the choices, back and forward
-    return '<div class="step-head"><h2 id="cfg-step-h" tabindex="-1"><span class="sr-only">' + t('step.of', { i: S.step, n: STEPS }) + ': </span>' + t('step.' + S.step + '.q') + '</h2><p>' + t('step.' + S.step + '.t') + '</p></div>' +
+    var w = stepWord(stepKey());
+    return '<div class="step-head"><h2 id="cfg-step-h" tabindex="-1"><span class="sr-only">' + t('step.of', { i: S.step, n: path().length }) + ': </span>' + t('step.' + w + '.q') + '</h2><p>' + t('step.' + w + '.t') + '</p></div>' +
       '<div id="cfg-static">' + stepStatic() + '</div><div id="cfg-dyn">' + stepDyn() + '</div><div class="cfg-bar" id="cfg-bar">' + barHtml() + '</div>';
   }
   function viewConfig() {
@@ -3288,13 +3605,13 @@ if (typeof module !== 'undefined') module.exports = I18N;
       '<form id="cfg-form" novalidate>' + formInner() + '</form></div></div><aside class="wrap wiz-sum" id="cfg-sum" aria-label="' + t('step.sum') + '">' + sumHtml() + '</aside>';
   }
   function stepBlock() { // what stops the step on show from being left forwards: the id to bring into view, or ''
-    var errs = Pricing.computeWindow(S.cfg).errors;
-    if (S.step === 3 && !S.cfg.rail) return 'cfg-norail';
-    if (S.step === 4) { if (errs.some(function (e) { return e.indexOf('width') === 0; })) return 'cfg-width'; if (errs.some(function (e) { return e.indexOf('height') === 0; })) return 'cfg-height'; }
+    var k = stepKey(), errs = curCheck().errors;
+    if (k === 'rail' && !S.cfg.rail) return 'cfg-norail';
+    if (k === 'size' || k === 'bsize') { if (errs.some(function (e) { return e.indexOf('width') === 0; })) return 'cfg-width'; if (errs.some(function (e) { return e.indexOf('height') === 0; })) return 'cfg-height'; }
     return '';
   }
   function setStep(i, quiet) { // quiet: the page is being drawn anyway (a link from elsewhere), so nothing is redrawn or moved here
-    i = Math.max(1, Math.min(STEPS, Number(i) || 1));
+    i = Math.max(1, Math.min(path().length, Number(i) || 1));
     if (i !== S.step) { S.added = false; S.undo = null; S.wa = null; }
     S.step = i;
     if (quiet) return;
@@ -3302,15 +3619,16 @@ if (typeof module !== 'undefined') module.exports = I18N;
     var hd = $('cfg-step-h'), top = $('cfg-steps');
     if (top) { try { var y = top.getBoundingClientRect().top + window.scrollY - stickyTop() - 8; if (window.scrollY > y) window.scrollTo(0, y); } catch (e) { /* stays where it is */ } }
     if (hd) hd.focus({ preventScroll: true });
-    say(t('step.of', { i: S.step, n: STEPS }) + ': ' + t('step.' + S.step));
+    say(t('step.of', { i: S.step, n: path().length }) + ': ' + t('step.' + stepWord(stepKey())));
   }
+  function setStepKey(k, quiet) { setStep(stepIndex(k), quiet); }
   function stickyTop() { return parseFloat(root.style.getPropertyValue('--top-h')) || 0; }
   function refreshConfig(dyn) {
     if (dyn) setHTML($('cfg-dyn'), stepDyn());
     setHTML($('cfg-sum'), sumHtml()); setHTML($('cfg-bar'), barHtml());
     paintSizeErrors();
-    var calc = Pricing.computeWindow(S.cfg);
-    say((S.railNote ? S.railNote + ' ' : '') + (calc.ok ? barText(calc) : issuesText(calc)));
+    var calc = curCheck();
+    say((S.railNote && !isBlindKind(S.kind) ? S.railNote + ' ' : '') + (isBlindKind(S.kind) ? (calc.errors.length || calc.consult.length ? blindIssues(calc, S.blind) : blindSummary(S.blind)) : calc.ok ? barText(calc) : issuesText(calc)));
   }
   function sayFabric(fb) { // a new fabric or colour: its name and whether it is in stock, then the usual status
     if (!fb) return;
@@ -3329,7 +3647,7 @@ if (typeof module !== 'undefined') module.exports = I18N;
         (b.copied === 'manual' ? '<label class="field" for="code-text"><span>' + t('book.done.copyManual') + '</span><input type="text" id="code-text" readonly value="' + esc(d.code) + '"></label>' : '') +
         '<p>' + (d.slot ? t('book.done.slot', { date: fmtDate(d.date, 'day'), slot: t('slot.' + d.slot) }) : (d.notHeld ? t('book.done.notHeld') : t('book.done.callback'))) + ' ' + t('book.done.phone', { phone: '<bdi dir="ltr">' + esc(d.phone) + '</bdi>' }) + '</p>';
       if (d.items.length) {
-        var de = Pricing.computeEstimate(d.items.map(function (x) { return x.cfg; }), d.zone);
+        var de = Pricing.computeEstimate(winsOf(d.items).map(function (x) { return x.cfg; }), d.zone);
         h += '<h3>' + t('book.done.windows') + '</h3>' + estListHtml(d.items, de, false);
       }
       h += '<p>' + t('book.done.pin') + '</p><p class="muted">' + t('book.done.demo') + '</p>' +
@@ -3396,9 +3714,10 @@ if (typeof module !== 'undefined') module.exports = I18N;
     if (Object.keys(b.errors).length) { render(); focusFirstError(); return; }
     var callback = S.zone === 'C' || b.callback;
     var measure = callback ? null : { date: b.slot.split('|')[0], slot: b.slot.split('|')[1] };
-    var items = S.est.map(function (x) { return { room: x.room, cfg: x.cfg }; });
+    var items = S.est.map(function (x) { return x.cfg ? { room: x.room, cfg: x.cfg } : { room: x.room, blind: x.blind }; });
+    var extras = items.filter(function (x) { return x.blind; }).map(function (x) { var e = JSON.parse(JSON.stringify(x.blind)); e.room = x.room; return e; });
     // A filled trap field marks the request for the office; it is still received, without holding a slot.
-    var res = Ops.createPublicBooking(st, { name: b.name, phone: b.phone, email: b.email, zone: S.zone, address: b.address, notes: b.notes, consent: b.consent, windows: items, measure: measure, suspect: !!b.hp });
+    var res = Ops.createPublicBooking(st, { name: b.name, phone: b.phone, email: b.email, zone: S.zone, address: b.address, notes: b.notes, consent: b.consent, windows: winsOf(items), extras: extras, measure: measure, suspect: !!b.hp });
     if (!res.ok) {
       if (['name', 'phone', 'email', 'address', 'consent'].indexOf(res.error) >= 0) b.errors[res.error] = res.error;
       else { b.errors.slot = 'slotTaken'; b.slot = ''; }
@@ -3465,7 +3784,8 @@ if (typeof module !== 'undefined') module.exports = I18N;
     if (o.guaranteeUntil) h += '<dt>' + t('ops.guaranteeLabel') + '</dt><dd>' + fmtDate(o.guaranteeUntil, 'long') + '</dd>';
     h += '</dl>';
     if (o.quote) h += '<p class="muted small">' + t('track.amounts') + '</p>';
-    if (!o.quote && o.windows.length) h += '<h3>' + t('track.request') + '</h3>' + estListHtml(o.windows, Ops.estimate(o), false); // until a quote replaces it, the customer sees what was asked for
+    var asked = o.windows.concat((o.extras || []).map(function (x) { return { room: x.room, blind: x }; }));
+    if (!o.quote && asked.length) h += '<h3>' + t('track.request') + '</h3>' + estListHtml(asked, Ops.estimate(o), false); // until a quote replaces it, the customer sees what was asked for
     return h + '</div>';
   }
 
@@ -3520,7 +3840,7 @@ if (typeof module !== 'undefined') module.exports = I18N;
         var appt = (i <= 1 && o.measure) ? t('ops.card.measure', { date: fmtDate(o.measure.date) + ', ' + t('slot.' + o.measure.slot) })
           : (i === 7 && o.install) ? t('ops.card.install', { date: fmtDate(o.install.date) + ', ' + t('slot.' + o.install.slot) }) : '';
         h += '<button class="ocard" id="card-' + o.id + '" data-act="ops-open" data-id="' + o.id + '" aria-label="' + t('ops.open', { code: esc(o.code) }) + '"><span class="ocode">' + esc(o.code) + '</span><span class="oname">' + bdi(o.customer.name) + '</span>' +
-          '<span class="ometa">' + t('zone.' + o.customer.zone) + ' · ' + tn('ops.windowsN', o.windows.length) + '</span>' + (appt ? '<span class="ometa">' + appt + '</span>' : '') + '<span class="ototal">' + (total ? fmtL(total) : '–') + '</span><span class="oflags">' + orderFlags(o) + '</span></button>';
+          '<span class="ometa">' + t('zone.' + o.customer.zone) + ' · ' + tn('ops.windowsN', o.windows.length + (o.extras || []).length) + '</span>' + (appt ? '<span class="ometa">' + appt + '</span>' : '') + '<span class="ototal">' + (total ? fmtL(total) : '–') + '</span><span class="oflags">' + orderFlags(o) + '</span></button>';
       });
       h += '</section>';
     });
@@ -3680,6 +4000,9 @@ if (typeof module !== 'undefined') module.exports = I18N;
     h += '<section class="next" id="od-next">' + nextHtml(o) + '</section>';
 
     // windows and rails
+    if (o.extras && o.extras.length) h += '<section id="od-extras"><h3>' + t('ops.extras') + '</h3><ul class="plain">' + o.extras.map(function (x, n) {
+      return '<li><b>' + bdi(x.room || t('est.window', { n: o.windows.length + n + 1 })) + '</b> ' + esc(blindSummary(x)) + '</li>';
+    }).join('') + '</ul><p class="muted small">' + t('ops.extras.note') + '</p></section>';
     h += '<section><h3>' + t('ops.windows') + '</h3>';
     o.windows.forEach(function (w, i) {
       var rs = w.rail.status, asking = cf && cf.i === i;
@@ -3842,19 +4165,24 @@ if (typeof module !== 'undefined') module.exports = I18N;
   }
 
   /* ===================== RENDER ===================== */
-  function navOf(view) { return view === 'fabric' ? 'catalog' : view; } // a fabric's page belongs to "Fabrics"
+  function navOf(view) { return view === 'fabric' || view === 'item' ? 'catalog' : view; } // a fabric's or a blind's page belongs to the shop
   function hashFor() { // the address of what is on show
+    if (S.view === 'catalog') return S.cat ? 'shop-' + S.cat : 'catalog';
     if (S.view === 'fabric') return 'fabric-' + S.fab;
+    if (S.view === 'item') return 'item-' + S.item;
     if (S.view === 'inspire' && S.insp) return 'inspire-' + S.insp;
     if (S.view === 'guides' && S.guide) return 'guide-' + S.guide;
     return S.view;
   }
   function parseHash(h) {
-    var m = /^(fabric|inspire|guide)-([a-z0-9]+)$/.exec(h);
-    return m ? { view: m[1] === 'guide' ? 'guides' : m[1], param: m[2] } : { view: h, param: '' };
+    if (h === 'rails') return { view: 'catalog', param: 'shina' }; // the address the rails page had
+    var m = /^(shop|fabric|item|inspire|guide)-([a-z0-9]+)$/.exec(h);
+    return m ? { view: m[1] === 'guide' ? 'guides' : m[1] === 'shop' ? 'catalog' : m[1], param: m[2] } : { view: h, param: '' };
   }
   function titleFor() {
+    if (S.view === 'catalog' && S.cat) return catName(S.cat);
     if (S.view === 'fabric') return familyOf(S.fab)[0][S.lang];
+    if (S.view === 'item') return blindName(blindById(S.item));
     if (S.view === 'inspire' && S.insp) return t('insp.' + S.insp + '.title');
     if (S.view === 'guides' && S.guide) return t('guide.' + S.guide + '.title');
     return t('nav.' + S.view);
@@ -3893,7 +4221,7 @@ if (typeof module !== 'undefined') module.exports = I18N;
   }
   function render() {
     chrome();
-    var fn = { home: viewHome, catalog: viewCatalog, fabric: viewFabric, rails: viewRails, inspire: viewInspire, guides: viewGuides, config: viewConfig, book: viewBook, track: viewTrack, ops: viewOps }[S.view];
+    var fn = { home: viewHome, catalog: viewCatalog, fabric: viewFabric, item: viewItem, inspire: viewInspire, guides: viewGuides, config: viewConfig, book: viewBook, track: viewTrack, ops: viewOps }[S.view];
     var main = $('main');
     main.className = 'view view-' + S.view;
     setHTML(main, S.view === 'home' || S.view === 'config' ? fn() : '<div class="wrap view-body">' + fn() + '</div>'); // the home page and the builder lay out their own full-width bands
@@ -3901,10 +4229,13 @@ if (typeof module !== 'undefined') module.exports = I18N;
     setDrawer();
   }
   function setHash(h) { try { if (location.hash.replace('#', '') !== h) location.hash = h; } catch (e) { /* hash not available */ } }
-  // param: which fabric, room or guide. Without one, "Inspiration" and "Guides" show their lists and "fabric" the one last opened.
+  // param: which kind of product, fabric, blind, room or guide. Without one, the shop shows the five kinds, "Inspiration"
+  // and "Guides" their lists, and a fabric's or blind's page the one last opened.
   function go(view, fromHash, param) {
     if (VIEWS.indexOf(view) < 0) view = 'home';
-    if (view === 'fabric') { if (param && FAMILIES.indexOf(param) >= 0) S.fab = param; else if (param) view = 'catalog'; }
+    if (view === 'fabric') { if (param && FAMILIES.indexOf(param) >= 0) S.fab = param; else if (param) { view = 'catalog'; param = 'perde'; } }
+    if (view === 'item') { if (param && blindById(param)) S.item = param; else if (param) { view = 'catalog'; param = ''; } }
+    if (view === 'catalog') S.cat = param && CATEGORIES.indexOf(param) >= 0 ? param : '';
     if (view === 'inspire') S.insp = param && byId(INSPIRE, param) ? param : '';
     if (view === 'guides') S.guide = param && byId(GUIDES, param) ? param : '';
     S.view = view; S.added = false; S.undo = null;
@@ -3969,14 +4300,24 @@ if (typeof module !== 'undefined') module.exports = I18N;
     var act = el.getAttribute('data-act'), o = S.ops.open ? orderById(S.ops.open) : null, i = Number(el.getAttribute('data-i')), r, v;
     switch (act) {
       case 'menu': setMenu(!S.menu, true); break;
-      case 'cat-filter': S.cat = el.getAttribute('data-type'); if (S.view !== 'catalog') go('catalog'); else { render(); var cf = $('cat-' + S.cat); if (cf) cf.focus(); } break;
+      case 'cat-filter': // the kinds of curtain fabric
+        S.ftype = el.getAttribute('data-type');
+        if (S.view !== 'catalog' || S.cat !== 'perde') go('catalog', false, 'perde'); else { render(); var cf = $('cat-' + S.ftype); if (cf) cf.focus(); } break;
+      case 'open-cat': go('catalog', false, el.getAttribute('data-cat')); break;
+      case 'open-item': go('item', false, el.getAttribute('data-id')); break;
+      case 'use-item': // a blind's model and the colour on show become the product being built; its size is asked next
+        var ub = blindById(el.getAttribute('data-id')); if (!ub) break;
+        setKind(ub.cat); S.blind.model = ub.id; S.blind.color = (blindColor(ub, S.itemCol[ub.id]) || ub.colors[0]).id;
+        setStepKey('bsize', true); go('config'); break;
       case 'use-fabric':
         var f = famFabric(el.getAttribute('data-fam'), S.fabCol[el.getAttribute('data-fam')]); if (!f) break;
+        setKind('perde');
         if (f.type === 'sheer') { S.cfg.sheerId = f.id; if (S.cfg.layers === 'main' || S.cfg.layers === 'none') S.cfg.layers = 'sheer'; }
         else { S.cfg.mainId = f.id; if (S.cfg.layers === 'sheer' || S.cfg.layers === 'none') S.cfg.layers = 'main'; }
-        settle('layers'); setStep(1, true); go('config'); break;
+        settle('layers'); setStepKey('fabric', true); go('config'); break;
       case 'use-rail':
         var rl = railById(el.getAttribute('data-id')); if (!rl) break;
+        setKind('shina'); // from the rails' page the product is the rail alone; the first step turns it into a curtain on this rail
         var trial = JSON.parse(JSON.stringify(S.cfg)), ch = {};
         trial.rail = rl.id;
         if (rl.headings.indexOf(trial.heading) < 0) { trial.heading = rl.headings[0]; ch.heading = trial.heading; }
@@ -3984,7 +4325,7 @@ if (typeof module !== 'undefined') module.exports = I18N;
         var why = Pricing.railIssues(rl, trial);
         if (why.length) S.railNote = t('cfg.railNoFit', { v: t('rail.' + rl.id), why: why.map(function (x) { return t('issue.' + x); }).join('; ') }); // the window is left as it was
         else { S.cfg = trial; S.wantMount = trial.mount; S.railNote = changeNote(ch); }
-        setStep(3, true); go('config'); break;
+        setStepKey('rail', true); go('config'); break;
       case 'open-fabric': // from a card, or from a room that names the colour hung there
         var of = el.getAttribute('data-fam'), oc = el.getAttribute('data-col');
         if (oc && fabricById(oc) && fabricById(oc).fam === of) S.fabCol[of] = oc;
@@ -3994,22 +4335,23 @@ if (typeof module !== 'undefined') module.exports = I18N;
       case 'insp-use': // the room's curtain becomes the window being built; only its size is left to give
         var ir = byId(INSPIRE, el.getAttribute('data-id')), x = ir && byId(SAMPLES, ir.sample); if (!x) break;
         var sheerOnly = x.layers === 'sheer';
-        S.cfg.layers = x.layers; S.cfg.heading = x.heading; S.cfg.rail = x.rail; S.cfg.mount = x.mount;
+        setKind('perde'); S.cfg.layers = x.layers; S.cfg.heading = x.heading; S.cfg.rail = x.rail; S.cfg.mount = x.mount;
         if (sheerOnly) S.cfg.sheerId = x.color; else { S.cfg.mainId = x.color; if (x.sheer) S.cfg.sheerId = x.sheer; }
         var smr = railById(S.cfg.rail), modeNote = '';
         if (smr && S.cfg.mode !== x.mode && Pricing.railIssues(smr, S.cfg).length) { S.cfg.mode = x.mode; modeNote = t('cfg.modeAuto', { v: t('cfg.mode.' + x.mode, { n: PARAMS.overhang }) }); }
         S.wantMount = x.mount; S.railNote = (modeNote + ' ' + changeNote(Ops.fixRail(S.cfg, S.wantMount))).trim();
-        setStep(4, true); go('config'); break;
+        setStepKey('size', true); go('config'); break;
       case 'step-go': setStep(i); break;
       case 'step-back': setStep(S.step - 1); break;
       case 'step-next':
         var blk = stepBlock();
-        if (blk) { paintSizeErrors(); var be = $(blk); if (be) { if (be.focus) be.focus(); if (be.scrollIntoView) be.scrollIntoView({ block: 'center' }); } say(issuesText(Pricing.computeWindow(S.cfg)) || t('cfg.noRail')); break; }
+        if (blk) { paintSizeErrors(); var be = $(blk); if (be) { if (be.focus) be.focus(); if (be.scrollIntoView) be.scrollIntoView({ block: 'center' }); } say(curIssues(curCheck()) || t('cfg.noRail')); break; }
         setStep(S.step + 1); break;
       case 'step-again': S.room = ''; setStep(1); break; // the same choices stay as a start for the next window
       case 'est-add':
-        if (Pricing.computeWindow(S.cfg).errors.length || S.est.length >= Ops.MAX_WINDOWS) break;
-        S.est.push({ room: Ops.cleanText(S.room, 40), cfg: JSON.parse(JSON.stringify(S.cfg)), at: Date.now() });
+        if (curCheck().errors.length || S.est.length >= Ops.MAX_WINDOWS) break;
+        S.est.push(isBlindKind(S.kind) ? { room: Ops.cleanText(S.room, 40), blind: JSON.parse(JSON.stringify(S.blind)), at: Date.now() }
+          : { room: Ops.cleanText(S.room, 40), cfg: JSON.parse(JSON.stringify(S.cfg)), at: Date.now() });
         S.added = true; S.room = ''; S.wa = null; S.undo = null; saveEst(); var rm = $('cfg-room'); if (rm) rm.value = '';
         refreshEstimate(); var eo = $('est-out'); if (eo) eo.focus({ preventScroll: true }); say(t('cfg.added')); break;
       case 'est-remove':
@@ -4115,6 +4457,22 @@ if (typeof module !== 'undefined') module.exports = I18N;
         var kn = $('fab-col-name'); if (kn) kn.textContent = colorName(kf);
         var kt = $('fab-stock'); if (kt) { kt.className = (kf.stock ? 'ok' : 'warn') + '-text'; kt.textContent = stockText(kf); }
         say(kf[S.lang] + ', ' + colorName(kf) + '. ' + stockText(kf)); break;
+      case 'item-color': // a blind's photographs follow the colour
+        var ib = blindById(k), ic = blindColor(ib, v); if (!ic) break;
+        S.itemCol[k] = ic.id; setHTML($('item-gallery'), itemGallery(ib, ic)); setHTML($('item-second'), itemSecond(ib, ic));
+        var icn = $('item-col-name'); if (icn) icn.textContent = bColorName(ic);
+        say(blindName(ib) + ', ' + bColorName(ic)); break;
+      case 'kind': // another product has its own steps
+        setKind(v); setHTML($('cfg-steps'), stepperHtml()); refreshConfig(true); break;
+      case 'bmodel': // a new model starts on its first colour
+        var nm = blindById(v); if (!nm || nm.cat !== S.kind) break;
+        S.blind.model = nm.id; S.blind.color = nm.colors[0].id; S.added = false; refreshConfig(true); break;
+      case 'bcolor': if (blindColor(blindById(S.blind.model), v)) { S.blind.color = v; S.added = false; refreshConfig(true); } break;
+      case 'bmount': case 'bside': S.blind[f === 'bmount' ? 'mount' : 'side'] = v; S.added = false; refreshConfig(true); break;
+      case 'bwidth': case 'bheight':
+        var bf = f === 'bwidth' ? 'width' : 'height', bv = num(v);
+        if (isChange && (bv === S.blind[bf] || (isNaN(bv) && isNaN(S.blind[bf])))) break; // already applied while typing
+        S.blind[bf] = bv; S.added = false; refreshConfig(true); break; // the fields themselves are not redrawn: they stand outside the redrawn part
       case 'sheerFam': case 'mainFam': // a new fabric starts on its first colour
         S.cfg[f === 'sheerFam' ? 'sheerId' : 'mainId'] = familyOf(v)[0].id; S.added = false;
         settle(f); refreshConfig(true); sayFabric(familyOf(v)[0]); break;
@@ -4249,7 +4607,9 @@ if (typeof module !== 'undefined') module.exports = I18N;
   try { start = location.hash.replace('#', ''); } catch (e) { start = ''; }
   var first = parseHash(start);
   S.view = VIEWS.indexOf(first.view) >= 0 ? first.view : start.indexOf('ops-') === 0 && !PUBLIC_ONLY ? 'ops' : 'home';
-  if (S.view === 'fabric') { if (FAMILIES.indexOf(first.param) >= 0) S.fab = first.param; else S.view = 'catalog'; }
+  if (S.view === 'fabric') { if (FAMILIES.indexOf(first.param) >= 0) S.fab = first.param; else { S.view = 'catalog'; first.param = 'perde'; } }
+  if (S.view === 'item') { if (blindById(first.param)) S.item = first.param; else { S.view = 'catalog'; first.param = ''; } }
+  if (S.view === 'catalog') S.cat = CATEGORIES.indexOf(first.param) >= 0 ? first.param : '';
   if (S.view === 'inspire' && byId(INSPIRE, first.param)) S.insp = first.param;
   if (S.view === 'guides' && byId(GUIDES, first.param)) S.guide = first.param;
   if (S.view === 'ops' && start.indexOf('ops-') === 0 && orderById(start.slice(4))) S.ops.open = start.slice(4);
