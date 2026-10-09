@@ -868,6 +868,29 @@ table.data.matrix td.yes { color: var(--accent); }
 @media (min-width: 761px) { .igrid.has-lead:has(> :nth-child(3):last-child) { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 /* ten fabrics on a computer: three across, a last lone card centred, cards large enough to judge cloth */
 @media (min-width: 1000px) { .fgrid:has(> :nth-child(10):last-child) { display: flex; flex-wrap: wrap; justify-content: center; gap: 40px 20px; } .fgrid:has(> :nth-child(10):last-child) > * { flex: 0 1 calc((100% - 40px) / 3); } }
+/* ----- the configurator as a story being written (9 October 2026) ----- */
+/* The question is a small label; under it the window is one sentence that grows with each choice. Written phrases
+   can be tapped to rewrite them; the phrase being written is in the accent with the pen after it. No motion: the
+   words change only when a choice changes. */
+.step-head { gap: 10px; }
+.step-head h2 { font: 600 .75rem/1.4 var(--font-body); letter-spacing: .14em; text-transform: uppercase; color: var(--accent); }
+.step-head .story { font: 400 1.25rem/1.55 var(--font-display); color: var(--ink); max-width: 34ch; text-wrap: pretty; margin: 2px auto 0; text-align: center; }
+@media (min-width: 700px) { .step-head .story { font-size: 1.5rem; line-height: 1.5; max-width: 36ch; } }
+.story .st-room { display: block; font: 600 .75rem/1.4 var(--font-body); letter-spacing: .14em; text-transform: uppercase; color: var(--ink-2); margin-bottom: 4px; }
+.story .st-w { color: inherit; text-decoration: none; border-radius: 2px; }
+.story .st-w:hover, .story .st-w:focus-visible { text-decoration: underline dotted; text-decoration-thickness: 1px; text-underline-offset: 5px; color: var(--accent); }
+.story .st-w:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.story .st-now { color: var(--accent); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 6px; text-decoration-color: rgba(111, 101, 91, .45); }
+.story .st-pen { display: inline-block; width: 2px; height: 1.05em; margin-left: 3px; vertical-align: -.15em; background: var(--accent); border-radius: 1px; }
+.story .st-end { color: var(--ink-2); font-size: .875em; }
+.step-help { font-size: .875rem; color: var(--ink-2); }
+@media (max-width: 560px) { .step-head .story { text-align: left; margin-inline: 0; } .step-head { align-items: flex-start; } .step-head h2, .step-help { text-align: left; } }
+@media (forced-colors: active) { .story .st-pen { background: Highlight; } }
+/* the story on a sheet of its own, and each window of the request told the same way */
+.step-head .story { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 14px 18px 16px; box-shadow: 0 1px 0 rgba(78, 78, 78, .03); }
+@media (min-width: 700px) { .step-head .story { padding: 20px 28px 22px; } }
+.est-list li .muted { font-family: var(--font-display); font-size: 1rem; line-height: 1.5; color: var(--ink); }
+@media (max-width: 560px) { .step-head .story { width: 100%; box-sizing: border-box; font-size: 1.125rem; line-height: 1.5; padding: 12px 14px 13px; } }
 </style>
 </head>
 <body>
@@ -2783,7 +2806,28 @@ var I18N = {
     'price.free': 'Matja është falas dhe nuk ju detyron për asgjë.',
     'book.done.next': 'Një ditë përpara ju telefonojmë ose ju shkruajmë për ta konfirmuar. Matja është falas dhe nuk ju detyron për asgjë.',
     'shop.end.p': 'Sjellim mostrat në shtëpinë tuaj dhe masim çdo dritare, falas.',
-    'book.orWa': 'Ose na shkruani në WhatsApp'
+    'book.orWa': 'Ose na shkruani në WhatsApp',
+    'story.label': 'Dritarja juaj, siç po e shkruani',
+    'story.start.perde': 'Një perde',
+    'story.start.shina': 'Vetëm shina',
+    'story.fabric': 'prej {a}',
+    'story.fabric2': 'me dy shtresa: {a}, dhe {b}',
+    'story.heading': 'e qepur {h}',
+    'story.headingOwn': 'për perde të qepura {h}',
+    'story.h.wave': 'me valë',
+    'story.h.pinch': 'me pala treshe',
+    'story.h.pencil': 'me rrudha me shirit',
+    'story.h.eyelet': 'me unaza metalike',
+    'story.r.std': 'e varur në shinë alumini',
+    'story.r.wave': 'e varur në shinë për valë',
+    'story.r.pole': 'e varur në shufër dekorative 28 mm',
+    'story.r.motor': 'e varur në shinë me motor',
+    'story.r.own': 'e varur në shinën që keni',
+    'story.m.ceiling': 'në tavan',
+    'story.m.wall': 'në mur',
+    'story.size': 'për një dritare {w} × {h} cm',
+    'story.ready': ' Gati për t\'u shtuar në kërkesë.',
+    'story.added': ' U shtua në kërkesë.'
   },
   en: {
     'demo.notePublic': 'Demo: models, fabrics, inspiration and availability are samples. The photographs are Unsplash samples, not our work: your own photographs replace them. The empty frames hold the place of the ones still missing. The price comes with the quote, after the free measurement.', 
@@ -3298,7 +3342,28 @@ var I18N = {
     'price.free': 'The visit is free and commits you to nothing.',
     'book.done.next': 'The day before, we call or message you to confirm. The visit is free and commits you to nothing.',
     'shop.end.p': 'We bring the samples to your home and measure every window, free of charge.',
-    'book.orWa': 'Or message us on WhatsApp'
+    'book.orWa': 'Or message us on WhatsApp',
+    'story.label': 'Your window, as you are writing it',
+    'story.start.perde': 'A curtain',
+    'story.start.shina': 'A rail on its own',
+    'story.fabric': 'in {a}',
+    'story.fabric2': 'in two layers: {a}, and {b}',
+    'story.heading': 'sewn {h}',
+    'story.headingOwn': 'for curtains sewn {h}',
+    'story.h.wave': 'in soft waves',
+    'story.h.pinch': 'with pinch pleats',
+    'story.h.pencil': 'with pencil pleats',
+    'story.h.eyelet': 'with eyelets',
+    'story.r.std': 'hung on an aluminium track',
+    'story.r.wave': 'hung on a wave track',
+    'story.r.pole': 'hung on a 28 mm decorative pole',
+    'story.r.motor': 'hung on a motorised track',
+    'story.r.own': 'hung on the rail you already have',
+    'story.m.ceiling': 'on the ceiling',
+    'story.m.wall': 'on the wall',
+    'story.size': 'for a window {w} × {h} cm',
+    'story.ready': ' Ready to add to your request.',
+    'story.added': ' Added to your request.'
   }
 };
 if (typeof module !== 'undefined') module.exports = I18N;
@@ -3873,14 +3938,13 @@ if (typeof module !== 'undefined') module.exports = I18N;
       var b = S.blind, m = blindById(b.model), bc = Pricing.checkBlind(b);
       if (bc.errors.length) h += '<p class="alert">' + esc(blindIssues(bc, b)) + '</p>';
       else {
-        h += '<p>' + esc(blindSummary(b)) + '</p><ul class="incl" aria-label="' + t('cfg.incl') + '"><li>' + esc(blindName(m) + ', ' + bColorName(blindColor(m, b.color))) + ', ' + t('bl.incl.made') + '</li><li>' + t('bl.incl.mech') + '</li><li>' + t('line.install') + '</li></ul>';
+        h += '<ul class="incl" aria-label="' + t('cfg.incl') + '"><li>' + esc(blindName(m) + ', ' + bColorName(blindColor(m, b.color))) + ', ' + t('bl.incl.made') + '</li><li>' + t('bl.incl.mech') + '</li><li>' + t('line.install') + '</li></ul>';
         if (bc.consult.length) h += '<p class="note">' + esc(blindIssues(bc, b)) + '</p>';
       }
     } else {
       var calc = Pricing.computeWindow(c);
       if (calc.errors.length) h += '<p class="alert">' + esc(issuesText(calc)) + '</p>'; // nothing is summed up while a size is missing or wrong
       else {
-        h += '<p>' + esc(cfgSummary(c)) + '</p>';
         if (calc.ok) {
           var seen = {}; // two layers are sewn the same way: said once
           h += '<ul class="incl" aria-label="' + t('cfg.incl') + '">' + calc.lines.map(function (l) { return lineLabel(l, c); }).filter(function (x) { if (seen[x]) return false; seen[x] = 1; return true; }).map(function (x) { return '<li>' + x + '</li>'; }).join('') + '</ul>';
@@ -3909,7 +3973,7 @@ if (typeof module !== 'undefined') module.exports = I18N;
   }
   function waText() {
     var lines = [t('est.wa.head')];
-    S.est.forEach(function (x, i) { lines.push((i + 1) + '. ' + (x.room || t('est.window', { n: i + 1 })) + ': ' + (x.blind ? blindSummary(x.blind) : cfgSummary(x.cfg))); });
+    S.est.forEach(function (x, i) { lines.push((i + 1) + '. ' + (x.room || t('est.window', { n: i + 1 })) + ': ' + storyOf(x)); }); // each window as its sentence
     return lines.join('\n').replace(/ /g, ' ');
   }
   function estListHtml(items, e, removable) { // what a request asks for, without amounts; e is the estimate of its curtain windows
@@ -3918,10 +3982,10 @@ if (typeof module !== 'undefined') module.exports = I18N;
       var name = bdi(x.room || t('est.window', { n: i + 1 })), text, note = '';
       if (x.blind) {
         var bc = Pricing.checkBlind(x.blind), gone = bc.errors.indexOf('config') >= 0;
-        text = gone ? '' : blindSummary(x.blind); note = gone ? t('est.gone') : bc.ok ? '' : blindIssues(bc, x.blind);
+        text = gone ? '' : storyOf(x); note = gone ? t('est.gone') : bc.ok ? '' : blindIssues(bc, x.blind);
       } else {
         var w = e.windows[k++];
-        text = cfgSummary(x.cfg); note = w.ok ? '' : (w.errors.indexOf('fabric') >= 0 ? t('est.gone') : issuesText(w));
+        text = storyOf(x); note = w.ok ? '' : (w.errors.indexOf('fabric') >= 0 ? t('est.gone') : issuesText(w));
       }
       h += '<li><div><b>' + name + '</b><span class="muted">' + esc(text) + '</span>' + (note ? '<span class="note">' + esc(note) + '</span>' : '') + '</div>' +
         (removable ? '<div class="est-amt"><button class="link" id="est-rm-' + i + '" data-act="est-remove" data-i="' + i + '" aria-label="' + t('est.remove') + ': ' + esc(x.room || t('est.window', { n: i + 1 })) + '">' + t('est.remove') + '</button></div>' : '') + '</li>';
@@ -3940,24 +4004,51 @@ if (typeof module !== 'undefined') module.exports = I18N;
     if (S.wa === 'manual') h += '<label class="field" for="wa-text"><span>' + t('est.wa.manual') + '</span><textarea id="wa-text" rows="5" readonly>' + esc(waText()) + '</textarea></label>';
     return h;
   }
-  function sumHtml() { // the choices so far, each with a way back to its step
-    var c = S.cfg, rows = [['product', catShort(S.kind)]];
-    if (isBlindKind(S.kind)) {
-      var b = S.blind, m = blindById(b.model), bc = Pricing.checkBlind(b);
-      rows.push(['model', esc(blindName(m) + ', ' + bColorName(blindColor(m, b.color)))]);
-      rows.push(['size', bc.errors.length ? '–' : fmtN(b.width) + ' × ' + fmtN(b.height) + ' cm. ' + t('bl.mount.' + b.mount)]);
-    } else {
-      var calc = Pricing.computeWindow(c);
-      var okSize = typeof c.width === 'number' && c.width >= PARAMS.minWidth && typeof c.height === 'number' && c.height >= PARAMS.minHeight;
-      if (S.kind === 'perde') rows.push(['fabric', t('layers.' + c.layers) + Pricing.layerRoles(c).map(function (r) { var x = fabricById(r === 'sheer' ? c.sheerId : c.mainId); return x ? '. ' + esc(fabName(x)) : ''; }).join('')]);
-      rows.push(['heading', t('heading.' + c.heading)]);
-      rows.push(['rail', c.rail ? t('rail.' + c.rail) + ', ' + lc1(t('mount.' + c.mount)) : '–']);
-      rows.push(['size', okSize ? fmtN(c.width) + ' × ' + fmtN(c.height) + ' cm' + (calc.ok ? '. ' + t('cfg.railLen', { n: fmtLen(Pricing.railLength(c)) }) : '') : '–']);
+  // The window as a story being written. Every choice already made is a phrase of one sentence (tap it to rewrite it);
+  // the phrase of the step on show is the one being written: it changes as the visitor picks, in the accent with the pen
+  // after it; steps not reached yet are not written. Nothing moves by itself: the words change only when a choice does.
+  function storyPhrase(k, kind, c, b) { // plain text of one step's phrase, or '' when it cannot be said yet
+    kind = kind || S.kind; c = c || S.cfg; b = b || S.blind;
+    if (k === 'product') return isBlindKind(kind) ? catShort(kind) + ' —' : t('story.start.' + kind);
+    if (k === 'fabric') {
+      var roles = Pricing.layerRoles(c).map(function (r) { return fabricById(r === 'sheer' ? c.sheerId : c.mainId); }).filter(Boolean);
+      if (!roles.length) return '';
+      if (roles.length === 2) return t('story.fabric2', { a: fabName(roles[0]), b: fabName(roles[1]) });
+      return t('story.fabric', { a: fabName(roles[0]) });
     }
-    return '<h2>' + t('step.sum') + '</h2><ul class="sum">' + rows.map(function (r) {
-      return '<li><small>' + t('step.' + r[0]) + '</small><span id="sum-' + r[0] + '">' + (stepIndex(r[0]) <= S.reach ? r[1] : '–') + '</span><button type="button" class="link" data-act="step-go" data-i="' + stepIndex(r[0]) + '" id="sum-go-' + r[0] + '" aria-label="' + t('step.edit') + ': ' + t('step.' + r[0]) + '">' + t('step.edit') + '</button></li>';
-    }).join('') + '</ul>' +
-      (S.est.length ? '<p class="small"><button type="button" class="link" data-act="step-go" data-i="' + path().length + '" id="sum-est">' + tn('est.count', S.est.length) + '</button></p>' : '') +
+    if (k === 'heading') return t(kind === 'shina' ? 'story.headingOwn' : 'story.heading', { h: t('story.h.' + c.heading) });
+    if (k === 'rail') return c.rail ? (kind === 'shina' ? lc1(t('rail.' + c.rail)) : t('story.r.' + c.rail)) + ', ' + t('story.m.' + c.mount) : '';
+    var num2 = function (v) { return typeof v === 'number' && !isNaN(v) ? fmtN(v) : '…'; };
+    if (k === 'size') return t('story.size', { w: num2(c.width), h: num2(c.height) });
+    if (k === 'model') { var m = blindById(b.model); return m ? blindName(m) + ', ' + bColorName(blindColor(m, b.color)) : ''; }
+    if (k === 'bsize') return lc1(t('bl.mount.' + b.mount)) + ', ' + lc1(t('bl.side.' + b.side)) + ', ' + num2(b.width) + ' × ' + num2(b.height) + ' cm';
+    return '';
+  }
+  function storyJoin(parts, kind) { // phrases join with commas; after a curtain's opening words, or the kind of blind and its dash, a space
+    return parts.map(function (x, n) { return (n === 0 ? '' : n === 1 && kind === 'perde' ? ' ' : ', ') + x; }).join('');
+  }
+  function storyOf(x) { // a window of the request, told as its sentence (plain text)
+    var kind = x.blind ? (blindById(x.blind.model) || {}).cat || 'rolera' : (x.cfg.layers === 'none' ? 'shina' : 'perde');
+    var keys = PATHS[isBlindKind(kind) ? 'blind' : kind].filter(function (k) { return k !== 'summary' && !(k === 'product' && isBlindKind(kind)); });
+    return storyJoin(keys.map(function (k) { return storyPhrase(k, kind, x.cfg, x.blind); }).filter(Boolean), kind) + '.';
+  }
+  function storyHtml() {
+    var p = path(), now = stepKey(), out = [];
+    p.forEach(function (k, n) {
+      var i = n + 1, w = stepWord(k);
+      if (k === 'summary' || (i > S.reach && i !== S.step)) return;
+      if (k === 'product' && isBlindKind(S.kind) && S.step > 1) return; // a model's name already says its kind
+      var txt = storyPhrase(k); if (!txt) return;
+      if (k === now) out.push('<span class="st-now" id="sum-' + w + '">' + esc(txt) + '</span><span class="st-pen" aria-hidden="true"></span>');
+      else out.push('<a class="st-w" href="#' + (i > 1 ? 'config-' + w : 'config') + '" data-act="step-go" data-i="' + i + '" id="sum-go-' + w + '" title="' + t('step.edit') + ': ' + t('step.' + w) + '"><span id="sum-' + w + '">' + esc(txt) + '</span></a>'); // a link, so the words wrap as words
+    });
+    var end = now === 'summary' ? '<span class="st-end">' + t(S.added ? 'story.added' : 'story.ready') + '</span>' : '';
+    var h = storyJoin(out, S.kind);
+    return (S.room ? '<span class="st-room">' + esc(S.room) + '</span>' : '') + h + (now === 'summary' ? '.' : '') + end;
+  }
+  function setSum() { setHTML($('cfg-sum'), sumHtml()); var st = $('cfg-story'); if (st) setHTML(st, storyHtml()); }
+  function sumHtml() { // beside the story: the request so far and the price sentence
+    return (S.est.length ? '<p class="small"><button type="button" class="link" data-act="step-go" data-i="' + path().length + '" id="sum-est">' + tn('est.count', S.est.length) + '</button></p>' : '') +
       '<p class="muted small">' + t('cfg.quoteNote') + '</p>';
   }
   function stepperHtml() { // the large count, as on the client's reference, and the steps of this product to jump between
@@ -3971,7 +4062,8 @@ if (typeof module !== 'undefined') module.exports = I18N;
   function formInner() { // one question to a screen: the question, a line of help, the choices, back and forward
     var w = stepWord(stepKey());
     var have = S.step === 1 && S.est.length && !S.added ? '<p class="note have" id="cfg-have">' + tn('cfg.have', S.est.length) + ' <button type="button" class="link" data-act="step-go" data-i="' + path().length + '" id="cfg-have-see">' + t('cfg.have.see') + '</button></p>' : '';
-    return have + '<div class="step-head"><h2 id="cfg-step-h" tabindex="-1"><span class="sr-only" id="cfg-step-of">' + t('step.of', { i: S.step, n: path().length }) + ': </span>' + t('step.' + w + '.q') + '</h2><p>' + t('step.' + w + '.t') + '</p></div>' +
+    return have + '<div class="step-head"><h2 id="cfg-step-h" tabindex="-1"><span class="sr-only" id="cfg-step-of">' + t('step.of', { i: S.step, n: path().length }) + ': </span>' + t('step.' + w + '.q') + '</h2>' +
+      '<p class="story" id="cfg-story" aria-label="' + t('story.label') + '">' + storyHtml() + '</p><p class="step-help">' + t('step.' + w + '.t') + '</p></div>' +
       '<div id="cfg-static">' + stepStatic() + '</div><div id="cfg-dyn">' + stepDyn() + '</div><div class="cfg-bar" id="cfg-bar">' + barHtml() + '</div>';
   }
   function viewConfig() {
@@ -3990,7 +4082,7 @@ if (typeof module !== 'undefined') module.exports = I18N;
     S.step = i; S.reach = Math.max(S.reach, i);
     if (quiet) return;
     setHash(hashFor());
-    setHTML($('cfg-steps'), stepperHtml()); setHTML($('cfg-form'), formInner()); setHTML($('cfg-sum'), sumHtml()); paintSizeErrors();
+    setHTML($('cfg-steps'), stepperHtml()); setHTML($('cfg-form'), formInner()); setSum(); paintSizeErrors();
     var hd = $('cfg-step-h'), top = $('cfg-steps');
     if (top) { try { var y = top.getBoundingClientRect().top + window.scrollY - stickyTop() - 8; if (window.scrollY > y) window.scrollTo(0, y); } catch (e) { /* stays where it is */ } }
     if (hd) hd.focus({ preventScroll: true });
@@ -4001,7 +4093,7 @@ if (typeof module !== 'undefined') module.exports = I18N;
   function sizesOnly(calc) { return calc.errors.length > 0 && !S.sizeAsked && !S.sizeSeen.width && !S.sizeSeen.height && calc.errors.every(function (e) { return /^(width|height)/.test(e); }); }
   function refreshConfig(dyn) {
     if (dyn) setHTML($('cfg-dyn'), stepDyn());
-    setHTML($('cfg-sum'), sumHtml()); setHTML($('cfg-bar'), barHtml());
+    setSum(); setHTML($('cfg-bar'), barHtml());
     paintSizeErrors();
     var calc = curCheck();
     if (sizesOnly(calc)) { say(S.railNote && !isBlindKind(S.kind) ? S.railNote : ''); return; } // sizes not asked for yet are not called a mistake
@@ -4012,7 +4104,7 @@ if (typeof module !== 'undefined') module.exports = I18N;
     var calc = Pricing.computeWindow(S.cfg);
     say(fabName(fb) + '. ' + stockText(fb) + '. ' + (S.railNote ? S.railNote + ' ' : '') + (calc.ok ? barText(calc) : sizesOnly(calc) ? '' : issuesText(calc)));
   }
-  function refreshEstimate() { setHTML($('cfg-price'), cfgPrice()); setHTML($('est-out'), estHtml()); setHTML($('cfg-bar'), barHtml()); setHTML($('cfg-sum'), sumHtml()); chrome(); }
+  function refreshEstimate() { setHTML($('cfg-price'), cfgPrice()); setHTML($('est-out'), estHtml()); setHTML($('cfg-bar'), barHtml()); setSum(); chrome(); }
 
   /* ----- booking ----- */
   function fmtPhone(p) { var m = /^\+355(\d{2})(\d{3})(\d{4})$/.exec(p || ''); return m ? '+355 ' + m[1] + ' ' + m[2] + ' ' + m[3] : p; } // as the visitor would write it
@@ -4904,7 +4996,7 @@ if (typeof module !== 'undefined') module.exports = I18N;
       case 'sheerFam': case 'mainFam': // a new fabric starts on the colour its photograph shows (else its first)
         S.cfg[f === 'sheerFam' ? 'sheerId' : 'mainId'] = famFabric(v).id; S.added = false;
         settle(f); refreshConfig(true); sayFabric(familyOf(v)[0]); break;
-      case 'room': S.room = v; break;
+      case 'room': S.room = v; setSum(); break;
       case 'width': case 'height':
         var nv = num(v);
         if (isChange) S.sizeSeen[f] = true;
