@@ -868,29 +868,89 @@ table.data.matrix td.yes { color: var(--accent); }
 @media (min-width: 761px) { .igrid.has-lead:has(> :nth-child(3):last-child) { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 /* ten fabrics on a computer: three across, a last lone card centred, cards large enough to judge cloth */
 @media (min-width: 1000px) { .fgrid:has(> :nth-child(10):last-child) { display: flex; flex-wrap: wrap; justify-content: center; gap: 40px 20px; } .fgrid:has(> :nth-child(10):last-child) > * { flex: 0 1 calc((100% - 40px) / 3); } }
-/* ----- the configurator as a story being written (9 October 2026) ----- */
-/* The question is a small label; under it the window is one sentence that grows with each choice. Written phrases
-   can be tapped to rewrite them; the phrase being written is in the accent with the pen after it. No motion: the
-   words change only when a choice changes. */
-.step-head { gap: 10px; }
-.step-head h2 { font: 600 .75rem/1.4 var(--font-body); letter-spacing: .14em; text-transform: uppercase; color: var(--accent); }
-.step-head .story { font: 400 1.25rem/1.55 var(--font-display); color: var(--ink); max-width: 34ch; text-wrap: pretty; margin: 2px auto 0; text-align: center; }
-@media (min-width: 700px) { .step-head .story { font-size: 1.5rem; line-height: 1.5; max-width: 36ch; } }
-.story .st-room { display: block; font: 600 .75rem/1.4 var(--font-body); letter-spacing: .14em; text-transform: uppercase; color: var(--ink-2); margin-bottom: 4px; }
-.story .st-w { color: inherit; text-decoration: none; border-radius: 2px; }
-.story .st-w:hover, .story .st-w:focus-visible { text-decoration: underline dotted; text-decoration-thickness: 1px; text-underline-offset: 5px; color: var(--accent); }
-.story .st-w:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-.story .st-now { color: var(--accent); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 6px; text-decoration-color: rgba(111, 101, 91, .45); }
-.story .st-pen { display: inline-block; width: 2px; height: 1.05em; margin-left: 3px; vertical-align: -.15em; background: var(--accent); border-radius: 1px; }
-.story .st-end { color: var(--ink-2); font-size: .875em; }
-.step-help { font-size: .875rem; color: var(--ink-2); }
-@media (max-width: 560px) { .step-head .story { text-align: left; margin-inline: 0; } .step-head { align-items: flex-start; } .step-head h2, .step-help { text-align: left; } }
-@media (forced-colors: active) { .story .st-pen { background: Highlight; } }
 /* the story on a sheet of its own, and each window of the request told the same way */
-.step-head .story { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 14px 18px 16px; box-shadow: 0 1px 0 rgba(78, 78, 78, .03); }
-@media (min-width: 700px) { .step-head .story { padding: 20px 28px 22px; } }
 .est-list li .muted { font-family: var(--font-display); font-size: 1rem; line-height: 1.5; color: var(--ink); }
-@media (max-width: 560px) { .step-head .story { width: 100%; box-sizing: border-box; font-size: 1.125rem; line-height: 1.5; padding: 12px 14px 13px; } }
+/* ----- the configurator after the client's reference (tesorocasa.it, its builder seen 9 October 2026) ----- */
+/* A welcome screen, then one question to a screen: the large count at the top left, a cross at the top right, the
+   question in the middle in the heading typeface with one word in capitals, the choices as cards that fill with the
+   grey-brown when chosen, Back to step n and Continue at the foot, and at the end the window as numbered rows. */
+.cfg-intro { min-height: calc(100svh - 260px); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 22px; text-align: center; padding-block: 48px; }
+.cfg-intro h1 { font: 400 var(--fs-h1)/1.15 var(--font-display); color: var(--taupe); max-width: 18ch; text-wrap: balance; outline: none; }
+.cfg-intro p { max-width: 46ch; color: var(--ink-2); }
+.cfg-intro .btn { min-width: 220px; margin-top: 8px; }
+.wiz-top { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.wiz-top .stepper { display: none; } /* as on the reference: the count and the cross only; the pencils of the last step go back */
+.wiz-count { display: block !important; font: 400 var(--fs-h2)/1 var(--font-display); color: var(--taupe); }
+.wiz-close { display: inline-grid; place-items: center; width: 44px; height: 44px; color: var(--ink); border-radius: 50%; }
+.wiz-close svg { width: 26px; height: 26px; }
+.wiz-close:hover { color: var(--accent); }
+.step-head { align-items: center; gap: 12px; }
+.step-head h2 { font: 400 var(--fs-h2)/1.2 var(--font-display) !important; letter-spacing: .01em !important; text-transform: none !important; color: var(--taupe) !important; text-align: center; text-wrap: balance; }
+.step-help { font-size: .875rem; color: var(--ink-2); text-align: center; max-width: 52ch; }
+@media (max-width: 560px) { .step-head { align-items: center; } .step-head h2, .step-help { text-align: center; } }
+/* the room: one line, as on the reference */
+.room-field { max-width: 520px; margin: 18px auto 0; }
+.room-field input { text-align: center; font-size: 1.125rem; }
+/* cards of the product and the heading: outlined; the chosen one filled with the grey-brown and its drawing in cream */
+.hcard input:checked + .hcard-body { background: var(--accent); border-color: var(--accent); box-shadow: none; color: var(--accent-ink); }
+.hcard input:checked + .hcard-body svg, .hcard input:checked + .hcard-body b, .hcard input:checked + .hcard-body small { color: var(--accent-ink); }
+.hcard input:checked + .hcard-body::after { display: none; }
+.hcard-body svg { color: var(--taupe); }
+@media (max-width: 560px) {
+  .hcards.five { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .hcards.five .hcard:last-child { grid-column: 1 / -1; }
+  .hcards.five .hcard-body { display: flex; flex-direction: column; align-items: center; text-align: center; padding: 16px 10px 14px; border-radius: 16px; }
+  .hcards.five .hcard-body svg { width: 64px; height: 42px; margin-bottom: 4px; }
+}
+/* fabrics as photographs: two across on a phone, four on a computer; the chosen one veiled in grey-brown and ringed */
+.fabcards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 12px; width: 100%; }
+@media (min-width: 900px) { .fabcards { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 22px 16px; } }
+.fabc { position: relative; display: flex; flex-direction: column; gap: 4px; cursor: pointer; border-radius: 14px; padding: 0 0 10px; border: 1px solid transparent; min-width: 0; }
+.fabc input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; z-index: 1; }
+.fabc-pic { position: relative; display: block; aspect-ratio: 3 / 4; overflow: hidden; border-radius: 12px 12px 0 0; background: var(--ph); }
+.fabc-pic img, .fabc-pic i { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 0; display: block; }
+.fabc-pic i { background: var(--c); }
+.fabc-name { font: 700 1rem/1.3 var(--font-body); padding: 6px 10px 0; color: var(--ink); }
+.fabc-meta { font-size: .875rem; color: var(--ink-2); padding: 0 10px; }
+.fabc input:checked ~ .fabc-pic::after { content: ''; position: absolute; inset: 0; background: rgba(111, 101, 91, .42); }
+.fabc:has(input:checked) { border-color: var(--accent); }
+.fabc input:checked ~ .fabc-name { color: var(--accent); }
+.fabc input:focus-visible ~ .fabc-pic { outline: 2px solid var(--accent); outline-offset: 2px; }
+/* colours as large samples, each with its name and its fabric */
+.colors legend { display: block; width: 100%; text-align: center; font-size: 1rem; margin-bottom: 14px; }
+.ctiles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 12px; }
+@media (min-width: 900px) { .ctiles { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 22px 16px; } }
+.ctile-c { position: relative; display: flex; flex-direction: column; gap: 2px; cursor: pointer; border-radius: 14px; padding-bottom: 10px; border: 1px solid transparent; }
+.ctile-c input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; }
+.ctile-sw { display: block; aspect-ratio: 4 / 5; border-radius: 12px 12px 0 0; background: var(--c); box-shadow: inset 0 0 0 1px rgba(78, 78, 78, .12); forced-color-adjust: none; }
+.ctile-name { font: 700 1rem/1.3 var(--font-body); padding: 8px 10px 0; text-transform: capitalize; }
+.ctile-of { font-size: .875rem; color: var(--ink-2); padding: 0 10px; }
+.ctile-c:has(input:checked) { border-color: var(--accent); }
+.ctile-c input:checked ~ .ctile-name { color: var(--accent); }
+.ctile-c input:focus-visible ~ .ctile-sw { outline: 2px solid var(--accent); outline-offset: 2px; }
+/* the last step: the window as numbered rows, a pencil on each */
+.sumlist { list-style: none; padding: 0; margin: 8px 0 18px; border-top: 1px solid var(--line); width: 100%; }
+.sumlist li { display: grid; grid-template-columns: 56px minmax(0, 1fr) auto; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--line); }
+.sl-n { font: 400 var(--fs-h2)/1 var(--font-display); color: var(--taupe); text-align: center; }
+.sl-t { font-size: 1rem; overflow-wrap: anywhere; }
+.sl-t b { font-weight: 700; }
+.sl-edit { display: inline-grid; place-items: center; width: 44px; height: 44px; color: var(--ink); border-radius: 50%; }
+.sl-edit svg { width: 26px; height: 26px; }
+.sl-edit:hover, .sl-edit:focus-visible { color: var(--accent); }
+@media (min-width: 900px) { .sumlist li { grid-template-columns: 96px minmax(0, 1fr) auto; padding: 18px 0; } }
+.colors, .colors .ctiles { width: 100%; }
+.colors { min-width: 0; }
+.sumlist .sl-t { text-align: left; }
+.room-field input { border: 0; border-bottom: 1px solid var(--field-line); border-radius: 0; background: transparent; padding: 12px 4px; width: 100%; }
+.room-field input:focus { outline: none; border-bottom: 2px solid var(--accent); }
+.bk-short { display: none; }
+@media (max-width: 560px) { .bk-long { display: none; } .bk-short { display: inline; } }
+@media (min-width: 900px) {
+  #cfg-form .hcards { width: 100%; max-width: 980px; margin-inline: auto; gap: 22px; }
+  #cfg-form .hcards.five { max-width: 1120px; }
+  #cfg-form .hcard-body { padding: 34px 16px 26px; border-radius: 22px; }
+  #cfg-form .hcard-body svg { width: 110px; height: 72px; }
+}
 </style>
 </head>
 <body>
@@ -2611,7 +2671,7 @@ var I18N = {
     'step.heading.t': 'Palosja është mënyra si mblidhet pëlhura në krye. Nga ajo varet si bie perdja.', 
     'step.rail.t': 'Shina zgjidhet sipas palosjes dhe vendit ku montohet.', 
     'step.size.t': 'Mjaftojnë masa të përafërta. Të saktat i marrim ne, në matjen falas.', 
-    'step.summary.t': 'Nëse çdo gjë është në rregull, shtojeni te kërkesa. Pastaj mund të shtoni dritare të tjera.', 
+    'step.summary.t': 'Kontrolloni çdo hap dhe ndryshojeni me lapsin. Pastaj shtojeni te kërkesa.', 
     'step.back': 'Kthehu',
     'step.next': 'Vazhdo',
     'step.nav': 'Hapat',
@@ -2699,11 +2759,11 @@ var I18N = {
     'cat.side': 'Kategoritë',
     'fab.card.h': 'Shiheni nga afër, në shtëpi',
     'fab.card.p': 'Në matjen falas sjellim mostra të kësaj pëlhure, që ta shihni në dritën e dhomës suaj.',
-    'step.fabric.q': 'Zgjidhni PËLHURËN dhe ngjyrën', 
+    'step.fabric.q': 'Zgjidhni PËLHURËN për perden tuaj', 
     'step.heading.q': 'Zgjidhni PALOSJEN që ju pëlqen', 
     'step.rail.q': 'Zgjidhni SHINËN dhe vendin e saj', 
     'step.size.q': 'Shkruani MASAT e dritares', 
-    'step.summary.q': 'Kontrolloni DRITAREN dhe shtojeni', 
+    'step.summary.q': 'Ja DRITARJA juaj', 
     'foot.say': 'Na gjeni në Instagram dhe në WhatsApp',
     'home.cats.h': 'Çfarë bëjmë',
     'home.cats.t': 'Gjithçka me masë dhe e montuar nga ne.',
@@ -2757,7 +2817,7 @@ var I18N = {
     'item.more': 'Modele të tjera të këtij lloji',
     'item.card.p': 'Në matjen falas sjellim mostra të këtij modeli, që ta shihni në dritaren tuaj.',
     'step.product': 'Produkti',
-    'step.product.q': 'Zgjidhni PRODUKTIN',
+    'step.product.q': 'Zgjidhni PRODUKTIN që ju duhet',
     'step.product.t': 'Çdo produkt bëhet sipas masës së dritares suaj.',
     'step.model': 'Modeli',
     'step.model.q': 'Zgjidhni MODELIN dhe ngjyrën',
@@ -2807,7 +2867,6 @@ var I18N = {
     'book.done.next': 'Një ditë përpara ju telefonojmë ose ju shkruajmë për ta konfirmuar. Matja është falas dhe nuk ju detyron për asgjë.',
     'shop.end.p': 'Sjellim mostrat në shtëpinë tuaj dhe masim çdo dritare, falas.',
     'book.orWa': 'Ose na shkruani në WhatsApp',
-    'story.label': 'Dritarja juaj, siç po e shkruani',
     'story.start.perde': 'Një perde',
     'story.start.shina': 'Vetëm shina',
     'story.fabric': 'prej {a}',
@@ -2826,8 +2885,26 @@ var I18N = {
     'story.m.ceiling': 'në tavan',
     'story.m.wall': 'në mur',
     'story.size': 'për një dritare {w} × {h} cm',
-    'story.ready': ' Gati për t\'u shtuar në kërkesë.',
-    'story.added': ' U shtua në kërkesë.'
+    'step.room': 'Dhoma',
+    'step.room.q': 'Për cilën DHOMË është dritarja?',
+    'step.room.t': 'Jepini një emër, p.sh. dhoma e gjumit, dhoma e ndenjes…',
+    'step.color': 'Ngjyra',
+    'step.color.q': 'Zgjidhni NGJYRËN e pëlhurës',
+    'step.color.t': 'Ngjyrat i shihni në mostër, në dritën e dhomës suaj, në matjen falas.',
+    'step.backTo': 'Kthehu te hapi {n}',
+    'step.backStart': 'Kthehu te fillimi',
+    'cfg.intro.h': 'Gati të KRIJONI perdet tuaja?',
+    'cfg.intro.t': 'Zgjidhni hap pas hapi produktin, pëlhurën, ngjyrën dhe masat. Çmimin e saktë jua japim pas matjes falas.',
+    'cfg.intro.go': 'Fillojmë',
+    'cfg.room.name': 'emri i dhomës',
+    'cfg.room.none': 'pa emër',
+    'cfg.guide': 'Udhëzuesi i matjes',
+    'cfg.chosen.sheer': 'Tyli që zgjodhët:',
+    'cfg.chosen.main': 'Perdja që zgjodhët:',
+    'cfg.order': 'jo në stok',
+    'cfg.ncolors.one': '{n} ngjyrë',
+    'cfg.ncolors.other': '{n} ngjyra',
+    'cfg.close': 'Mbyll konfiguratorin'
   },
   en: {
     'demo.notePublic': 'Demo: models, fabrics, inspiration and availability are samples. The photographs are Unsplash samples, not our work: your own photographs replace them. The empty frames hold the place of the ones still missing. The price comes with the quote, after the free measurement.', 
@@ -3147,7 +3224,7 @@ var I18N = {
     'step.heading.t': 'The heading is how the fabric is gathered at the top. It decides how the curtain falls.', 
     'step.rail.t': 'The rail follows from the heading and from where it is fitted.', 
     'step.size.t': 'Rough sizes are enough. We take the exact ones ourselves at the free visit.', 
-    'step.summary.t': 'If all is right, add it to your request. You can add more windows after it.', 
+    'step.summary.t': 'Check each step and change it with the pencil. Then add it to your request.', 
     'step.back': 'Back',
     'step.next': 'Continue',
     'step.nav': 'Steps',
@@ -3235,11 +3312,11 @@ var I18N = {
     'cat.side': 'Categories',
     'fab.card.h': 'See it up close, at home',
     'fab.card.p': 'At the free measurement we bring samples of this fabric, so you see it in the light of your own room.',
-    'step.fabric.q': 'Choose the FABRIC and its colour', 
+    'step.fabric.q': 'Choose the FABRIC for your curtain', 
     'step.heading.q': 'Choose the HEADING you prefer', 
     'step.rail.q': 'Choose the RAIL and where it goes', 
     'step.size.q': 'Enter the SIZE of your window', 
-    'step.summary.q': 'Check this WINDOW and add it', 
+    'step.summary.q': 'Here is your WINDOW', 
     'foot.say': 'Find us on Instagram and on WhatsApp',
     'home.cats.h': 'What we make',
     'home.cats.t': 'All made to measure and fitted by us.',
@@ -3293,7 +3370,7 @@ var I18N = {
     'item.more': 'Other models of this kind',
     'item.card.p': 'At the free measurement we bring samples of this model, so you see it at your own window.',
     'step.product': 'Product',
-    'step.product.q': 'Choose the PRODUCT',
+    'step.product.q': 'Choose the PRODUCT you need',
     'step.product.t': 'Every product is made to the size of your window.',
     'step.model': 'Model',
     'step.model.q': 'Choose the MODEL and its colour',
@@ -3343,7 +3420,6 @@ var I18N = {
     'book.done.next': 'The day before, we call or message you to confirm. The visit is free and commits you to nothing.',
     'shop.end.p': 'We bring the samples to your home and measure every window, free of charge.',
     'book.orWa': 'Or message us on WhatsApp',
-    'story.label': 'Your window, as you are writing it',
     'story.start.perde': 'A curtain',
     'story.start.shina': 'A rail on its own',
     'story.fabric': 'in {a}',
@@ -3362,8 +3438,26 @@ var I18N = {
     'story.m.ceiling': 'on the ceiling',
     'story.m.wall': 'on the wall',
     'story.size': 'for a window {w} × {h} cm',
-    'story.ready': ' Ready to add to your request.',
-    'story.added': ' Added to your request.'
+    'step.room': 'Room',
+    'step.room.q': 'Which ROOM is the window in?',
+    'step.room.t': 'Give it a name, e.g. bedroom, living room…',
+    'step.color': 'Colour',
+    'step.color.q': 'Choose the COLOUR of your fabric',
+    'step.color.t': 'You see every colour as a sample, in your own room\'s light, at the free measurement.',
+    'step.backTo': 'Back to step {n}',
+    'step.backStart': 'Back to the start',
+    'cfg.intro.h': 'Ready to DESIGN your curtains?',
+    'cfg.intro.t': 'Choose the product, fabric, colour and size, one step at a time. You get the exact price after the free measuring visit.',
+    'cfg.intro.go': 'Let\'s start',
+    'cfg.room.name': 'room name',
+    'cfg.room.none': 'not named',
+    'cfg.guide': 'How to measure',
+    'cfg.chosen.sheer': 'The sheer you chose:',
+    'cfg.chosen.main': 'The curtain fabric you chose:',
+    'cfg.order': 'not in stock',
+    'cfg.ncolors.one': '{n} colour',
+    'cfg.ncolors.other': '{n} colours',
+    'cfg.close': 'Close the configurator'
   }
 };
 if (typeof module !== 'undefined') module.exports = I18N;
@@ -3789,7 +3883,7 @@ if (typeof module !== 'undefined') module.exports = I18N;
   /* ----- the builder: one product for one window, one question to a screen, no prices ----- */
   // The steps depend on the product: a curtain asks for fabric, heading, rail and size; a rail alone skips the fabric;
   // a blind (venetian or vertical, roman, roller) asks for its model and colour, then its size.
-  var PATHS = { perde: ['product', 'fabric', 'heading', 'rail', 'size', 'summary'], shina: ['product', 'heading', 'rail', 'size', 'summary'], blind: ['product', 'model', 'bsize', 'summary'] };
+  var PATHS = { perde: ['room', 'product', 'fabric', 'color', 'heading', 'rail', 'size', 'summary'], shina: ['room', 'product', 'heading', 'rail', 'size', 'summary'], blind: ['room', 'product', 'model', 'bsize', 'summary'] };
   function path() { return PATHS[isBlindKind(S.kind) ? 'blind' : S.kind] || PATHS.perde; }
   function stepKey() { return path()[S.step - 1]; }
   function stepWord(k) { return k === 'bsize' ? 'size' : k; }   // a blind's size step is named and worded as the curtain's
@@ -3823,43 +3917,52 @@ if (typeof module !== 'undefined') module.exports = I18N;
       return radio('mount', m.mount, c.mount === m.mount, t('mount.' + m.mount), { extra: m.ok ? '' : t('mount.off'), off: !m.ok });
     }).join('') + '</div></fieldset>';
   }
-  function fabField(role, types, cur) { // the fabric and its colours; with photographs the colours stand first, so they are on the first screen
+  function fabField(role, types, cur) { // the fabrics of this layer as photograph cards, as on the reference; the colour comes next
     var fams = FAMILIES.filter(function (fam) { return types.indexOf(familyOf(fam)[0].type) >= 0; });
     var f = fabricById(cur); if (!f || fams.indexOf(f.fam) < 0) f = familyOf(fams[0])[0];
-    var pics = !!PH['fab-' + fams[0]];
-    var cards = '<div class="chips' + (pics ? ' pics' : '') + '">' + fams.map(function (fam) {
-      return radio(role + 'Fam', fam, f.fam === fam, esc(familyOf(fam)[0][S.lang]), { img: 'fab-' + fam });
-    }).join('') + '</div>';
-    var cols = '<p class="sw-name" id="' + role + '-col-label">' + t('car.color') + ': <b>' + esc(colorName(f)) + '</b></p><div class="swatches" role="radiogroup" aria-labelledby="' + role + '-col-label">' +
-      familyOf(f.fam).map(function (x) { return swatch(role + 'Id', x, x.id === f.id, role + 'Id'); }).join('') + '</div>' + stockHtml(f, role + '-stock');
-    return '<fieldset><legend>' + t('cfg.' + role) + '</legend>' + (pics ? '<div class="cols-first">' + cols + '</div>' + cards : cards + cols) + '</fieldset>';
+    return '<fieldset><legend>' + t('cfg.' + role) + '</legend><div class="fabcards">' + fams.map(function (fam) {
+      var x = familyOf(fam)[0], id = role + 'Fam-' + fam, src = PH['fab-' + fam];
+      return '<label class="fabc" for="' + id + '"><input type="radio" id="' + id + '" name="' + role + 'Fam" value="' + fam + '"' + (f.fam === fam ? ' checked' : '') + ' data-f="' + role + 'Fam">' +
+        '<span class="fabc-pic">' + (src ? '<img src="' + src + '" alt="" loading="lazy" decoding="async">' : '<i style="--c:' + x.hex + '"></i>') + '</span><span class="fabc-name">' + esc(x[S.lang]) + '</span><span class="fabc-meta">' + tn('cfg.ncolors', familyOf(fam).length) + '</span></label>';
+    }).join('') + '</div></fieldset>';
   }
   function notes() { // what an automatic correction changed, and a choice no rail can carry
     return !S.cfg.rail ? '<p class="alert" id="cfg-norail">' + t('cfg.noRail') + '</p>' : '';
   }
   function stepStatic() { // the size fields are written once, so typing in them is never interrupted
     var k = stepKey(), blind = k === 'bsize', v = blind ? S.blind : S.cfg;
+    if (k === 'room') return '<div class="field line room-field"><label for="cfg-room" class="sr-only">' + t('cfg.room') + '</label><input type="text" id="cfg-room" maxlength="40" autocomplete="off" placeholder="' + t('cfg.room.name') + '" value="' + esc(S.room) + '" data-f="room"></div>';
     if (k !== 'size' && !blind) return '';
     var eg = blind ? [120, 160] : [240, 260];
     function size(f, n) {
       return '<div class="field"><label for="cfg-' + f + '">' + t('cfg.' + f) + '</label><input type="text" inputmode="numeric" id="cfg-' + f + '" maxlength="4" autocomplete="off" placeholder="' + t('cfg.eg', { n: eg[n] }) + '" value="' + (typeof v[f] === 'number' && !isNaN(v[f]) ? v[f] : '') + '" data-f="' + (blind ? 'b' : '') + f + '" aria-describedby="cfg-' + f + '-hint">' +
         '<small id="cfg-' + f + '-hint">' + (f === 'width' && !blind ? t('cfg.width.hint') : '') + '</small></div>';
     }
-    return '<label class="field line" for="cfg-room"><span>' + t('cfg.room') + '</span><input type="text" id="cfg-room" maxlength="40" autocomplete="off" placeholder="' + t('cfg.room.ph') + '" value="' + esc(S.room) + '" data-f="room"></label>' +
-      '<fieldset><legend class="sr-only">' + t('step.size') + '</legend><div class="sizes">' + size('width', 0) + size('height', 1) + '</div><p class="field-err" id="cfg-size-err" role="alert"></p></fieldset>';
+    return '<fieldset><legend class="sr-only">' + t('step.size') + '</legend><div class="sizes">' + size('width', 0) + size('height', 1) + '</div><p class="field-err" id="cfg-size-err" role="alert"></p><p class="center"><a class="link" href="#guide-matja" data-go="guide-matja" id="cfg-guide">' + t('cfg.guide') + '</a></p></fieldset>';
   }
   function stepDyn() { // the choices of the step on show; redrawn whenever one of them changes what the others allow
     var c = S.cfg, k = stepKey(), h = '';
-    if (k === 'product') {
+    if (k === 'room') return '';
+    if (k === 'product') { // the five kinds as cards with their line drawing; the one chosen is filled
       h += '<fieldset><legend class="sr-only">' + t('step.product') + '</legend><div class="hcards five">' + CATEGORIES.map(function (x) {
         return '<label class="hcard" for="kind-' + x + '"><input type="radio" id="kind-' + x + '" name="kind" value="' + x + '"' + (S.kind === x ? ' checked' : '') + ' data-f="kind" aria-describedby="kind-' + x + '-d">' +
-          '<span class="hcard-body">' + (PH['cat-' + x] ? '<span class="hthumb"><img src="' + PH['cat-' + x] + '" alt="" decoding="async"></span>' : catIcon(x)) + '<b>' + catShort(x) + '</b><small id="kind-' + x + '-d">' + t('cat.' + x + '.hint') + '</small></span></label>';
+          '<span class="hcard-body">' + catIcon(x) + '<b>' + catShort(x) + '</b><small id="kind-' + x + '-d">' + t('cat.' + x + '.hint') + '</small></span></label>';
       }).join('') + '</div></fieldset>';
-    } else if (k === 'fabric') {
+    } else if (k === 'fabric') { // the layers, then the fabrics as photographs; the colour is the next question
       h += '<fieldset><legend>' + t('cfg.layers') + '</legend><div class="chips">' + LAYERS.filter(function (x) { return x !== 'none'; }).map(function (x) { return radio('layers', x, c.layers === x, t('layers.' + x)); }).join('') + '</div></fieldset>';
       if (c.layers === 'sheer' || c.layers === 'double') h += fabField('sheer', ['sheer'], c.sheerId);
       if (c.layers === 'main' || c.layers === 'double') h += fabField('main', ['blackout', 'decor'], c.mainId);
       h += notes();
+    } else if (k === 'color') { // each fabric chosen, its colours as large samples, as on the reference
+      Pricing.layerRoles(c).forEach(function (r) {
+        var f = fabricById(r === 'sheer' ? c.sheerId : c.mainId); if (!f) return;
+        var id = r === 'sheer' ? 'sheerId' : 'mainId';
+        h += '<fieldset class="colors"><legend><span class="muted">' + t('cfg.chosen.' + r) + '</span> <b>' + esc(f[S.lang]) + '</b></legend><div class="ctiles">' + familyOf(f.fam).map(function (x) {
+          var on = x.id === f.id;
+          return '<label class="ctile-c" for="' + id + '-' + x.id + '"><input type="radio" id="' + id + '-' + x.id + '" name="' + id + '" value="' + x.id + '"' + (on ? ' checked' : '') + ' data-f="' + id + '">' +
+            '<span class="ctile-sw" style="--c:' + x.hex + '"></span><span class="ctile-name">' + esc(colorName(x)) + '</span><span class="ctile-of">' + esc(x[S.lang]) + (x.stock ? '' : ' · ' + t('cfg.order')) + '</span></label>';
+        }).join('') + '</div></fieldset>';
+      });
     } else if (k === 'heading') {
       h += '<fieldset><legend class="sr-only">' + t(c.layers === 'none' ? 'cfg.heading.own' : 'cfg.heading') + '</legend><div class="hcards">' + HEADINGS.map(function (x) {
         return '<label class="hcard" for="heading-' + x + '"><input type="radio" id="heading-' + x + '" name="heading" value="' + x + '"' + (c.heading === x ? ' checked' : '') + ' data-f="heading" aria-describedby="heading-' + x + '-d">' +
@@ -3890,6 +3993,7 @@ if (typeof module !== 'undefined') module.exports = I18N;
       h += '<fieldset><legend>' + t('bl.mount') + '</legend><div class="chips">' + BLIND_MOUNTS.map(function (x) { return radio('bmount', x, S.blind.mount === x, t('bl.mount.' + x)); }).join('') + '</div></fieldset>' +
         '<fieldset><legend>' + t('bl.side') + '</legend><div class="chips">' + BLIND_SIDES.map(function (x) { return radio('bside', x, S.blind.side === x, t('bl.side.' + x)); }).join('') + '</div></fieldset>';
     } else {
+      h += '<ol class="sumlist" id="cfg-sumlist">' + sumListHtml() + '</ol>';
       h += '<div class="review"><div class="sub" id="cfg-price">' + cfgPrice() + '</div><div class="sub" id="est-out" tabindex="-1">' + estHtml() + '</div></div>';
     }
     return h;
@@ -3927,7 +4031,7 @@ if (typeof module !== 'undefined') module.exports = I18N;
     var calc = curCheck(), full = S.est.length >= Ops.MAX_WINDOWS, last = S.step === path().length, note = barNote();
     var h = note ? '<p class="note" id="cfg-note">' + esc(note) + '</p>' : '';
     if (last && S.added) return h + '<div class="bar-btns"><button type="button" class="btn ghost" data-act="step-again" id="cfg-again">' + t('step.again.short') + '</button><a class="btn" href="#book" data-go="book" id="cfg-book">' + t('est.book') + '</a></div>';
-    return h + '<div class="bar-btns">' + (S.step > 1 ? '<button type="button" class="btn ghost" data-act="step-back" id="cfg-back">' + ARROW + t('step.back') + '</button>' : '<span></span>') +
+    return h + '<div class="bar-btns">' + (S.step > 1 ? '<button type="button" class="btn ghost" data-act="step-back" id="cfg-back">' + ARROW + '<span class="bk-long">' + t('step.backTo', { n: S.step - 1 }) + '</span><span class="bk-short" aria-hidden="true">' + t('step.back') + '</span></button>' : '<button type="button" class="btn ghost" data-act="cfg-intro" id="cfg-intro-back">' + ARROW + t('step.backStart') + '</button>') +
       (last ? '<button type="button" class="btn" data-act="est-add" id="cfg-add"' + (calc.errors.length || full ? ' disabled' : '') + '>' + t('cfg.add') + '</button>'
         : '<button type="button" class="btn" data-act="step-next" id="cfg-next">' + t('step.next') + '</button>') + '</div>';
   }
@@ -4032,22 +4136,28 @@ if (typeof module !== 'undefined') module.exports = I18N;
     var keys = PATHS[isBlindKind(kind) ? 'blind' : kind].filter(function (k) { return k !== 'summary' && !(k === 'product' && isBlindKind(kind)); });
     return storyJoin(keys.map(function (k) { return storyPhrase(k, kind, x.cfg, x.blind); }).filter(Boolean), kind) + '.';
   }
-  function storyHtml() {
-    var p = path(), now = stepKey(), out = [];
-    p.forEach(function (k, n) {
-      var i = n + 1, w = stepWord(k);
-      if (k === 'summary' || (i > S.reach && i !== S.step)) return;
-      if (k === 'product' && isBlindKind(S.kind) && S.step > 1) return; // a model's name already says its kind
-      var txt = storyPhrase(k); if (!txt) return;
-      if (k === now) out.push('<span class="st-now" id="sum-' + w + '">' + esc(txt) + '</span><span class="st-pen" aria-hidden="true"></span>');
-      else out.push('<a class="st-w" href="#' + (i > 1 ? 'config-' + w : 'config') + '" data-act="step-go" data-i="' + i + '" id="sum-go-' + w + '" title="' + t('step.edit') + ': ' + t('step.' + w) + '"><span id="sum-' + w + '">' + esc(txt) + '</span></a>'); // a link, so the words wrap as words
-    });
-    var end = now === 'summary' ? '<span class="st-end">' + t(S.added ? 'story.added' : 'story.ready') + '</span>' : '';
-    var h = storyJoin(out, S.kind);
-    return (S.room ? '<span class="st-room">' + esc(S.room) + '</span>' : '') + h + (now === 'summary' ? '.' : '') + end;
+  function setSum() { setHTML($('cfg-sum'), sumHtml()); var sl = $('cfg-sumlist'); if (sl) setHTML(sl, sumListHtml()); }
+  function sumValue(k) { // what was chosen at one step, in a few words
+    var c = S.cfg, b = S.blind, m = blindById(b.model);
+    if (k === 'room') return S.room ? esc(S.room) : '<span class="muted">' + t('cfg.room.none') + '</span>';
+    if (k === 'product') return catShort(S.kind);
+    if (k === 'fabric') return t('layers.' + c.layers) + ': ' + Pricing.layerRoles(c).map(function (r) { var x = fabricById(r === 'sheer' ? c.sheerId : c.mainId); return x ? esc(x[S.lang]) : ''; }).filter(Boolean).join(', ');
+    if (k === 'color') return Pricing.layerRoles(c).map(function (r) { var x = fabricById(r === 'sheer' ? c.sheerId : c.mainId); return x ? esc(colorName(x)) : ''; }).filter(Boolean).join(', ');
+    if (k === 'heading') return t('heading.' + c.heading) + (c.layers === 'none' ? '' : ', ' + lc1(t('panels.' + c.panels)));
+    if (k === 'rail') return c.rail ? t('rail.' + c.rail) + ', ' + lc1(t('mount.' + c.mount)) : '–';
+    if (k === 'size') return (typeof c.width === 'number' && !isNaN(c.width) ? fmtN(c.width) : '–') + ' × ' + (typeof c.height === 'number' && !isNaN(c.height) ? fmtN(c.height) : '–') + ' cm';
+    if (k === 'model') return m ? esc(blindName(m) + ', ' + bColorName(blindColor(m, b.color))) : '–';
+    if (k === 'bsize') return (typeof b.width === 'number' && !isNaN(b.width) ? fmtN(b.width) : '–') + ' × ' + (typeof b.height === 'number' && !isNaN(b.height) ? fmtN(b.height) : '–') + ' cm, ' + lc1(t('bl.mount.' + b.mount));
+    return '';
   }
-  function setSum() { setHTML($('cfg-sum'), sumHtml()); var st = $('cfg-story'); if (st) setHTML(st, storyHtml()); }
-  function sumHtml() { // beside the story: the request so far and the price sentence
+  function sumListHtml() {
+    return path().filter(function (k) { return k !== 'summary'; }).map(function (k, n) {
+      var w = stepWord(k);
+      return '<li><span class="sl-n" aria-hidden="true">' + (n + 1) + '</span><span class="sl-t"><b>' + t('step.' + w) + ':</b> <span id="sum-' + w + '">' + sumValue(k) + '</span></span>' +
+        '<a class="sl-edit" href="#' + (n ? 'config-' + w : 'config') + '" data-act="step-go" data-i="' + (n + 1) + '" id="sum-go-' + w + '" aria-label="' + t('step.edit') + ': ' + t('step.' + w) + '"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10.5"/><path d="M8 16l1-3.5 6.5-6.5 2.5 2.5L11.5 15 8 16zM14.5 7l2.5 2.5"/></svg></a></li>';
+    }).join('');
+  }
+  function sumHtml() { // under the steps: the request so far and the price sentence
     return (S.est.length ? '<p class="small"><button type="button" class="link" data-act="step-go" data-i="' + path().length + '" id="sum-est">' + tn('est.count', S.est.length) + '</button></p>' : '') +
       '<p class="muted small">' + t('cfg.quoteNote') + '</p>';
   }
@@ -4057,16 +4167,18 @@ if (typeof module !== 'undefined') module.exports = I18N;
       var i = n + 1;
       h += '<li><button type="button" class="stepbtn' + (i < S.step ? ' is-done' : '') + '" data-act="step-go" data-i="' + i + '" data-key="' + k + '" id="step-' + stepWord(k) + '"' + (i === S.step ? ' aria-current="step"' : '') + '><i aria-hidden="true">' + i + '</i><span>' + t('step.' + stepWord(k)) + (i < S.step ? '<span class="sr-only">, ' + t('step.done') + '</span>' : '') + '</span></button></li>';
     });
-    return h + '</ol>';
+    return h + '</ol><a class="wiz-close" href="#catalog" data-go="catalog" id="cfg-close" aria-label="' + t('cfg.close') + '"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M5 5l14 14M19 5L5 19"/></svg></a>';
   }
   function formInner() { // one question to a screen: the question, a line of help, the choices, back and forward
     var w = stepWord(stepKey());
     var have = S.step === 1 && S.est.length && !S.added ? '<p class="note have" id="cfg-have">' + tn('cfg.have', S.est.length) + ' <button type="button" class="link" data-act="step-go" data-i="' + path().length + '" id="cfg-have-see">' + t('cfg.have.see') + '</button></p>' : '';
     return have + '<div class="step-head"><h2 id="cfg-step-h" tabindex="-1"><span class="sr-only" id="cfg-step-of">' + t('step.of', { i: S.step, n: path().length }) + ': </span>' + t('step.' + w + '.q') + '</h2>' +
-      '<p class="story" id="cfg-story" aria-label="' + t('story.label') + '">' + storyHtml() + '</p><p class="step-help">' + t('step.' + w + '.t') + '</p></div>' +
+      '<p class="step-help">' + t('step.' + w + '.t') + '</p></div>' +
       '<div id="cfg-static">' + stepStatic() + '</div><div id="cfg-dyn">' + stepDyn() + '</div><div class="cfg-bar" id="cfg-bar">' + barHtml() + '</div>';
   }
   function viewConfig() {
+    if (!S.introDone && S.step === 1 && S.reach <= 1) return '<div class="wiz-band"><div class="wrap wiz cfg-intro" id="cfg-intro"><h1 id="cfg-intro-h" tabindex="-1">' + t('cfg.intro.h') + '</h1><p>' + t('cfg.intro.t') + '</p>' +
+      '<button type="button" class="btn ghost" data-act="cfg-start" id="cfg-start">' + t('cfg.intro.go') + '</button>' + (S.est.length ? '<p class="small"><button type="button" class="link" data-act="cfg-see-req" id="cfg-intro-req">' + tn('est.count', S.est.length) + '</button></p>' : '') + '</div></div>';
     return '<div class="wiz-band"><div class="wrap wiz"><h1 class="sr-only">' + t('cfg.h') + '</h1><div class="wiz-top" id="cfg-steps">' + stepperHtml() + '</div>' +
       '<form id="cfg-form" novalidate>' + formInner() + '</form></div></div><aside class="wrap wiz-sum" id="cfg-sum" aria-label="' + t('step.sum') + '">' + sumHtml() + '</aside>';
   }
@@ -4860,6 +4972,9 @@ if (typeof module !== 'undefined') module.exports = I18N;
         setStepKey('size', true); go('config'); break;
       case 'step-go': setStep(i); break;
       case 'step-back': setStep(S.step - 1); break;
+      case 'cfg-start': S.introDone = true; render(); var rq = $('cfg-room'); if (rq) rq.focus({ preventScroll: true }); else { var sh = $('cfg-step-h'); if (sh) sh.focus({ preventScroll: true }); } break;
+      case 'cfg-intro': S.introDone = false; render(); var ih = $('cfg-intro-h'); if (ih) ih.focus({ preventScroll: true }); break;
+      case 'cfg-see-req': S.introDone = true; S.reach = path().length; render(); setStep(path().length); break;
       case 'step-next':
         var blk = stepBlock();
         if (blk) { S.sizeAsked = true; paintSizeErrors(); var be = $(blk); if (be) { if (be.focus) be.focus(); if (be.scrollIntoView) be.scrollIntoView({ block: 'center' }); } say(curIssues(curCheck()) || t('cfg.noRail')); break; }
@@ -4982,7 +5097,7 @@ if (typeof module !== 'undefined') module.exports = I18N;
         var icn = $('item-col-name'); if (icn) icn.textContent = bColorName(ic);
         say(blindName(ib) + ', ' + bColorName(ic)); break;
       case 'kind': // another product has its own steps
-        setKind(v); S.reach = 1; setHTML($('cfg-steps'), stepperHtml()); var so = $('cfg-step-of'); if (so) so.textContent = t('step.of', { i: S.step, n: path().length }) + ': '; refreshConfig(true); break;
+        setKind(v); S.reach = S.step; setHTML($('cfg-steps'), stepperHtml()); var so = $('cfg-step-of'); if (so) so.textContent = t('step.of', { i: S.step, n: path().length }) + ': '; refreshConfig(true); break;
       case 'bmodel': // a new model starts on its first colour
         var nm = blindById(v); if (!nm || nm.cat !== S.kind) break;
         S.blind.model = nm.id; S.blind.color = nm.colors[0].id; S.added = false; refreshConfig(true); break;
