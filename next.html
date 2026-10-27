@@ -991,28 +991,43 @@ table.data.matrix td.yes { color: var(--accent); }
 .bkform .muted.small, .bkform .note { text-align: center; margin-inline: auto; max-width: 560px; }
 .bkform .center { text-align: center; }
 .bk-fields { display: grid; gap: 16px; max-width: 520px; width: 100%; margin-inline: auto; }
-.bk-fields fieldset legend { text-align: left; font-size: 1rem; margin-bottom: 8px; }
+.bkform .bk-fields legend:not(.sr-only) { text-align: left; font: 700 .875rem/1.4 var(--font-body); margin-bottom: 8px; }
 .bk-fields fieldset .chips { justify-content: flex-start; }
 .bkform .visit li::before { font-size: var(--fs-h3); }
 .bkform .visit h3 { font-size: 1rem; }
 .bkform .visit p { font-size: .875rem; }
 @media (max-width: 560px) { .bkform .visit { grid-template-columns: minmax(0, 1fr); gap: 10px; } .bkform .visit li { display: grid; grid-template-columns: 28px minmax(0, 1fr); column-gap: 10px; } .bkform .visit li::before { grid-row: 1 / span 2; } }
-.kcards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
-@media (max-width: 479px) { .kcards { grid-template-columns: minmax(0, 1fr); gap: 8px; } .kcard { min-height: 58px; padding-block: 6px; } .kc-pic { width: 46px; } .kcard { grid-template-columns: 46px minmax(0, 1fr); } }
-@media (min-width: 700px) { .kcards { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; } }
-.kcard { position: relative; display: grid; grid-template-columns: 52px minmax(0, 1fr); align-items: center; gap: 12px; min-height: 68px; padding: 8px 12px 8px 8px; border: var(--bw) solid var(--btn-line); border-radius: 14px; cursor: pointer; text-align: left; }
-.kcard input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; }
-.kc-pic { display: grid; place-items: center; width: 52px; aspect-ratio: 1; border-radius: 10px; overflow: hidden; background: var(--ph); }
+.kcards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+@media (min-width: 700px) { .kcards { gap: 14px; } }
+.kcard { position: relative; display: flex; flex-direction: column; gap: 6px; padding: 6px 6px 8px; border: var(--bw) solid var(--btn-line); border-radius: 14px; cursor: pointer; text-align: center; min-width: 0; }
+.kcard input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; z-index: 1; }
+.kc-pic { display: grid; place-items: center; width: 100%; aspect-ratio: 4 / 3; border-radius: 10px; overflow: hidden; background: var(--ph); }
 .kc-pic img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .kc-q { font: 400 var(--fs-h3)/1 var(--font-display); color: var(--accent); background: var(--soft); }
-.kc-name { font-weight: 700; font-size: .875rem; line-height: 1.3; letter-spacing: .06em; text-transform: uppercase; color: var(--accent); overflow-wrap: anywhere; }
-.kcard:has(input:checked) { background: var(--accent); border-color: var(--accent); }
-.kcard:has(input:checked) .kc-name { color: var(--accent-ink); }
+.kc-name { font-weight: 700; font-size: .75rem; line-height: 1.3; letter-spacing: .04em; text-transform: uppercase; color: var(--accent); overflow-wrap: anywhere; }
+.kcard:has(input:checked) { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+.kcard:has(input:checked)::after { content: ''; position: absolute; top: 10px; right: 10px; width: 22px; height: 22px; border-radius: 50%; background: var(--accent) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23FFFDF8' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5'/%3E%3C/svg%3E") center / 14px no-repeat; }
 .kcard:has(input:focus-visible) { outline: 2px solid var(--ink); outline-offset: 2px; }
 .bar-btns.one { justify-content: flex-end; }
 .tt tr.is-full th span { color: var(--ink-2); }
 .done-pref { font-size: 1rem; color: var(--ink); }
 #bk-alt { justify-content: center; }
+
+.bk-commit { display: flex; flex-direction: column; gap: 4px; max-width: 560px; width: 100%; margin-inline: auto; }
+.bk-commit .check { font-size: .875rem; }
+.bk-commit .muted.small, .bk-commit .field-err { margin: 0; text-align: left; }
+.bk-commit .field-err:empty { display: none; }
+.bk-zone .chips { justify-content: center; }
+.bk-zone .bk-fields { margin-top: 14px; }
+.bk-more { width: 100%; max-width: 560px; margin-inline: auto; display: flex; flex-direction: column; gap: 18px; }
+.bk-more summary { cursor: pointer; text-align: center; color: var(--link); text-decoration: underline; text-underline-offset: 4px; min-height: 44px; display: grid; place-items: center; }
+.bk-more[open] summary { margin-bottom: 8px; }
+.bk-alt { text-align: center; }
+.bk-alt p { margin-bottom: 8px; }
+.tt-cell.is-lost > span { border-style: solid; border-color: var(--bad, #A8432F); color: var(--bad, #A8432F); text-decoration: none; }
+.done-links.stack { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; }
+.link.tall { min-height: 44px; display: inline-flex; align-items: center; }
+#bk-bar .bar-btns { width: 100%; }
 </style>
 </head>
 <body>
@@ -1519,6 +1534,7 @@ var Ops = (function () {
   /* ----- text: one cleaner for every free-text field ----- */
   function cleanText(v, max) {
     var s = String(v === null || v === undefined ? '' : v);
+    if (s.length > max * 4 + 64) s = s.slice(0, max * 4 + 64); // a huge input costs no more than a short one
     try { s = s.normalize('NFC'); } catch (e) { /* keep as is */ }
     // control and format characters (including direction overrides and zero-width characters) become spaces
     s = s.replace(/[\u0000-\u001F\u007F-\u009F­؜​-‏‪-‮⁠-⁤⁦-⁯﻿]/g, ' ').replace(/\s+/g, ' ').trim();
@@ -1600,7 +1616,7 @@ var Ops = (function () {
     return function () { x = (Math.imul(x, 1103515245) + 12345) >>> 0; return x / 4294967296; };
   }
   function newState(today, random) {
-    return { today: today, orders: [], seq: { order: 0, piece: 0, confirm: 0 }, random: random || null, stock: { pieces: [], parts: {} }, moves: [], trackFails: {} };
+    return { today: today, hour: 9, orders: [], seq: { order: 0, piece: 0, confirm: 0 }, random: random || null, stock: { pieces: [], parts: {} }, moves: [], trackFails: {} }; // hour: Tirana's, set by the page from the clock
   }
   function addPiece(st, sys, len, offcut) {
     var p = { id: 'P' + (++st.seq.piece), sys: sys, len: len, offcut: !!offcut, cuts: [] };
@@ -1682,7 +1698,7 @@ var Ops = (function () {
     if (wins.length + extras.length > MAX_WINDOWS) return { ok: false, error: 'tooMany' };
     var o = {
       id: 'O' + (++st.seq.order), code: nextCode(st), status: 'lead', hold: null, suspect: !!input.suspect, source: SOURCES.indexOf(input.source) >= 0 ? input.source : 'web',
-      customer: { name: name, phone: phone, email: cleanText(input.email, 120), zone: input.zone, address: cleanText(input.address, 120), addr2: cleanText(input.addr2, 60), access: cleanText(input.access, 120), notes: cleanText(input.notes, 300), whatsapp: input.whatsapp !== false, contactBy: pick(CONTACT_BY, input.contactBy, input.whatsapp === false ? 'call' : 'wa'), callAt: pick(CALL_AT, input.callAt, 'any') },
+      customer: { name: name, phone: phone, email: cleanText(input.email, 120), zone: input.zone, address: cleanText(input.address, 120), city: cleanText(input.city, 40), addr2: cleanText(input.addr2, 60), access: cleanText(input.access, 120), notes: cleanText(input.notes, 300), whatsapp: input.whatsapp !== false, contactBy: pick(CONTACT_BY, input.contactBy, input.whatsapp === false ? 'call' : 'wa'), callAt: pick(CALL_AT, input.callAt, 'any') },
       interest: { kinds: pickAll(INTERESTS, input.interest && input.interest.kinds), count: pick(COUNT_BANDS, input.interest && input.interest.count, ''), rooms: pickAll(ROOMS, input.interest && input.interest.rooms), wishes: pickAll(WISHES, input.interest && input.interest.wishes) },
       createdAt: st.today, windows: [], extras: [], measure: null, install: null, travelManual: null, discount: 0,
       quote: null, quotes: [], accepted: false, longLeadAgreed: false, payments: [], confirmSeq: 0, confirmedAt: null, promised: null,
@@ -1703,11 +1719,17 @@ var Ops = (function () {
   // The public booking form. Nothing here trusts the caller: no force, no source, no totals.
   function createPublicBooking(st, input) {
     input = (input && typeof input === 'object') ? input : {};
+    var str = function (v) { return typeof v === 'string' ? v : ''; }; // text only: an object or a list counts as nothing
+    input = { name: str(input.name), phone: str(input.phone), email: str(input.email), zone: input.zone, address: str(input.address), city: str(input.city), addr2: str(input.addr2), access: str(input.access), notes: str(input.notes),
+      consent: input.consent, whatsapp: input.whatsapp !== false, contactBy: input.whatsapp === false && input.contactBy === 'wa' ? 'call' : input.contactBy, callAt: input.callAt,
+      interest: input.interest && typeof input.interest === 'object' ? input.interest : {}, windows: input.windows, extras: input.extras, measure: input.measure, suspect: input.suspect };
     if (visibleLength(cleanText(input.name, 80)) < 3) return { ok: false, error: 'name' };
     var phone = normalizePhone(input.phone, true);
     if (!phone) return { ok: false, error: 'phone' };
     if (ZONE_LIST.indexOf(input.zone) < 0) return { ok: false, error: 'zone' };
-    if (cleanText(input.address, 120).length < 5) return { ok: false, error: 'address' };
+    var asksVisit = !!(input.measure && typeof input.measure === 'object');
+    var addr = cleanText(input.address, 120);
+    if (asksVisit ? addr.length < 5 : addr.length > 0 && addr.length < 5) return { ok: false, error: 'address' }; // a call back may come without an address: it is taken on the phone
     var email = cleanText(input.email, 120);
     if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) return { ok: false, error: 'email' };
     if (input.consent !== true) return { ok: false, error: 'consent' };
@@ -1715,7 +1737,7 @@ var Ops = (function () {
     var extras = Array.isArray(input.extras) ? input.extras : [];
     if (wins.length + extras.length > MAX_WINDOWS) return { ok: false, error: 'tooMany' };
     // a booking without a request says at least what it is about
-    if (input.interest !== undefined && !wins.length && !extras.length && !pickAll(INTERESTS, input.interest && input.interest.kinds).length) return { ok: false, error: 'interest' };
+    if (!wins.length && !extras.length && !pickAll(INTERESTS, input.interest.kinds).length) return { ok: false, error: 'interest' };
     for (var i = 0; i < wins.length; i++) {
       if (!wins[i] || typeof wins[i] !== 'object' || PR.computeWindow(makeWindow(wins[i].cfg, '').cfg).errors.indexOf('config') >= 0) return { ok: false, error: 'config' };
     }
@@ -1725,7 +1747,7 @@ var Ops = (function () {
     // A slot is held only when the zone takes online bookings, the request is not flagged, and this phone holds no other visit.
     if (P.travel[input.zone] === null || input.suspect === true || hasVisit) measure = null;
     var asked = !!(input.measure && typeof input.measure === 'object');
-    var r = createOrder(st, { name: input.name, phone: phone, email: email, zone: input.zone, address: input.address, addr2: input.addr2, access: input.access, notes: input.notes, whatsapp: input.whatsapp, contactBy: input.contactBy, callAt: input.callAt, interest: input.interest, source: 'web', windows: wins, extras: extras, measure: measure, suspect: input.suspect === true, isPublic: true });
+    var r = createOrder(st, { name: input.name, phone: phone, email: email, zone: input.zone, address: input.address, city: input.city, addr2: input.addr2, access: input.access, notes: input.notes, whatsapp: input.whatsapp, contactBy: input.contactBy, callAt: input.callAt, interest: input.interest, source: 'web', windows: wins, extras: extras, measure: measure, suspect: input.suspect === true, isPublic: true });
     if (r.ok) { r.callback = !measure; r.notHeld = asked && !measure && P.travel[input.zone] !== null; } // a time was picked but not booked
     return r;
   }
@@ -1759,19 +1781,26 @@ var Ops = (function () {
   function bookable(st, date, isPublic) { return (isPublic ? date > st.today : date >= st.today) && date <= lastBookable(st) && isWorkday(date); }
   // st.hour is the hour in Tirana (the page sets it; the tests set it). After the cutoff the next working day's morning is closed to the public.
   function nextWorkday(st) { return workdaysFrom(st.today, 1)[0]; }
-  function pastCutoff(st) { return (st.hour || 0) >= CUTOFF_HOUR; }
-  function publicSlotOpen(st, date, slot) { return !(pastCutoff(st) && date === nextWorkday(st) && slot === MEASURE_SLOTS[0]); }
+  function pastCutoff(st) { var h = st.hour; return !(typeof h === 'number' && h === Math.round(h) && h >= 0 && h <= 23) || h >= CUTOFF_HOUR; } // an hour that is not known counts as late
+  function prevWorkday(date) { var d = addDays(date, -1); for (var i = 0; i < 20 && !isWorkday(d); i++) d = addDays(d, -1); return d; }
+  // A visit's day is locked from 16:00 of the last working day before it: from then on the route is planned, so no new booking,
+  // move or cancel reaches it online. A Sunday or a holiday in between keeps the lock of the working day before it.
+  function lockedDay(st, date) { var pw = prevWorkday(date); return date <= st.today || st.today > pw || (st.today === pw && pastCutoff(st)); }
+  function publicSlotOpen(st, date) { return !lockedDay(st, date); }
   // mode: 'public' (booking form), 'force' (sample data only: no calendar checks), anything else = staff
   function setMeasure(st, o, date, slot, mode, pref) {
     var force = mode === 'force' || mode === true;
     if (!active(o) || idx(o) > 1) return { ok: false, error: 'state' };
     if (MEASURE_SLOTS.indexOf(slot) < 0 || !validDate(date)) return { ok: false, error: 'slotInvalid' };
     if (!force) {
-      if (!bookable(st, date, mode === 'public') || (mode === 'public' && !publicSlotOpen(st, date, slot))) return { ok: false, error: 'slotInvalid' };
+      if (!bookable(st, date, mode === 'public') || (mode === 'public' && !publicSlotOpen(st, date))) return { ok: false, error: 'slotInvalid' };
       if (measureTaken(st, date, slot, o.id)) return { ok: false, error: 'slotTaken' };
     }
-    var moved = o.measure ? o.measure.moved || 0 : 0;
-    o.measure = { date: date, slot: slot, pref: slotHours(slot).indexOf(pref) >= 0 ? pref : 'any', time: null, moved: moved }; // the window is booked; the hour is a wish until the office confirms one
+    var old = o.measure, same = !!old && old.date === date && old.slot === slot;
+    if (pref === undefined && old) pref = old.pref; // the office's save keeps the hour the visitor asked for
+    if (same && old.time) { old.pref = slotHours(slot).indexOf(pref) >= 0 ? pref : old.pref; return { ok: true, unchanged: true }; } // nothing moved: the confirmed time stands
+    if (old && old.time) log(st, o, 'unconfirmed|' + old.date + '|' + old.time); // the customer must be told of the new time
+    o.measure = { date: date, slot: slot, pref: slotHours(slot).indexOf(pref) >= 0 ? pref : 'any', time: null, moved: old ? old.moved || 0 : 0, confirmedOn: null }; // the window is booked; the hour is a wish until the office confirms one
     log(st, o, 'measure|' + date + '|' + slot);
     return { ok: true };
   }
@@ -1790,42 +1819,72 @@ var Ops = (function () {
   }
   function freeMeasureSlots(st, days) {
     return workdaysFrom(st.today, days || HORIZON).map(function (d) {
-      return { date: d, slots: MEASURE_SLOTS.map(function (s) { return { slot: s, free: !measureTaken(st, d, s, null) && publicSlotOpen(st, d, s) }; }) };
+      return { date: d, slots: MEASURE_SLOTS.map(function (s) { return { slot: s, free: !measureTaken(st, d, s, null) && publicSlotOpen(st, d) }; }) };
     });
   }
   // The office confirms the exact time inside the booked window (it then tells the customer by WhatsApp or phone).
   function confirmMeasure(st, o, time) {
-    if (!active(o) || idx(o) > 1 || !o.measure) return { ok: false, error: 'state' };
+    if (!active(o) || idx(o) > 1 || !o.measure || o.measure.date < st.today) return { ok: false, error: 'state' };
     if (!/^\d{2}:(00|30)$/.test(time || '')) return { ok: false, error: 'time' };
     var h = +String(time).slice(0, 2), a = +o.measure.slot.slice(0, 2), b = +o.measure.slot.slice(3, 5);
     if (!(h >= a && h < b)) return { ok: false, error: 'time' };
-    o.measure.time = time;
+    o.measure.time = time; o.measure.confirmedOn = st.today;
     log(st, o, 'confirmed|' + o.measure.date + '|' + time);
     return { ok: true };
   }
   // The customer, from the tracking page: until the cutoff hour of the day before the visit.
-  function customerCanChange(st, o) {
-    if (!active(o) || idx(o) !== 1 || !o.measure || o.measure.date <= st.today) return false;
-    return !(o.measure.date === nextWorkday(st) && pastCutoff(st));
+  function customerCanChange(st, o) { // not for another city: that visit was arranged, and priced, by the office
+    return active(o) && idx(o) === 1 && !!o.measure && P.travel[o.customer.zone] !== null && !lockedDay(st, o.measure.date);
   }
-  function customerMove(st, o, date, slot) {
+  // Moves and cancellations a phone has made online in the last 30 days: cancelling and booking again does not reset the limit
+  function changesByPhone(st, phone) {
+    var since = addDays(st.today, -30), n = 0;
+    st.orders.forEach(function (x) { if (x.customer.phone === phone) (x.custChanges || []).forEach(function (d) { if (d >= since) n++; }); });
+    return n;
+  }
+  function customerMove(st, o, date, slot, pref) {
     if (!customerCanChange(st, o)) return { ok: false, error: 'late' };
-    if ((o.measure.moved || 0) >= MAX_MOVES) return { ok: false, error: 'moves' };
-    var before = o.measure, pref = before.pref;
-    var r = setMeasure(st, o, date, slot, 'public', pref);
+    if (o.measure.date === date && o.measure.slot === slot) return { ok: false, error: 'same' };
+    if (changesByPhone(st, o.customer.phone) >= MAX_MOVES) return { ok: false, error: 'moves' };
+    var before = o.measure;
+    var r = setMeasure(st, o, date, slot, 'public', pref === undefined ? before.pref : pref);
     if (!r.ok) { o.measure = before; return r; }
     o.measure.moved = (before.moved || 0) + 1;
+    (o.custChanges = o.custChanges || []).push(st.today);
     log(st, o, 'custMoved');
     return { ok: true };
   }
   function customerCancel(st, o) { // the visit is freed; the order stays a lead the office may call
     if (!customerCanChange(st, o)) return { ok: false, error: 'late' };
     o.measure = null; o.status = 'lead';
+    (o.custChanges = o.custChanges || []).push(st.today);
     log(st, o, 'custCancelled');
     return { ok: true };
   }
+  // The tracking page's way in: the code and the last four digits first, behind the same lockout as a lookup
+  function trackMove(st, code, pin, date, slot, pref) { var o = findForTracking(st, code, pin).order; return o ? customerMove(st, o, date, slot, pref) : { ok: false, error: 'notFound' }; }
+  function trackCancel(st, code, pin) { var o = findForTracking(st, code, pin).order; return o ? customerCancel(st, o) : { ok: false, error: 'notFound' }; }
+  // A visit still without an exact time when the route is being planned: from 12:00 of the working day before it
+  function confirmLate(st, o) {
+    if (!active(o) || idx(o) > 1 || !o.measure || o.measure.time || o.measure.date < st.today) return false;
+    var pw = prevWorkday(o.measure.date);
+    return o.measure.date === st.today || st.today > pw || (st.today === pw && pastCutoffAt(st, 12));
+  }
+  function pastCutoffAt(st, hour) { var h = st.hour; return !(typeof h === 'number' && h >= 0 && h <= 23) || h >= hour; }
+  // The visit for the customer's own calendar (RFC 5545): times in UTC from Tirana's offset on that day, lines folded at 75 octets
+  function tiranaOffset(date) { // +2 from the last Sunday of March to the last Sunday of October, else +1
+    var y = +date.slice(0, 4), lastSun = function (m) { var d = new Date(Date.UTC(y, m + 1, 0)); d.setUTCDate(d.getUTCDate() - d.getUTCDay()); return iso(new Date(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate(), 12)); };
+    return date >= lastSun(2) && date < lastSun(9) ? 2 : 1;
+  }
+  function icsText(v) { // v: code, date, slot, address, title, codeLabel, stamp (UTC 'YYYYMMDDTHHMMSSZ'), seq
+    var off = tiranaOffset(v.date), utc = function (h) { var d = new Date(Date.UTC(+v.date.slice(0, 4), +v.date.slice(5, 7) - 1, +v.date.slice(8, 10), h - off)); return d.getUTCFullYear() + pad(d.getUTCMonth() + 1) + pad(d.getUTCDate()) + 'T' + pad(d.getUTCHours()) + '0000Z'; };
+    var e = function (x) { return String(x).replace(/([,;\\])/g, '\\$1').replace(/[\r\n]+/g, ' '); };
+    var fold = function (line) { var out = [], cur = '', n = 0; Array.from(line).forEach(function (ch) { var b = unescape(encodeURIComponent(ch)).length; if (n + b > 75) { out.push(cur); cur = ' '; n = 1; } cur += ch; n += b; }); out.push(cur); return out.join('\r\n'); };
+    return ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Perde Nemis//booking//EN', 'METHOD:PUBLISH', 'BEGIN:VEVENT', 'UID:' + v.code + '@perde-nemis', 'SEQUENCE:' + (v.seq || 0), 'DTSTAMP:' + v.stamp,
+      'DTSTART:' + utc(+v.slot.slice(0, 2)), 'DTEND:' + utc(+v.slot.slice(3, 5)), 'SUMMARY:' + e(v.title), 'LOCATION:' + e(v.address), 'DESCRIPTION:' + e(v.codeLabel + ': ' + v.code), 'END:VEVENT', 'END:VCALENDAR'].map(fold).join('\r\n') + '\r\n';
+  }
   function toConfirm(st) { // the office's list: visits not yet given an exact time, the soonest first
-    return st.orders.filter(function (o) { return active(o) && idx(o) === 1 && o.measure && !o.measure.time && o.measure.date >= st.today; })
+    return st.orders.filter(function (o) { return active(o) && idx(o) <= 1 && o.measure && !o.measure.time && o.measure.date >= st.today; }) // a lead booked by phone without its address yet holds a window too
       .sort(function (a, b) { return a.measure.date < b.measure.date ? -1 : a.measure.date > b.measure.date ? 1 : a.measure.slot < b.measure.slot ? -1 : 1; });
   }
   function overdue(st, o) {
@@ -2335,13 +2394,15 @@ var Ops = (function () {
     var o = null;
     st.orders.forEach(function (x) { if (normCode(x.code) === key) o = x; });
     if (o && last4(o.customer.phone) === pin) { delete st.trackFails[key]; return { order: o }; }
-    if (Object.keys(st.trackFails).length > 500) st.trackFails = {};
+    var keys = Object.keys(st.trackFails);
+    if (keys.length > 500) keys.forEach(function (k) { if (st.trackFails[k].day !== st.today) delete st.trackFails[k]; }); // only yesterday's misses are forgotten
+    if (!f && Object.keys(st.trackFails).length > 500) return { order: null }; // full: a new code is not counted, and no lock is ever lifted
     st.trackFails[key] = { n: (f ? f.n : 0) + 1, day: st.today };
     return { order: null };
   }
 
   return {
-    STATES: STATES, MEASURE_SLOTS: MEASURE_SLOTS, INTERESTS: INTERESTS, COUNT_BANDS: COUNT_BANDS, ROOMS: ROOMS, WISHES: WISHES, CONTACT_BY: CONTACT_BY, CALL_AT: CALL_AT, CUTOFF_HOUR: CUTOFF_HOUR, MAX_MOVES: MAX_MOVES, slotHours: slotHours,
+    STATES: STATES, MEASURE_SLOTS: MEASURE_SLOTS, trackMove: trackMove, trackCancel: trackCancel, confirmLate: confirmLate, lockedDay: lockedDay, prevWorkday: prevWorkday, icsText: icsText, INTERESTS: INTERESTS, COUNT_BANDS: COUNT_BANDS, ROOMS: ROOMS, WISHES: WISHES, CONTACT_BY: CONTACT_BY, CALL_AT: CALL_AT, CUTOFF_HOUR: CUTOFF_HOUR, MAX_MOVES: MAX_MOVES, slotHours: slotHours,
     confirmMeasure: confirmMeasure, customerCanChange: customerCanChange, customerMove: customerMove, customerCancel: customerCancel, toConfirm: toConfirm, publicSlotOpen: publicSlotOpen, INSTALL_SLOTS: INSTALL_SLOTS, TEAMS: TEAMS, SUBSTRATES: SUBSTRATES, HOLDS: HOLDS, SOURCES: SOURCES, HOLIDAYS: HOLIDAYS, HORIZON: HORIZON, MAX_WINDOWS: MAX_WINDOWS,
     iso: iso, parse: parse, validDate: validDate, addDays: addDays, addYears: addYears, addWorkdays: addWorkdays, daysBetween: daysBetween, isWorkday: isWorkday, workdaysFrom: workdaysFrom, businessToday: businessToday,
     cleanText: cleanText, normalizePhone: normalizePhone, last4: last4, normCode: normCode, normInvoice: normInvoice, seededRandom: seededRandom,
@@ -3030,19 +3091,13 @@ var I18N = {
     'cfg.ncolors.other': '{n} ngjyra',
     'cfg.close': 'Mbyll konfiguratorin',
     'step.save': 'Ruaj',
-    'bk.s.where': 'Ku',
     'bk.s.when': 'Kur',
     'bk.s.what': 'Çfarë',
     'bk.s.who': 'Kush',
     'bk.s.check': 'Përmbledhja',
-    'bk.where.q': 'Ku ndodhet SHTËPIA?',
-    'bk.where.t': 'Matja është falas në Tiranë, Durrës, Kamëz dhe Vorë.',
-    'bk.zone.A': 'Matja falas',
-    'bk.zone.B': 'Matja falas',
-    'bk.zone.C': 'Ju telefonojmë; mund të ketë tarifë',
     'bk.noEst': 'Nuk keni zgjedhur ende produkte: në hapin 3 na tregoni çfarë ju intereson.',
     'bk.when.q': 'Kur ju PËRSHTATET matja?',
-    'bk.when.t': 'Zgjidhni ditën dhe orarin. Orën e saktë jua konfirmojmë një ditë përpara.',
+    'bk.when.t': 'Zgjidhni zonën, ditën dhe orarin. Matja është falas; orën e saktë jua konfirmojmë një ditë përpara.',
     'bk.pref': 'Cila orë ju përshtatet më shumë? ({date}, {slot})',
     'bk.pref.any': 'Çdo orë brenda kësaj kohe',
     'bk.pref.note': 'Është një dëshirë: e mbajmë nëse e lejon rruga e ditës dhe jua konfirmojmë një ditë përpara.',
@@ -3096,12 +3151,11 @@ var I18N = {
     'bk.access.eg': 'Ashensor, emri në interfon, parkim…',
     'bk.check.q': 'Ja TAKIMI juaj',
     'bk.check.t': 'Kontrolloni çdo rresht dhe ndryshojeni me lapsin.',
-    'bk.row.where': 'Ku',
     'bk.row.when': 'Kur',
     'bk.row.what': 'Çfarë',
     'bk.row.who': 'Kush',
     'bk.row.addr': 'Adresa',
-    'bk.promise': 'Matja është falas dhe nuk ju detyron për asgjë. Çmimin e saktë jua japim pas matjes falas.',
+    'bk.promise': 'Matja është falas dhe nuk ju detyron për asgjë.',
     'bk.send': 'Rezervo matjen',
     'book.e.kinds': 'Zgjidhni të paktën një produkt, ose «Nuk e di ende».',
     'bk.done.pref': 'Ora që kërkuat: rreth {h}.',
@@ -3123,7 +3177,7 @@ var I18N = {
     'bk.tr.noMoves': 'Ora është ndryshuar dy herë; për një ndryshim tjetër na shkruani.',
     'bk.tr.until': 'Deri në orën 16:00 të ditës para matjes.',
     'bk.tr.pick': 'Zgjidhni orarin e ri',
-    'bk.tr.now': 'Tani',
+    'bk.tr.now': 'Matja juaj',
     'bk.tr.save': 'Ruaj orarin e ri',
     'bk.tr.keep': 'Mbaje si është',
     'bk.tr.moved': 'Matja u zhvendos: {when}.',
@@ -3157,7 +3211,28 @@ var I18N = {
     'bk.ops.none': 'Asnjë matje pa orë të konfirmuar.',
     'log.confirmed': 'Ora e matjes u konfirmua: {a}, ora {b}',
     'log.custMoved': 'Klienti e zhvendosi matjen',
-    'log.custCancelled': 'Klienti e anuloi matjen'
+    'log.custCancelled': 'Klienti e anuloi matjen',
+    'bk.zoneQ': 'Ku ndodhet shtëpia?',
+    'bk.city': 'Cili qytet?',
+    'book.e.city': 'Shkruani qytetin.',
+    'bk.callLink': 'Asnjë orar nuk ju përshtatet? Ju telefonojmë ne.',
+    'bk.callOn': 'Ju telefonojmë për ta caktuar. Më poshtë zgjidhni kur t\'ju telefonojmë.',
+    'bk.alt': 'Këto orare janë ende të lira:',
+    'bk.tt.lost': 'U zu sapo',
+    'bk.tt.off': 'jo tani: ju telefonojmë',
+    'bk.more': 'Më shumë detaje (jo e detyrueshme)',
+    'bk.count.n': '{n} dritare',
+    'bk.whatReq.q': 'Kërkesa JUAJ',
+    'bk.whatReq.t': 'Do t\'i shohim bashkë në matje. Shtoni një shënim nëse doni.',
+    'bk.street.opt': 'Rruga dhe numri (jo e detyrueshme: e marrim në telefon)',
+    'bk.promise.c': 'Ju telefonojmë; nëse matja ka tarifë, jua themi para se ta caktojmë.',
+    'bk.sendCall': 'Dërgo kërkesën',
+    'bk.tr.rebook': 'Zgjidhni një orë tjetër',
+    'bk.ics.again': 'Shtoje orarin e ri në kalendar',
+    'bk.ops.smsNow': 'Klienti do SMS: {phone}.',
+    'bk.ops.late': 'Pa orë të konfirmuar',
+    'bk.tr.e.notFound': 'Kodi ose shifrat nuk përputhen. Kontrolloni dhe provoni përsëri.',
+    'bk.tr.e.same': 'Kjo është tashmë ora e matjes suaj.'
   },
   en: {
     'demo.notePublic': 'Demo: models, fabrics, inspiration and availability are samples. Some photographs are our own work; the others are Unsplash samples that your own photographs replace. The empty frames hold the place of the ones still missing. The price comes with the quote, after the free measurement.', 
@@ -3712,19 +3787,13 @@ var I18N = {
     'cfg.ncolors.other': '{n} colours',
     'cfg.close': 'Close the configurator',
     'step.save': 'Save',
-    'bk.s.where': 'Where',
     'bk.s.when': 'When',
     'bk.s.what': 'What',
     'bk.s.who': 'Who',
     'bk.s.check': 'Check',
-    'bk.where.q': 'Where is the HOME?',
-    'bk.where.t': 'The visit is free in Tirana, Durrës, Kamëz and Vorë.',
-    'bk.zone.A': 'Free visit',
-    'bk.zone.B': 'Free visit',
-    'bk.zone.C': 'We call you; a fee may apply',
     'bk.noEst': 'You have not picked any products yet: in step 3 tell us what you are interested in.',
     'bk.when.q': 'When SUITS you for the visit?',
-    'bk.when.t': 'Pick a day and a time. We confirm the exact hour the day before.',
+    'bk.when.t': 'Choose the area, a day and a time. The visit is free; we confirm the exact hour the day before.',
     'bk.pref': 'Which hour suits you best? ({date}, {slot})',
     'bk.pref.any': 'Any time in this window',
     'bk.pref.note': 'It is a wish: we keep it if the day\'s route allows, and confirm it the day before.',
@@ -3778,12 +3847,11 @@ var I18N = {
     'bk.access.eg': 'Lift, name on the intercom, parking…',
     'bk.check.q': 'Here is your VISIT',
     'bk.check.t': 'Check each row and change it with the pencil.',
-    'bk.row.where': 'Where',
     'bk.row.when': 'When',
     'bk.row.what': 'What',
     'bk.row.who': 'Who',
     'bk.row.addr': 'Address',
-    'bk.promise': 'The visit is free and commits you to nothing. We give you the exact price after the free measurement.',
+    'bk.promise': 'The visit is free and commits you to nothing.',
     'bk.send': 'Book the visit',
     'book.e.kinds': 'Choose at least one product, or “Not sure yet”.',
     'bk.done.pref': 'The hour you asked for: around {h}.',
@@ -3805,7 +3873,7 @@ var I18N = {
     'bk.tr.noMoves': 'The time has been changed twice; for another change, message us.',
     'bk.tr.until': 'Until 16:00 the day before the visit.',
     'bk.tr.pick': 'Choose the new time',
-    'bk.tr.now': 'Now',
+    'bk.tr.now': 'Your visit',
     'bk.tr.save': 'Save the new time',
     'bk.tr.keep': 'Keep it as it is',
     'bk.tr.moved': 'The visit was moved: {when}.',
@@ -3839,7 +3907,28 @@ var I18N = {
     'bk.ops.none': 'No visit is waiting for a confirmed time.',
     'log.confirmed': 'Visit time confirmed: {a}, {b}',
     'log.custMoved': 'The customer moved the visit',
-    'log.custCancelled': 'The customer cancelled the visit'
+    'log.custCancelled': 'The customer cancelled the visit',
+    'bk.zoneQ': 'Where is the home?',
+    'bk.city': 'Which city?',
+    'book.e.city': 'Enter the city.',
+    'bk.callLink': 'No time suits you? We will call you.',
+    'bk.callOn': 'We will call you to arrange it. Below, choose when to call.',
+    'bk.alt': 'These times are still free:',
+    'bk.tt.lost': 'Just taken',
+    'bk.tt.off': 'not now: we will call you',
+    'bk.more': 'More details (optional)',
+    'bk.count.n': '{n} windows',
+    'bk.whatReq.q': 'Your REQUEST',
+    'bk.whatReq.t': 'We will go through it together at the visit. Add a note if you like.',
+    'bk.street.opt': 'Street and number (optional: we take it on the phone)',
+    'bk.promise.c': 'We will call you; if the visit carries a fee, we tell you before we arrange it.',
+    'bk.sendCall': 'Send the request',
+    'bk.tr.rebook': 'Choose another time',
+    'bk.ics.again': 'Add the new time to your calendar',
+    'bk.ops.smsNow': 'The customer wants an SMS: {phone}.',
+    'bk.ops.late': 'No confirmed time',
+    'bk.tr.e.notFound': 'The code or the digits do not match. Check them and try again.',
+    'bk.tr.e.same': 'That is already your visit\'s time.'
   }
 };
 if (typeof module !== 'undefined') module.exports = I18N;
@@ -3858,7 +3947,7 @@ if (typeof module !== 'undefined') module.exports = I18N;
   function defaultCfg() {
     return { width: NaN, height: NaN, mode: 'overhang', layers: 'sheer', sheerId: typeof PHOTOS !== 'undefined' && PHOTOS['fab-liri'] ? FAB_PHOTO_COL.liri : 's1', mainId: 'b1', heading: 'wave', rail: 'wave', mount: 'ceiling', shape: 'straight', panels: 2 };
   }
-  function emptyBook() { return { name: '', phone: '', email: '', address: '', addr2: '', access: '', notes: '', slot: '', pref: 'any', lost: '', callback: false, callAt: 'any', kinds: [], count: '', rooms: [], wishes: [], whatsapp: true, contactBy: 'wa', consent: false, hp: '', errors: {}, done: null, copied: false }; }
+  function emptyBook() { return { name: '', phone: '', email: '', address: '', addr2: '', access: '', notes: '', slot: '', pref: 'any', lost: '', callback: false, callAt: 'any', kinds: ['unsure'], count: '', rooms: [], wishes: [], whatsapp: true, contactBy: 'wa', city: '', consent: false, hp: '', errors: {}, done: null, copied: false }; }
   function emptyLead() { return { name: '', phone: '', address: '', notes: '', zone: 'A', source: 'phone', err: false }; }
 
   var S = {
@@ -4612,15 +4701,28 @@ if (typeof module !== 'undefined') module.exports = I18N;
     if (!el) return;
     try { window.scrollTo(0, Math.max(0, el.getBoundingClientRect().top + (window.scrollY || 0) - stickyTop() - 14)); } catch (e) { /* stays where it is */ }
   }
-  // The booking, in five steps as the plan's "Booking a measurement: the calendar" describes: where, when, what, who, check.
+  // The booking, in four steps as the plan's "Booking a measurement: the calendar" describes: when (with the area), what, who, check.
   // It has the configurator's look: one question to a screen, the count and a cross at the top, Back and Continue at the foot.
-  var BSTEPS = ['where', 'when', 'what', 'who', 'check'];
-  var BOOK_FIELDS = { when: ['slot'], what: ['kinds'], who: ['name', 'phone', 'email', 'address'], check: ['consent'] }; // which step asks for what
-  function bkey() { return BSTEPS[S.bstep - 1] || 'where'; }
+  var BSTEPS = ['when', 'what', 'who', 'check'];
+  var BOOK_FIELDS = { when: ['slot', 'city'], what: [], who: ['name', 'phone', 'email', 'address'], check: ['consent'] }; // which step asks for what
+  function bkey() { return BSTEPS[S.bstep - 1] || 'when'; }
   function stepOfField(k) { for (var s in BOOK_FIELDS) if (BOOK_FIELDS[s].indexOf(k) >= 0) return BSTEPS.indexOf(s) + 1; return 1; }
   function isCallback() { return S.zone === 'C' || S.book.callback; }
-  function chk(name, value, checked, label, opt) { // a chip that can be one of several
-    opt = opt || {};
+  function tiranaNow() { // the date and hour in Tirana, read again whenever a choice depends on them
+    try {
+      var nh = Number(new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/Tirane', hour: '2-digit', hour12: false }).format(new Date())) % 24;
+      if (nh >= 0 && nh <= 23) st.hour = nh;
+      var td = Ops.businessToday(); if (td > st.today) st.today = td; // a page left open overnight moves to the new day
+    } catch (e) { /* the hour stays unknown and counts as late */ }
+  }
+  function saveBook() { // what was typed stays for this session only: it holds a name and an address
+    try { var c = {}; for (var k in S.book) if (['errors', 'hp', 'done', 'copied'].indexOf(k) < 0) c[k] = S.book[k]; sessionStorage.setItem('pn-book', JSON.stringify({ b: c, z: S.zone })); } catch (e) { /* not kept */ }
+  }
+  function loadBook() {
+    try { var v = JSON.parse(sessionStorage.getItem('pn-book') || 'null'); if (!v || !v.b) return; var e = emptyBook(); for (var k in e) if (Object.prototype.hasOwnProperty.call(v.b, k) && typeof v.b[k] === typeof e[k]) e[k] = v.b[k]; S.book = e; if (ZONES.indexOf(v.z) >= 0) S.zone = v.z; } catch (e2) { /* starts empty */ }
+  }
+  function dropBook() { try { sessionStorage.removeItem('pn-book'); } catch (e) { /* nothing kept */ } }
+  function chk(name, value, checked, label) { // a chip that can be one of several
     var id = name + '-' + value;
     return '<label class="chip" for="' + id + '"><input type="checkbox" id="' + id + '" value="' + esc(value) + '"' + (checked ? ' checked' : '') + ' data-f="' + name + '"><span class="chip-body"><span class="chip-name">' + label + '</span></span></label>';
   }
@@ -4630,11 +4732,14 @@ if (typeof module !== 'undefined') module.exports = I18N;
       '<a class="wiz-close" href="#' + to + '" data-go="' + to + '" id="bk-close" aria-label="' + t('cfg.close') + '"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M5 5l14 14M19 5L5 19"/></svg></a>';
   }
   function bkBar() {
-    var n = S.bstep, last = n === BSTEPS.length;
+    var b = S.book, n = S.bstep, last = n === BSTEPS.length;
     var back = n > 1 ? '<button type="button" class="btn ghost" data-act="bk-back" id="bk-back">' + ARROW + '<span class="bk-long">' + t('step.backTo', { n: n - 1 }) + '</span><span class="bk-short" aria-hidden="true">' + t('step.back') + '</span></button>' : '';
-    var fwd = last ? '<button type="submit" class="btn" id="bk-send">' + t('bk.send') + '</button>'
+    var fwd = last ? '<button type="submit" class="btn" id="bk-send">' + t(isCallback() ? 'bk.sendCall' : 'bk.send') + '</button>'
       : '<button type="button" class="btn" data-act="bk-next" id="bk-next"' + (S.bFromSum ? ' data-sum="1"' : '') + '>' + t(S.bFromSum ? 'step.save' : 'step.next') + '</button>';
-    return '<div class="bar-btns' + (back ? '' : ' one') + '">' + back + fwd + '</div>';
+    // on the last step the consent and the promise stand in the bar, by the button that sends
+    var pre = last ? '<div class="bk-commit"><label class="check" for="book-consent"><input type="checkbox" id="book-consent" required aria-required="true"' + (b.consent ? ' checked' : '') + ' data-f="b-consent"' + bkAria('consent') + '><span>' + t('book.consent') + '</span></label>' + bkErr('consent') +
+      '<p class="muted small">' + t(S.zone === 'C' ? 'bk.promise.c' : 'bk.promise') + '</p></div>' : '';
+    return pre + '<div class="bar-btns' + (back ? '' : ' one') + '">' + back + fwd + '</div>';
   }
   function bkErr(k) { var b = S.book; return '<p class="field-err" id="book-' + k + '-err">' + (b.errors[k] ? t('book.e.' + b.errors[k]) : '') + '</p>'; }
   function bkAria(k, extra) { var b = S.book; return ' aria-describedby="' + (extra ? extra + ' ' : '') + 'book-' + k + '-err"' + (b.errors[k] ? ' aria-invalid="true"' : ''); }
@@ -4648,72 +4753,78 @@ if (typeof module !== 'undefined') module.exports = I18N;
       return radio('b-pref', x, b.pref === x, x === 'any' ? t('bk.pref.any') : x, { id: x.replace(':', '') });
     }).join('') + '</div><p class="muted small">' + t('bk.pref.note') + '</p></fieldset>';
   }
-  function altHtml() { // after a window was taken in the meantime: the next free ones, as buttons
+  function altHtml() { // after a window was taken in the meantime: the next free ones, as buttons, above the timetable
     var b = S.book; if (b.errors.slot !== 'slotTaken' || !b.lost) return '';
-    var out = [];
-    Ops.freeMeasureSlots(st).forEach(function (d) { if (d.date < b.lost) return; d.slots.forEach(function (x) { if (x.free && out.length < 3) out.push(d.date + '|' + x.slot); }); });
-    return out.length ? '<div class="btn-row" id="bk-alt">' + out.map(function (v) { return '<button type="button" class="btn ghost small" data-act="bk-alt" data-v="' + v + '">' + esc(fmtDate(v.split('|')[0], 'day')) + ', ' + t('slot.' + v.split('|')[1]) + '</button>'; }).join('') + '</div>' : '';
+    var out = [], from = b.lost.split('|')[0];
+    Ops.freeMeasureSlots(st).forEach(function (d) { if (d.date < from) return; d.slots.forEach(function (x) { if (x.free && out.length < 3) out.push(d.date + '|' + x.slot); }); });
+    return out.length ? '<div class="bk-alt" id="bk-alt"><p>' + t('bk.alt') + '</p><div class="btn-row">' + out.map(function (v) { return '<button type="button" class="btn ghost small" data-act="bk-alt" data-v="' + v + '">' + esc(fmtDate(v.split('|')[0], 'day')) + ', ' + t('slot.' + v.split('|')[1]) + '</button>'; }).join('') + '</div></div>' : '';
   }
-  function kindsHtml() {
-    var b = S.book;
-    return '<fieldset class="kinds" aria-describedby="book-kinds-err"><legend>' + t('bk.kinds') + '</legend>' + bkErr('kinds') + '<div class="kcards">' + Ops.INTERESTS.map(function (k) {
+  function kindsHtml() { // several may be chosen; "not sure" stands first and is chosen until a product is
+    var b = S.book, list = ['unsure'].concat(Ops.INTERESTS.filter(function (k) { return k !== 'unsure'; }));
+    return '<fieldset class="kinds"><legend>' + t('bk.kinds') + '</legend><div class="kcards">' + list.map(function (k) {
       var pic = k !== 'unsure' && PH['cat-' + k] ? '<span class="kc-pic"><img src="' + PH['cat-' + k] + '" alt="" loading="lazy" decoding="async"></span>' : '<span class="kc-pic kc-q" aria-hidden="true">?</span>';
       return '<label class="kcard" for="b-kind-' + k + '"><input type="checkbox" id="b-kind-' + k + '" value="' + k + '"' + (b.kinds.indexOf(k) >= 0 ? ' checked' : '') + ' data-f="b-kind">' + pic +
         '<span class="kc-name">' + (k === 'unsure' ? t('bk.unsure') : catShort(k)) + '</span></label>';
     }).join('') + '</div></fieldset>';
   }
+  function zoneChips() {
+    return '<fieldset class="bk-zone"><legend>' + t('bk.zoneQ') + '</legend><div class="chips">' + ZONES.map(function (z) { return radio('b-zone', z, S.zone === z, t('zone.' + z)); }).join('') + '</div>' +
+      (S.zone === 'C' ? '<div class="bk-fields">' + bkFld('city', t('bk.city'), '<input type="text" id="book-city" maxlength="40" autocomplete="address-level2" enterkeyhint="done" value="' + esc(S.book.city) + '" data-f="b-city"' + bkAria('city') + '>') + '</div>' : '') + '</fieldset>';
+  }
   function bkBody() {
     var b = S.book, k = bkey();
-    if (k === 'where') {
-      return '<fieldset><legend class="sr-only">' + t('book.zone') + '</legend><div class="chips col">' + ZONES.map(function (z) { return radio('b-zone', z, S.zone === z, t('zone.' + z), { extra: t('bk.zone.' + z) }); }).join('') + '</div></fieldset>' +
-        '<p class="' + (S.est.length ? 'note quiet' : 'muted small') + '" id="book-attached">' + attachedText() + '</p>' +
-        '<ol class="visit" aria-label="' + t('visit.h') + '">' + [1, 2, 3].map(function (i) { return '<li><h3 class="h3">' + t('visit.' + i + '.h') + '</h3><p>' + t('visit.' + i + '.p') + '</p></li>'; }).join('') + '</ol>';
+    if (k === 'when') {
+      return '<div id="bk-zone">' + zoneChips() + '</div>' + altHtml() +
+        (S.zone === 'C' ? '' : '<p class="center small"><button type="button" class="link" data-act="bk-call" id="bk-call-link">' + t('bk.callLink') + '</button></p>') +
+        '<div id="book-slots">' + slotsHtml() + '</div><div id="book-pref">' + prefHtml() + '</div>' +
+        '<p class="' + (S.est.length ? 'note quiet' : 'muted small') + '" id="book-attached">' + attachedText() + '</p>';
     }
-    if (k === 'when') return '<div id="book-slots">' + slotsHtml() + '</div>' + altHtml() + '<div id="book-pref">' + prefHtml() + '</div>';
     if (k === 'what') {
-      if (S.est.length) return '<p class="note quiet">' + attachedText() + '</p><div class="review">' + estListHtml(S.est, estCalc(), false) + '</div><p class="center"><a class="link" href="#config" data-go="config" id="bk-edit-req">' + t('bk.editReq') + '</a></p>' +
+      if (S.est.length) return '<div class="review">' + estListHtml(S.est, estCalc(), false) + '</div><p class="center"><a class="link" href="#config" data-go="config" id="bk-edit-req">' + t('bk.editReq') + '</a></p>' +
         bkFld('notes', t('bk.notes'), '<textarea id="book-notes" rows="2" maxlength="300" data-f="b-notes">' + esc(b.notes) + '</textarea>', '', true);
       return kindsHtml() +
         '<fieldset><legend>' + t('bk.count') + '</legend><div class="chips">' + Ops.COUNT_BANDS.map(function (x) { return radio('b-count', x, b.count === x, t('bk.count.' + x)); }).join('') + '</div></fieldset>' +
+        '<details class="bk-more"' + (b.rooms.length || b.wishes.length || b.notes ? ' open' : '') + '><summary>' + t('bk.more') + '</summary>' +
         '<fieldset><legend>' + t('bk.rooms') + '</legend><div class="chips">' + Ops.ROOMS.map(function (x) { return chk('b-room', x, b.rooms.indexOf(x) >= 0, t('bk.room.' + x)); }).join('') + '</div></fieldset>' +
         '<fieldset><legend>' + t('bk.wishes') + '</legend><div class="chips">' + Ops.WISHES.map(function (x) { return chk('b-wish', x, b.wishes.indexOf(x) >= 0, t('bk.wish.' + x)); }).join('') + '</div></fieldset>' +
-        bkFld('notes', t('bk.notes'), '<textarea id="book-notes" rows="2" maxlength="300" placeholder="' + t('bk.notes.eg') + '" data-f="b-notes">' + esc(b.notes) + '</textarea>', '', true);
+        bkFld('notes', t('bk.notes'), '<textarea id="book-notes" rows="2" maxlength="300" placeholder="' + t('bk.notes.eg') + '" data-f="b-notes">' + esc(b.notes) + '</textarea>', '', true) + '</details>';
     }
-    if (k === 'who') {
+    if (k === 'who') { // the order a phone fills them in: who, how to reach, where; the optional ones last
+      var call = isCallback();
       return '<div class="bk-fields">' + bkFld('name', t('book.name'), '<input type="text" id="book-name" maxlength="80" autocomplete="name" enterkeyhint="next" required aria-required="true" value="' + esc(b.name) + '" data-f="b-name"' + bkAria('name') + '>') +
         bkFld('phone', t('book.phone'), '<input type="tel" id="book-phone" maxlength="24" autocomplete="tel" enterkeyhint="next" required aria-required="true" value="' + esc(b.phone) + '" data-f="b-phone"' + bkAria('phone', 'book-phone-hint') + '>', t('book.phone.hint')) +
-        '<label class="check" for="book-wa"><input type="checkbox" id="book-wa"' + (b.whatsapp ? ' checked' : '') + ' data-f="b-wa"><span>' + t('bk.wa') + '</span></label>' +
-        '<fieldset id="bk-by"><legend>' + t('bk.by') + '</legend><div class="chips">' + Ops.CONTACT_BY.filter(function (x) { return x !== 'wa' || b.whatsapp; }).map(function (x) { return radio('b-by', x, b.contactBy === x, t('bk.by.' + x)); }).join('') + '</div></fieldset>' +
+        '<fieldset id="bk-by"><legend>' + t('bk.by') + '</legend><div class="chips">' + Ops.CONTACT_BY.map(function (x) { return radio('b-by', x, b.contactBy === x, t('bk.by.' + x)); }).join('') + '</div></fieldset>' +
+        bkFld('address', t(call ? 'bk.street.opt' : 'bk.street'), '<input type="text" id="book-address" maxlength="120" autocomplete="street-address" enterkeyhint="next"' + (call ? '' : ' required aria-required="true"') + ' value="' + esc(b.address) + '" data-f="b-address"' + bkAria('address', 'book-address-hint') + '>', t('bk.street.eg')) +
+        bkFld('addr2', t('bk.addr2'), '<input type="text" id="book-addr2" maxlength="60" autocomplete="address-line2" enterkeyhint="next" value="' + esc(b.addr2) + '" data-f="b-addr2" aria-describedby="book-addr2-hint">', t('bk.addr2.eg'), true) +
         bkFld('email', t('book.email'), '<input type="text" inputmode="email" id="book-email" maxlength="120" autocomplete="email" enterkeyhint="next" value="' + esc(b.email) + '" data-f="b-email"' + bkAria('email') + '>') +
-        bkFld('address', t('bk.street'), '<input type="text" id="book-address" maxlength="120" autocomplete="street-address" enterkeyhint="next" required aria-required="true" placeholder="' + t('bk.street.eg') + '" value="' + esc(b.address) + '" data-f="b-address"' + bkAria('address') + '>') +
-        bkFld('addr2', t('bk.addr2'), '<input type="text" id="book-addr2" maxlength="60" autocomplete="address-line2" enterkeyhint="next" placeholder="' + t('bk.addr2.eg') + '" value="' + esc(b.addr2) + '" data-f="b-addr2">', '', true) +
-        bkFld('access', t('bk.access'), '<input type="text" id="book-access" maxlength="120" autocomplete="off" enterkeyhint="done" placeholder="' + t('bk.access.eg') + '" value="' + esc(b.access) + '" data-f="b-access">', '', true) + '</div>';
+        bkFld('access', t('bk.access'), '<input type="text" id="book-access" maxlength="120" autocomplete="off" enterkeyhint="done" value="' + esc(b.access) + '" data-f="b-access" aria-describedby="book-access-hint">', t('bk.access.eg'), true) + '</div>';
     }
     // the check: one numbered row a step, a pencil on each, as on the configurator's summary
-    var rows = [['where', t('zone.' + S.zone)], ['when', whenText()], ['what', whatText()], ['who', esc(b.name) + ', <bdi dir="ltr">' + esc(fmtPhone(Ops.normalizePhone(b.phone, true) || b.phone)) + '</bdi>, ' + t('bk.by.' + b.contactBy)], ['addr', esc([b.address, b.addr2].filter(Boolean).join(', ')) + (b.access ? '<span class="muted"> · ' + esc(b.access) + '</span>' : '')]];
+    var rows = [['when', whenText()], ['what', whatText()], ['who', esc(b.name) + ', <bdi dir="ltr">' + esc(fmtPhone(Ops.normalizePhone(b.phone, true) || b.phone)) + '</bdi>, ' + t('bk.by.' + b.contactBy)], ['addr', esc([b.address, b.addr2, S.zone === 'C' ? b.city : t('zone.' + S.zone)].filter(Boolean).join(', ')) + (b.access ? '<span class="muted"> · ' + esc(b.access) + '</span>' : '')]];
     return '<ol class="sumlist" id="bk-sumlist">' + rows.map(function (r, n) {
-      var go = r[0] === 'addr' ? 4 : BSTEPS.indexOf(r[0]) + 1;
+      var go = r[0] === 'addr' ? 3 : BSTEPS.indexOf(r[0]) + 1;
       return '<li><span class="sl-n" aria-hidden="true">' + (n + 1) + '</span><span class="sl-t"><b>' + t('bk.row.' + r[0]) + ':</b> <span id="bk-row-' + r[0] + '">' + r[1] + '</span></span>' +
         '<a class="sl-edit" href="#' + (go > 1 ? 'book-' + BSTEPS[go - 1] : 'book') + '" data-act="bk-go" data-i="' + go + '" id="bk-go-' + r[0] + '" aria-label="' + t('step.edit') + ': ' + t('bk.row.' + r[0]) + '"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10.5"/><path d="M8 16l1-3.5 6.5-6.5 2.5 2.5L11.5 15 8 16zM14.5 7l2.5 2.5"/></svg></a></li>';
     }).join('') + '</ol>' +
       '<label class="hp" aria-hidden="true">Website<input type="text" id="book-website" tabindex="-1" autocomplete="off" data-f="b-hp"></label>' +
-      '<label class="check" for="book-consent"><input type="checkbox" id="book-consent" required aria-required="true"' + (b.consent ? ' checked' : '') + ' data-f="b-consent"' + bkAria('consent') + '><span>' + t('book.consent') + '</span></label>' + bkErr('consent') +
-      '<p class="muted small center">' + t('bk.promise') + '</p><p class="or-wa center">' + waBtn('link', t('wa.hello'), t('book.orWa'), 'book-wa-link') + '</p>';
+      '<p class="or-wa center">' + waBtn('link', t('wa.hello'), t('book.orWa'), 'book-wa-link') + '</p>';
   }
   function whenText() {
     var b = S.book;
-    if (isCallback()) return t('bk.when.call', { at: t('bk.callAt.' + b.callAt).toLowerCase() });
+    if (isCallback()) return (S.zone === 'C' && b.city ? esc(b.city) + ' · ' : '') + t('bk.when.call', { at: t('bk.callAt.' + b.callAt).toLowerCase() });
     if (!b.slot) return '–';
-    return esc(fmtDate(b.slot.split('|')[0], 'day')) + ', ' + t('slot.' + b.slot.split('|')[1]) + (b.pref !== 'any' ? ' (' + t('bk.pref.short', { h: b.pref }) + ')' : '');
+    return t('zone.' + S.zone) + ' · ' + esc(fmtDate(b.slot.split('|')[0], 'day')) + ', ' + t('slot.' + b.slot.split('|')[1]) + (b.pref !== 'any' ? ' (' + t('bk.pref.short', { h: b.pref }) + ')' : '');
   }
+  function bandText(c) { return c === '1' ? t('bk.count.1') : t('bk.count.n', { n: t('bk.count.' + c) }); }
   function whatText() {
     var b = S.book;
     if (S.est.length) return tn('bk.what.req', S.est.length);
-    return b.kinds.map(function (k) { return k === 'unsure' ? t('bk.unsure') : catShort(k); }).join(', ') + (b.count ? ' · ' + t('bk.count.' + b.count) : '') + (b.wishes.length ? ' · ' + b.wishes.map(function (w) { return lc1(t('bk.wish.' + w)); }).join(', ') : '');
+    var kinds = b.kinds.length ? b.kinds : ['unsure'];
+    return kinds.map(function (k) { return k === 'unsure' ? t('bk.unsure') : catShort(k); }).join(', ') + (b.count ? ' · ' + bandText(b.count) : '') + (b.wishes.length ? ' · ' + b.wishes.map(function (w) { return lc1(t('bk.wish.' + w)); }).join(', ') : '');
   }
   function bkInner() {
-    var n = S.bstep, k = bkey();
-    return '<div class="step-head"><h2 id="bk-step-h" tabindex="-1"><span class="sr-only">' + t('step.of', { i: n, n: BSTEPS.length }) + ': </span>' + t('bk.' + k + '.q') + '</h2><p class="step-help">' + t('bk.' + k + '.t') + '</p></div>' +
+    var n = S.bstep, k = bkey(), q = k === 'what' && S.est.length ? 'bk.whatReq' : 'bk.' + k;
+    return '<div class="step-head"><h2 id="bk-step-h" tabindex="-1"><span class="sr-only">' + t('step.of', { i: n, n: BSTEPS.length }) + ': </span>' + t(q + '.q') + '</h2><p class="step-help">' + t(q + '.t') + '</p></div>' +
       '<div id="bk-body" class="bk-body">' + bkBody() + '</div><div class="cfg-bar" id="bk-bar">' + bkBar() + '</div>';
   }
   function viewBook() {
@@ -4723,7 +4834,7 @@ if (typeof module !== 'undefined') module.exports = I18N;
       h = '<div class="view-head"><h1 id="book-done-h" tabindex="-1">' + t(d.slot ? 'book.done.booked' : 'book.done') + '</h1></div><div class="panel done" id="book-done">' +
         (d.slot ? '<p class="done-when">' + esc(fmtDate(d.date, 'day')) + ' · ' + t('slot.' + d.slot) + '</p>' + (d.pref && d.pref !== 'any' ? '<p class="done-pref">' + t('bk.done.pref', { h: d.pref }) + '</p>' : '')
           : '<p>' + (d.notHeld ? t('book.done.notHeld') : t('bk.done.call', { at: t('bk.callAt.' + d.callAt).toLowerCase() })) + '</p>') +
-        '<p>' + (d.slot ? t('bk.done.confirm.' + d.contactBy) + ' ' + t('bk.done.free') : t('book.done.callback')) + ' ' + t('book.done.phone', { phone: '<bdi dir="ltr">' + esc(fmtPhone(d.phone)) + '</bdi>' }) + '</p>' +
+        '<p>' + (d.slot ? t('bk.done.confirm.' + d.contactBy) + ' ' + t('bk.done.free') : t('book.done.callback') + (d.zone !== 'C' ? ' ' + t('bk.done.free') : '')) + ' ' + t('book.done.phone', { phone: '<bdi dir="ltr">' + esc(fmtPhone(d.phone)) + '</bdi>' }) + '</p>' +
         '<div class="btn-row">' + waBtn('btn', t('wa.booked', { code: d.code }), t('wa.ask'), 'done-wa') + (d.slot ? '<a class="btn ghost" id="done-ics" download="perde-nemis-matje-' + esc(d.code) + '.ics" href="' + icsHref(d) + '">' + t('bk.ics') + '</a>' : '') + '</div>';
       if (d.items.length) {
         var de = Pricing.computeEstimate(winsOf(d.items).map(function (x) { return x.cfg; }), d.zone);
@@ -4732,17 +4843,16 @@ if (typeof module !== 'undefined') module.exports = I18N;
       h += '<div class="done-code"><p class="code"><span>' + t('book.done.code') + '</span> <b>' + esc(d.code) + '</b> <button class="link" data-act="code-copy" id="code-copy">' + t('book.done.copy') + '</button>' + (b.copied === true ? ' <span class="ok-text">' + t('book.done.copied') + '</span>' : '') + '</p>' +
         (b.copied === 'manual' ? '<label class="field" for="code-text"><span>' + t('book.done.copyManual') + '</span><input type="text" id="code-text" readonly value="' + esc(d.code) + '"></label>' : '') +
         '<p>' + t('book.done.pin') + ' ' + (d.slot ? t('bk.done.change') : '') + '</p><p class="muted">' + t('book.done.demo') + '</p>' +
-        '<p class="done-links"><button class="link" data-act="track-code" data-code="' + esc(d.code) + '" data-pin="' + esc(d.pin) + '">' + t('book.done.track') + '</button><button class="link" data-act="book-new">' + t('book.done.new') + '</button></p></div></div>';
+        '<div class="done-links stack"><button class="btn ghost" data-act="track-code" data-code="' + esc(d.code) + '" data-pin="' + esc(d.pin) + '">' + t('book.done.track') + '</button><button class="link tall" data-act="book-new">' + t('book.done.new') + '</button></div></div></div>';
       return h;
     }
     return '<div class="wiz-band"><div class="wrap wiz"><h1 class="sr-only">' + t('book.h') + '</h1><div class="wiz-top" id="bk-top">' + bkTop() + '</div>' +
       '<form class="bkform" id="book-form" novalidate>' + bkInner() + '</form></div></div>';
   }
-  function icsHref(d) { // the visit for the customer's own calendar: the window, the address and the code, nothing else
-    var day = d.date.replace(/-/g, ''), a = d.slot.slice(0, 2), z = d.slot.slice(3, 5), esc2 = function (s) { return String(s).replace(/([,;\\])/g, '\\$1').replace(/\n/g, ' '); };
-    var ics = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Perde Nemis//demo//' + S.lang.toUpperCase(), 'BEGIN:VEVENT', 'UID:' + d.code + '@perde-nemis', 'DTSTAMP:' + day + 'T000000Z',
-      'DTSTART;TZID=Europe/Tirane:' + day + 'T' + a + '0000', 'DTEND;TZID=Europe/Tirane:' + day + 'T' + z + '0000', 'SUMMARY:' + esc2(t('bk.ics.title')), 'LOCATION:' + esc2(d.address), 'DESCRIPTION:' + esc2(t('book.done.code') + ': ' + d.code), 'END:VEVENT', 'END:VCALENDAR'].join('\r\n');
-    return 'data:text/calendar;charset=utf-8,' + encodeURIComponent(ics);
+  function icsHref(d) { // the visit for the customer's own calendar: the window, the address and the code, nothing else (Ops.icsText)
+    var n = new Date(), p2 = function (x) { return (x < 10 ? '0' : '') + x; };
+    var stamp = n.getUTCFullYear() + p2(n.getUTCMonth() + 1) + p2(n.getUTCDate()) + 'T' + p2(n.getUTCHours()) + p2(n.getUTCMinutes()) + p2(n.getUTCSeconds()) + 'Z';
+    return 'data:text/calendar;charset=utf-8,' + encodeURIComponent(Ops.icsText({ code: d.code, date: d.date, slot: d.slot, address: d.address, title: t('bk.ics.title'), codeLabel: t('book.done.code'), stamp: stamp, seq: d.seq || 0 }));
   }
   function attachedText() { return S.est.length ? tn('book.attached', S.est.length) : t('bk.noEst'); }
   // The coming working days as a timetable: a day to a row, a time of day to a column. A free time shows its hours
@@ -4763,9 +4873,9 @@ if (typeof module !== 'undefined') module.exports = I18N;
         if (n === 0 || wd < prev) h += (n ? '</tbody>' : '') + '<tbody>';
         prev = wd;
         h += '<tr' + (full ? ' class="is-full"' : '') + '><th scope="row"><b>' + name.charAt(0).toUpperCase() + name.slice(1) + '</b><span>' + dt.getDate() + ' ' + MOL[S.lang][dt.getMonth()] + (full ? ' · ' + t('bk.full') : '') + '</span></th>' + d.slots.map(function (x) {
-          var v = d.date + '|' + x.slot, on = !off && b.slot === v, id = 'slot-' + d.date + '-' + x.slot;
-          return '<td><label class="tt-cell' + (x.free ? '' : ' is-taken') + '" for="' + id + '"><input type="radio" name="slot" id="' + id + '" value="' + v + '"' + (on ? ' checked' : '') + (off || !x.free ? ' aria-disabled="true" data-off="1"' : '') +
-            ' data-f="slot" aria-label="' + esc(fmtDate(d.date, 'day') + ', ' + t('slot.' + x.slot) + ', ' + t(on ? 'book.tt.yours' : x.free ? 'book.tt.free' : 'book.tt.taken')) + '"><span aria-hidden="true">' + (on ? TICK : '') + (x.free ? x.slot.replace('-', '–') : t('book.tt.taken')) + '</span></label></td>';
+          var v = d.date + '|' + x.slot, on = !off && b.slot === v, id = 'slot-' + d.date + '-' + x.slot, lost = b.lost === v && !x.free;
+          return '<td><label class="tt-cell' + (x.free ? '' : ' is-taken') + (lost ? ' is-lost' : '') + '" for="' + id + '"><input type="radio" name="slot" id="' + id + '" value="' + v + '"' + (on ? ' checked' : '') + (off || !x.free ? ' aria-disabled="true" data-off="1"' : '') +
+            ' data-f="slot" aria-describedby="book-slot-err" aria-label="' + esc(fmtDate(d.date, 'day') + ', ' + t('slot.' + x.slot) + ', ' + t(lost ? 'bk.tt.lost' : on ? 'book.tt.yours' : !x.free ? 'book.tt.taken' : off ? 'bk.tt.off' : 'book.tt.free')) + '"><span aria-hidden="true">' + (on ? TICK : '') + (lost ? t('bk.tt.lost') : x.free ? x.slot.replace('-', '–') : t('book.tt.taken')) + '</span></label></td>';
         }).join('') + '</tr>';
       });
       h += '</tbody></table>';
@@ -4776,11 +4886,11 @@ if (typeof module !== 'undefined') module.exports = I18N;
   function bookErrors() {
     var b = S.book, e = {};
     if (!isCallback() && !b.slot) e.slot = 'slot';
-    if (!S.est.length && !b.kinds.length) e.kinds = 'kinds';
+    if (S.zone === 'C' && Ops.cleanText(b.city, 40).length < 2) e.city = 'city';
     if (Array.from(Ops.cleanText(b.name, 80).replace(/\s/g, '')).length < 3) e.name = 'name';
     if (!Ops.normalizePhone(b.phone, true)) e.phone = 'phone';
     if (b.email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(b.email.trim())) e.email = 'email';
-    if (Ops.cleanText(b.address, 120).length < 5) e.address = 'address';
+    var ad = Ops.cleanText(b.address, 120).length; if (isCallback() ? ad > 0 && ad < 5 : ad < 5) e.address = 'address'; // a call back may come without an address
     if (!b.consent) e.consent = 'consent';
     return e;
   }
@@ -4803,13 +4913,13 @@ if (typeof module !== 'undefined') module.exports = I18N;
     setHash(hashFor());
     setHTML($('bk-top'), bkTop()); setHTML($('book-form'), bkInner());
     var top = $('bk-top'); if (top) { try { var y = top.getBoundingClientRect().top + window.scrollY - stickyTop() - 8; if (window.scrollY > y) window.scrollTo(0, y); } catch (e) { /* stays */ } }
-    var hd = $('bk-step-h'); if (hd) hd.focus({ preventScroll: true });
-    say(t('step.of', { i: S.bstep, n: BSTEPS.length }) + ': ' + t('bk.s.' + bkey()));
+    var hd = $('bk-step-h'); if (hd) hd.focus({ preventScroll: true }); // the heading, with its "step n of 4", is read once
+    saveBook();
   }
-  function bkTarget(k) { return k === 'slot' ? (document.querySelector('#book-slots input[name=slot]:not([data-off])') || $('book-callback')) : k === 'kinds' ? $('b-kind-' + Ops.INTERESTS[0]) : $('book-' + k); }
+  function bkTarget(k) { return k === 'slot' ? ($('bk-alt') ? $('bk-alt').querySelector('button') : document.querySelector('#book-slots input[name=slot]:not([data-off])') || $('book-callback')) : $('book-' + k); }
   function showStepErrors(e) { // the step's fields are marked, the first takes the focus, and the mistakes are read out
     var b = S.book; Object.keys(e).forEach(function (k) { b.errors[k] = e[k]; });
-    setHTML($('bk-body'), bkBody());
+    setHTML($('bk-body'), bkBody()); setHTML($('bk-bar'), bkBar());
     var first = Object.keys(e)[0], el = bkTarget(first);
     if (el) { bringUp(el.closest('.field') || el.closest('fieldset') || el); try { el.focus({ preventScroll: true }); } catch (x) { /* ignore */ } }
     say(Object.keys(e).map(function (k) { return t('book.e.' + e[k]); }).join(' '));
@@ -4821,6 +4931,7 @@ if (typeof module !== 'undefined') module.exports = I18N;
     setBStep(S.bstep + 1);
   }
   function submitBooking() {
+    tiranaNow(); // the cutoff is judged at the moment of sending
     var b = S.book, all = bookErrors();
     if (Object.keys(all).length) { // the first step with a mistake comes back, its fields marked
       var first = BSTEPS.length; Object.keys(all).forEach(function (k) { first = Math.min(first, stepOfField(k)); });
@@ -4833,21 +4944,22 @@ if (typeof module !== 'undefined') module.exports = I18N;
     var items = S.est.map(function (x) { return x.cfg ? { room: x.room, cfg: x.cfg } : { room: x.room, blind: x.blind }; });
     var extras = items.filter(function (x) { return x.blind; }).map(function (x) { var e2 = JSON.parse(JSON.stringify(x.blind)); e2.room = x.room; return e2; });
     // A filled trap field marks the request for the office; it is still received, without holding a slot.
-    var res = Ops.createPublicBooking(st, { name: b.name, phone: b.phone, email: b.email, zone: S.zone, address: b.address, addr2: b.addr2, access: b.access, notes: b.notes, consent: b.consent,
-      whatsapp: b.whatsapp, contactBy: b.contactBy, callAt: b.callAt, interest: { kinds: b.kinds, count: b.count, rooms: b.rooms, wishes: b.wishes },
+    var res = Ops.createPublicBooking(st, { name: b.name, phone: b.phone, email: b.email, zone: S.zone, address: b.address, city: S.zone === 'C' ? b.city : '', addr2: b.addr2, access: b.access, notes: b.notes, consent: b.consent,
+      whatsapp: b.contactBy === 'wa', contactBy: b.contactBy, callAt: b.callAt, interest: { kinds: b.kinds, count: b.count, rooms: b.rooms, wishes: b.wishes },
       windows: winsOf(items), extras: extras, measure: measure, suspect: !!b.hp });
     if (!res.ok) {
       if (['name', 'phone', 'email', 'address', 'consent'].indexOf(res.error) >= 0) { var ee = {}; ee[res.error] = res.error; setBStep(stepOfField(res.error)); showStepErrors(ee); return; }
-      // the window was taken in the meantime: everything typed stays; the timetable comes back with the next free windows
-      b.lost = b.slot.split('|')[0]; b.slot = ''; b.pref = 'any';
-      setBStep(2); showStepErrors({ slot: 'slotTaken' }); return;
+      // the window was taken in the meantime: everything typed stays; the time step opens with the next free windows above
+      // the timetable, and its button saves straight back to the check
+      b.lost = b.slot; b.slot = ''; b.pref = 'any'; b.errors.slot = 'slotTaken'; S.bFromSum = true;
+      setBStep(1); showStepErrors({ slot: 'slotTaken' }); return;
     }
     var o = res.order;
     var done = { code: o.code, pin: Ops.last4(o.customer.phone), phone: o.customer.phone, slot: o.measure ? o.measure.slot : null, date: o.measure ? o.measure.date : null, pref: o.measure ? o.measure.pref : null,
       notHeld: !!res.notHeld, items: items, zone: S.zone, contactBy: o.customer.contactBy, callAt: o.customer.callAt, address: [o.customer.address, o.customer.addr2].filter(Boolean).join(', '), what: S.est.length ? '' : whatText() };
     saveCode(o.code);
     S.est = []; S.added = false; S.wa = null; saveEst();
-    S.book = emptyBook(); S.book.done = done; S.bstep = 1; S.bFromSum = false;
+    S.book = emptyBook(); S.book.done = done; S.bstep = 1; S.bFromSum = false; dropBook();
     S.track = { code: '', pin: '', result: undefined };
     render(); setHash('book');
     try { window.scrollTo(0, 0); } catch (e3) { /* ignore */ }
@@ -4914,17 +5026,19 @@ if (typeof module !== 'undefined') module.exports = I18N;
   function trChangeHtml(o) {
     var tr = S.track, h = '';
     if (tr.msg) h += '<p class="note quiet" id="tr-msg" tabindex="-1">' + tr.msg + '</p>';
+    if (tr.gone && !o.measure) return h + '<div class="btn-row"><a class="btn" href="#book" data-go="book" id="tr-rebook">' + t('bk.tr.rebook') + '</a>' + waBtn('btn ghost', t('wa.booked', { code: o.code }), t('wa.ask'), 'tr-wa2') + '</div>';
     if (!o.measure || Ops.STATES.indexOf(o.status) !== 1) return h;
+    if (tr.msg && o.measure.moved) h += '<p><a class="btn ghost small" id="tr-ics" download="perde-nemis-matje-' + esc(o.code) + '.ics" href="' + icsHref({ code: o.code, date: o.measure.date, slot: o.measure.slot, address: [o.customer.address, o.customer.addr2].filter(Boolean).join(', '), seq: o.measure.moved }) + '">' + t('bk.ics.again') + '</a></p>';
     if (!Ops.customerCanChange(st, o)) return h + '<p class="muted small">' + t('bk.tr.late') + '</p><div class="btn-row">' + waBtn('btn ghost small', t('wa.booked', { code: o.code }), t('wa.ask'), 'tr-wa') + '</div>';
     var left = Ops.MAX_MOVES - (o.measure.moved || 0);
     if (tr.move) {
       var off = function (d, s2) { return d === o.measure.date && s2 === o.measure.slot; };
-      h += '<fieldset class="tr-move" id="tr-move"><legend>' + t('bk.tr.pick') + '</legend><table class="tt" id="tr-table"><caption class="sr-only">' + t('book.tt.cap') + '</caption><thead><tr><th scope="col">' + t('book.day') + '</th>' + Ops.MEASURE_SLOTS.map(function (x) { return '<th scope="col"><span aria-hidden="true">' + x.replace('-', '–') + '</span><span class="sr-only">' + t('slot.' + x) + '</span></th>'; }).join('') + '</tr></thead><tbody>' +
+      h += '<fieldset class="tr-move" id="tr-move" tabindex="-1"><legend>' + t('bk.tr.pick') + '</legend><table class="tt" id="tr-table"><caption class="sr-only">' + t('book.tt.cap') + '</caption><thead><tr><th scope="col">' + t('book.day') + '</th>' + Ops.MEASURE_SLOTS.map(function (x) { return '<th scope="col"><span aria-hidden="true">' + x.replace('-', '–') + '</span><span class="sr-only">' + t('slot.' + x) + '</span></th>'; }).join('') + '</tr></thead><tbody>' +
         Ops.freeMeasureSlots(st).map(function (d) {
           var dt = Ops.parse(d.date), name = WDL[S.lang][dt.getDay()];
           return '<tr><th scope="row"><b>' + name.charAt(0).toUpperCase() + name.slice(1) + '</b><span>' + dt.getDate() + ' ' + MOL[S.lang][dt.getMonth()] + '</span></th>' + d.slots.map(function (x) {
             var v = d.date + '|' + x.slot, mine = off(d.date, x.slot), free = x.free && !mine, on = tr.pick === v, id = 'tr-slot-' + d.date + '-' + x.slot;
-            return '<td><label class="tt-cell' + (free ? '' : ' is-taken') + '" for="' + id + '"><input type="radio" name="trslot" id="' + id + '" value="' + v + '"' + (on ? ' checked' : '') + (free ? '' : ' aria-disabled="true" data-off="1"') + ' data-f="tr-slot" aria-label="' + esc(fmtDate(d.date, 'day') + ', ' + t('slot.' + x.slot) + ', ' + t(mine ? 'bk.tr.now' : on ? 'book.tt.yours' : x.free ? 'book.tt.free' : 'book.tt.taken')) + '"><span aria-hidden="true">' + (on ? TICK : '') + (mine ? t('bk.tr.now') : x.free ? x.slot.replace('-', '–') : t('book.tt.taken')) + '</span></label></td>';
+            return '<td><label class="tt-cell' + (mine ? ' is-mine' : free ? '' : ' is-taken') + '" for="' + id + '"><input type="radio" name="trslot" id="' + id + '" value="' + v + '"' + (on ? ' checked' : '') + (free ? '' : ' aria-disabled="true" data-off="1"') + ' data-f="tr-slot" aria-label="' + esc(fmtDate(d.date, 'day') + ', ' + t('slot.' + x.slot) + ', ' + t(mine ? 'bk.tr.now' : on ? 'book.tt.yours' : x.free ? 'book.tt.free' : 'book.tt.taken')) + '"><span aria-hidden="true">' + (on ? TICK : '') + (mine ? t('bk.tr.now') : x.free ? x.slot.replace('-', '–') : t('book.tt.taken')) + '</span></label></td>';
           }).join('') + '</tr>';
         }).join('') + '</tbody></table></fieldset><div class="btn-row"><button type="button" class="btn" data-act="tr-move-save" id="tr-move-save"' + (tr.pick ? '' : ' disabled') + '>' + t('bk.tr.save') + '</button><button type="button" class="btn ghost" data-act="tr-move-off" id="tr-move-off">' + t('bk.tr.keep') + '</button></div>';
       return h;
@@ -4948,6 +5062,7 @@ if (typeof module !== 'undefined') module.exports = I18N;
     if (Ops.quoteExpired(st, o)) f.push('<span class="pill bad">' + t('ops.flag.expired') + '</span>');
     if (Ops.quoteExpiring(st, o)) f.push('<span class="pill warn">' + t('ops.flag.expiring') + '</span>');
     if (o.suspect) f.push('<span class="pill warn">' + t('ops.flag.suspect') + '</span>');
+    if (Ops.confirmLate(st, o)) f.push('<span class="pill bad">' + t('bk.ops.late') + '</span>');
     return f.join('');
   }
   function clockText() { return t('ops.today', { date: fmtDate(st.today, 'day') + ' ' + Ops.parse(st.today).getFullYear() }); }
@@ -5216,12 +5331,12 @@ if (typeof module !== 'undefined') module.exports = I18N;
       if (o.measure && idx === 1) { // the exact time inside the window, then the message to the customer
         var hrs = []; Ops.slotHours(o.measure.slot).forEach(function (x) { hrs.push(x); hrs.push(x.slice(0, 3) + '30'); });
         var ct2 = dr.mTime !== undefined ? dr.mTime : (o.measure.time || (o.measure.pref !== 'any' ? o.measure.pref : ''));
-        h += '<div class="pair three"><label class="field" for="od-mtime"><span>' + t('bk.ops.time') + '</span><select id="od-mtime" data-f="od-pick" data-k="mTime"><option value="">' + t('bk.ops.time') + '</option>' + hrs.map(function (x) { return '<option value="' + x + '"' + (ct2 === x ? ' selected' : '') + '>' + x + '</option>'; }).join('') + '</select></label>' +
+        h += '<div class="pair three"><label class="field" for="od-mtime"><span>' + t('bk.ops.time') + '</span><select id="od-mtime" data-f="od-pick" data-k="mTime" aria-describedby="od-t-err"' + (err.mtime ? ' aria-invalid="true"' : '') + '><option value="">' + t('bk.ops.time') + '</option>' + hrs.map(function (x) { return '<option value="' + x + '"' + (ct2 === x ? ' selected' : '') + '>' + x + '</option>'; }).join('') + '</select></label>' +
           '<button class="btn small" data-act="ops-confirm-measure" id="od-mconfirm">' + t('bk.ops.confirm') + '</button></div><p class="field-err" id="od-t-err">' + (err.mtime ? t('bk.ops.e.time') : '') + '</p>';
         if (o.measure.time) {
           var msg = t('bk.ops.waText', { code: o.code, date: fmtDate(o.measure.date, 'day'), time: o.measure.time });
-          h += o.customer.whatsapp !== false && o.customer.contactBy !== 'call' ? '<p><a class="btn small ghost" target="_blank" rel="noopener" id="od-wa-confirm" href="https://wa.me/' + o.customer.phone.replace(/\D/g, '') + '?text=' + encodeURIComponent(msg) + '">' + t('bk.ops.sendWa') + '</a></p>'
-            : '<p class="note">' + t('bk.ops.callNow', { phone: esc(fmtPhone(o.customer.phone)) }) + '</p>';
+          h += o.customer.contactBy === 'wa' ? '<p><a class="btn small ghost" target="_blank" rel="noopener" id="od-wa-confirm" href="https://wa.me/' + o.customer.phone.replace(/\D/g, '') + '?text=' + encodeURIComponent(msg) + '">' + t('bk.ops.sendWa') + '</a></p>'
+            : '<p class="note">' + t(o.customer.contactBy === 'sms' ? 'bk.ops.smsNow' : 'bk.ops.callNow', { phone: esc(fmtPhone(o.customer.phone)) }) + '</p>';
         }
       }
     }
@@ -5306,7 +5421,7 @@ if (typeof module !== 'undefined') module.exports = I18N;
   function opsCal() { // today and the working days that can be booked
     var days = Ops.workdaysFrom(st.today, Ops.HORIZON, true);
     var tc = Ops.toConfirm(st), h = '<section class="to-confirm" id="cal-confirm"><h2>' + t('bk.ops.list', { n: tc.length }) + '</h2>' + (tc.length ? '<ul class="plain">' + tc.map(function (o) {
-      return '<li><button class="link" data-act="ops-open" data-id="' + o.id + '" id="tc-' + o.id + '">' + esc(o.code) + '</button> · ' + bdi(o.customer.name) + ' · ' + fmtDate(o.measure.date, 'day') + ', ' + t('slot.' + o.measure.slot) +
+      return '<li>' + (Ops.confirmLate(st, o) ? '<span class="pill bad">' + t('bk.ops.late') + '</span> ' : '') + '<button class="link" data-act="ops-open" data-id="' + o.id + '" id="tc-' + o.id + '">' + esc(o.code) + '</button> · ' + bdi(o.customer.name) + ' · ' + fmtDate(o.measure.date, 'day') + ', ' + t('slot.' + o.measure.slot) +
         (o.measure.pref && o.measure.pref !== 'any' ? ' (' + t('bk.pref.short', { h: o.measure.pref }) + ')' : '') + (o.interest && o.interest.kinds.length ? '<br><span class="muted small">' + interestText(o.interest) + '</span>' : '') + '</li>';
     }).join('') + '</ul>' : '<p class="muted small">' + t('bk.ops.none') + '</p>') + '</section>';
     h += '<h2>' + t('cal.h', { n: Ops.HORIZON }) + '</h2><div class="scroll-x" tabindex="0" role="region" aria-label="' + t('cal.h', { n: Ops.HORIZON }) + '"><table class="data cal sticky-col"><thead><tr><th scope="col">' + t('cal.day') + '</th>' +
@@ -5559,13 +5674,13 @@ if (typeof module !== 'undefined') module.exports = I18N;
         copyText(S.book.done ? S.book.done.code : '', function () { S.book.copied = true; render(); var cc = $('code-copy'); if (cc) cc.focus(); say(t('book.done.copied')); },
           function () { S.book.copied = 'manual'; render(); var ct = $('code-text'); if (ct) { ct.focus(); ct.select(); } });
         break;
-      case 'book-new': S.book = emptyBook(); S.bstep = 1; S.bFromSum = false; render(); var bn = $('bk-step-h'); if (bn) bn.focus(); break;
+      case 'book-new': S.book = emptyBook(); S.bstep = 1; S.bFromSum = false; dropBook(); render(); setHash('book'); var bn = $('bk-step-h'); if (bn) bn.focus(); break;
       case 'bk-next': bookNext(); break;
-      case 'tr-move': S.track.move = true; S.track.pick = ''; S.track.msg = ''; trRedraw('tr-move'); break;
+      case 'tr-move': tiranaNow(); S.track.move = true; S.track.pick = ''; S.track.msg = ''; trRedraw('tr-move'); break;
       case 'tr-move-off': S.track.move = false; S.track.pick = ''; trRedraw('tr-move-btn'); break;
       case 'tr-move-save':
         var tm = S.track.result && S.track.result.order; if (!tm || !S.track.pick) break;
-        var mr = Ops.customerMove(st, tm, S.track.pick.split('|')[0], S.track.pick.split('|')[1]);
+        tiranaNow(); var mr = Ops.trackMove(st, S.track.code, S.track.pin, S.track.pick.split('|')[0], S.track.pick.split('|')[1]); // through the code and the four digits, as the real API does
         S.track.move = mr.ok ? false : S.track.move; S.track.pick = '';
         S.track.msg = mr.ok ? t('bk.tr.moved', { when: visitText(tm) }) : t('bk.tr.e.' + mr.error);
         trRedraw('tr-msg'); say(S.track.msg); break;
@@ -5573,14 +5688,18 @@ if (typeof module !== 'undefined') module.exports = I18N;
       case 'tr-cancel-no': S.track.ask = false; trRedraw('tr-cancel'); break;
       case 'tr-cancel-yes':
         var tc = S.track.result && S.track.result.order; if (!tc) break;
-        var cr = Ops.customerCancel(st, tc); S.track.ask = false;
+        tiranaNow(); var cr = Ops.trackCancel(st, S.track.code, S.track.pin); S.track.ask = false; S.track.gone = cr.ok;
         S.track.msg = cr.ok ? t('bk.tr.cancelled') : t('bk.tr.e.' + cr.error);
         trRedraw('tr-msg'); say(S.track.msg); break;
       case 'bk-back': S.bFromSum = false; setBStep(S.bstep - 1); break;
       case 'bk-go': S.bFromSum = Number(el.getAttribute('data-i')) < BSTEPS.length; setBStep(el.getAttribute('data-i')); break;
-      case 'bk-alt': S.book.slot = el.getAttribute('data-v'); S.book.pref = 'any'; S.book.lost = ''; delete S.book.errors.slot; setHTML($('bk-body'), bkBody()); var bpx = $('book-pref'); if (bpx) bringUp(bpx); say(t('book.chosen', { date: fmtDate(S.book.slot.split('|')[0], 'day'), slot: t('slot.' + S.book.slot.split('|')[1]) })); break;
+      case 'bk-alt': // one of the next free windows: chosen, and straight back to the check
+        S.book.slot = el.getAttribute('data-v'); S.book.pref = 'any'; S.book.lost = ''; delete S.book.errors.slot; saveBook();
+        S.bFromSum = false; setBStep(BSTEPS.length); say(t('book.chosen', { date: fmtDate(S.book.slot.split('|')[0], 'day'), slot: t('slot.' + S.book.slot.split('|')[1]) })); break;
+      case 'bk-call': S.book.callback = true; delete S.book.errors.slot; setHTML($('book-slots'), slotsHtml()); setHTML($('book-pref'), prefHtml()); setHTML($('bk-bar'), bkBar()); saveBook();
+        var cb2 = $('book-callback'); if (cb2) { bringUp(cb2.closest('label')); cb2.focus({ preventScroll: true }); } say(t('bk.callOn')); break;
       case 'track-code':
-        S.track.code = el.getAttribute('data-code'); S.track.pin = el.getAttribute('data-pin'); S.track.result = Ops.findForTracking(st, S.track.code, S.track.pin); S.track.move = false; S.track.ask = false; S.track.msg = '';
+        S.track.code = el.getAttribute('data-code'); S.track.pin = el.getAttribute('data-pin'); S.track.result = Ops.findForTracking(st, S.track.code, S.track.pin); S.track.move = false; S.track.ask = false; S.track.msg = ''; S.track.gone = false;
         go('track'); var tr0 = $('track-res'); if (tr0) { bringUp(tr0); tr0.focus({ preventScroll: true }); } break; // the answer, not the form, is what comes into sight
       case 'ops-tab': S.ops.tab = el.getAttribute('data-tab'); render(); var tb = $('tab-' + S.ops.tab); if (tb) tb.focus(); break;
       case 'ops-next-day': Ops.nextDay(st); refreshOps(S.ops.open ? ['od-next-day', 'od-advance'] : 'ops-next-day', ''); break;
@@ -5619,7 +5738,7 @@ if (typeof module !== 'undefined') module.exports = I18N;
         if (!o) break;
         r = Ops.confirmMeasure(st, o, draft('mTime', o.measure ? o.measure.time || (o.measure.pref !== 'any' ? o.measure.pref : '') : ''));
         S.ops.err.mtime = r.ok ? null : r.error; if (r.ok) delete S.ops.drafts.mTime;
-        refreshOps(r.ok ? ['od-wa-confirm', 'od-mconfirm'] : 'od-mconfirm', r.ok ? t('bk.ops.flash') : ''); break;
+        refreshOps(r.ok ? ['od-wa-confirm', 'od-mconfirm'] : 'od-mtime', r.ok ? t('bk.ops.flash') : t('bk.ops.e.time')); break;
       case 'ops-set-measure':
         if (!o) break;
         r = Ops.setMeasure(st, o, draft('mDate', o.measure ? o.measure.date : ''), draft('mSlot', o.measure ? o.measure.slot : ''));
@@ -5700,36 +5819,47 @@ if (typeof module !== 'undefined') module.exports = I18N;
         S.cfg[f] = f === 'panels' ? Number(v) : v; S.added = false;
         settle(f);
         refreshConfig(true); if (f === 'sheerId' || f === 'mainId') sayFabric(fabricById(v)); break;
-      case 'b-name': S.book.name = v; clearFixed('name'); break;
-      case 'b-phone': S.book.phone = v; clearFixed('phone'); break;
-      case 'b-email': S.book.email = v; clearFixed('email'); break;
-      case 'b-address': S.book.address = v; clearFixed('address'); break;
-      case 'b-notes': S.book.notes = v; break;
+      case 'b-name': S.book.name = v; clearFixed('name'); saveBook(); break;
+      case 'b-phone': S.book.phone = v; clearFixed('phone'); saveBook(); break;
+      case 'b-email': S.book.email = v; clearFixed('email'); saveBook(); break;
+      case 'b-address': S.book.address = v; clearFixed('address'); saveBook(); break;
+      case 'b-notes': S.book.notes = v; saveBook(); break;
       case 'b-hp': S.book.hp = v; break;
       case 'b-consent': S.book.consent = el.checked; clearFixed('consent'); break;
-      case 'b-callback': S.book.callback = el.checked; delete S.book.errors.slot; setHTML($('book-slots'), slotsHtml()); setHTML($('book-pref'), prefHtml()); break;
-      case 'b-zone': S.zone = v; saveEst(); delete S.book.errors.slot; break;
+      case 'b-callback': S.book.callback = el.checked; delete S.book.errors.slot; setHTML($('book-slots'), slotsHtml()); setHTML($('book-pref'), prefHtml()); setHTML($('bk-bar'), bkBar()); saveBook(); break;
+      case 'b-zone': // another city asks for its name, and the timetable gives way to a call
+        S.zone = v; saveEst(); delete S.book.errors.slot; delete S.book.errors.city; setHTML($('bk-body'), bkBody()); setHTML($('bk-bar'), bkBar()); saveBook();
+        var zf = $('b-zone-' + v); if (zf) zf.focus({ preventScroll: true }); break;
+      case 'b-city': S.book.city = v; clearFixed('city'); saveBook(); break;
       case 'slot': // the window is chosen; the hour that suits best is asked right under the timetable
         S.book.slot = v; S.book.pref = 'any'; delete S.book.errors.slot; S.book.lost = ''; setHTML($('book-slots'), slotsHtml()); setHTML($('book-pref'), prefHtml());
-        var ba = $('bk-alt'); if (ba) ba.remove();
-        var bp = $('book-pref'); if (bp && bp.scrollIntoView) { try { bp.scrollIntoView({ block: 'nearest' }); } catch (e) { /* ignore */ } }
+        var ba = $('bk-alt'); if (ba) ba.remove(); setHTML($('bk-zone'), zoneChips());
+        // the hour chips come into sight, but never so far that the chosen cell, which keeps the focus, leaves the screen
+        try {
+          var bp = $('book-pref'), cell = $('slot-' + v.replace('|', '-')), bar = $('bk-bar');
+          if (bp && cell && bar) { var need = bp.getBoundingClientRect().bottom - bar.getBoundingClientRect().top + 8, room = cell.getBoundingClientRect().top - stickyTop() - 12; if (need > 0) window.scrollBy(0, Math.min(need, Math.max(0, room))); }
+        } catch (e) { /* stays where it is */ }
+        saveBook();
         say(t('book.chosen', { date: fmtDate(v.split('|')[0], 'day'), slot: t('slot.' + v.split('|')[1]) }) + ' ' + t('bk.pref.say')); break;
-      case 'b-pref': S.book.pref = v; break;
-      case 'b-callat': S.book.callAt = v; break;
-      case 'b-count': S.book.count = v; break;
+      case 'b-pref': S.book.pref = v; saveBook(); break;
+      case 'b-callat': S.book.callAt = v; saveBook(); break;
+      case 'b-count': S.book.count = v; saveBook(); break;
       case 'b-kind': case 'b-room': case 'b-wish': // several may be chosen
         var lst = S.book[f === 'b-kind' ? 'kinds' : f === 'b-room' ? 'rooms' : 'wishes'], at = lst.indexOf(v);
         if (el.checked && at < 0) lst.push(v); if (!el.checked && at >= 0) lst.splice(at, 1);
-        if (f === 'b-kind') { clearFixed('kinds'); var ke = $('book-kinds-err'); if (ke && !S.book.errors.kinds) ke.textContent = ''; }
-        break;
-      case 'b-wa': S.book.whatsapp = el.checked; if (!el.checked && S.book.contactBy === 'wa') S.book.contactBy = 'call'; if (el.checked) S.book.contactBy = 'wa';
-        var by = $('bk-by'); if (by) by.outerHTML = '<fieldset id="bk-by"><legend>' + t('bk.by') + '</legend><div class="chips">' + Ops.CONTACT_BY.filter(function (x) { return x !== 'wa' || S.book.whatsapp; }).map(function (x) { return radio('b-by', x, S.book.contactBy === x, t('bk.by.' + x)); }).join('') + '</div></fieldset>';
-        break;
-      case 'b-by': S.book.contactBy = v; break;
-      case 'b-addr2': S.book.addr2 = v; break;
-      case 'b-access': S.book.access = v; break;
+        if (f === 'b-kind') { // "not sure" and a product exclude each other; with nothing chosen, "not sure" is
+          var kn = S.book.kinds;
+          if (v === 'unsure' && el.checked) kn.splice(0, kn.length, 'unsure');
+          else if (v !== 'unsure' && el.checked) { var ui = kn.indexOf('unsure'); if (ui >= 0) kn.splice(ui, 1); }
+          if (!kn.length) kn.push('unsure');
+          Ops.INTERESTS.forEach(function (x) { var c = $('b-kind-' + x); if (c) c.checked = kn.indexOf(x) >= 0; });
+        }
+        saveBook(); break;
+      case 'b-by': S.book.contactBy = v; S.book.whatsapp = v === 'wa'; saveBook(); break;
+      case 'b-addr2': S.book.addr2 = v; saveBook(); break;
+      case 'b-access': S.book.access = v; saveBook(); break;
       case 't-code': S.track.code = v; break;
-      case 'tr-slot': S.track.pick = v; var sv = $('tr-move-save'); if (sv) sv.disabled = false; break;
+      case 'tr-slot': S.track.pick = v; var sv = $('tr-move-save'); if (sv) { sv.disabled = false; try { var sr = sv.getBoundingClientRect(); if (sr.bottom > window.innerHeight) window.scrollBy(0, Math.min(sr.bottom - window.innerHeight + 16, el.getBoundingClientRect().top - stickyTop() - 12)); } catch (e) { /* stays */ } } break;
       case 't-pin': S.track.pin = v; break;
       case 'lead': S.ops.lead[k] = v; break;
       case 'od-draft': S.ops.drafts[k] = v; break;
@@ -5776,13 +5906,17 @@ if (typeof module !== 'undefined') module.exports = I18N;
   document.addEventListener('keydown', function (ev) {
     if (ev.key !== 'Enter' || ev.isComposing || !ev.target.closest || !ev.target.closest('#cfg-form, #book-form') || ev.target.tagName !== 'INPUT' || (ev.target.type !== 'text' && ev.target.type !== 'tel')) return;
     ev.preventDefault(); onField(ev.target, true);
+    if (ev.target.closest('#book-form')) { // the keyboard's Next goes to the next field; only the last one goes on
+      var flds = [].slice.call(document.querySelectorAll('#bk-body input[type=text], #bk-body input[type=tel]')), at2 = flds.indexOf(ev.target);
+      if (at2 >= 0 && at2 < flds.length - 1) { flds[at2 + 1].focus(); return; }
+    }
     var fw = ev.target.closest('#book-form') ? $('bk-next') || $('bk-send') : $('cfg-next') || $('cfg-add'); if (fw && !fw.disabled) fw.click();
   });
   document.addEventListener('submit', function (ev) {
     ev.preventDefault();
     if (ev.target.id === 'book-form') submitBooking();
     if (ev.target.id === 'track-form') {
-      S.track.result = Ops.findForTracking(st, S.track.code, S.track.pin); S.track.move = false; S.track.ask = false; S.track.msg = '';
+      S.track.result = Ops.findForTracking(st, S.track.code, S.track.pin); S.track.move = false; S.track.ask = false; S.track.msg = ''; S.track.gone = false;
       setHTML($('track-out'), trackResult());
       var res = $('track-res');
       if (res) { bringUp(res); res.focus({ preventScroll: true }); say(S.track.result.order ? S.track.result.order.code + ': ' + t('c.' + S.track.result.order.status) : t('track.notFound')); }
@@ -5860,6 +5994,7 @@ if (typeof module !== 'undefined') module.exports = I18N;
   if (S.view === 'fabric') { if (FAMILIES.indexOf(first.param) >= 0) S.fab = first.param; else { S.view = 'catalog'; first.param = 'perde'; } }
   if (S.view === 'item') { if (blindById(first.param)) S.item = first.param; else { S.view = 'catalog'; first.param = ''; } }
   if (S.view === 'catalog') S.cat = CATEGORIES.indexOf(first.param) >= 0 ? first.param : '';
+  loadBook(); // what was typed in this session comes back after a reload
   if (S.view === 'book' && first.param) S.bstep = Math.max(1, BSTEPS.indexOf(first.param) + 1);
   if (S.view === 'config' && first.param) { var fs = path().map(stepWord).indexOf(first.param); S.step = fs < 0 ? 1 : fs + 1; S.reach = S.step; }
   if (S.view === 'inspire' && byId(INSPIRE, first.param)) S.insp = first.param;
