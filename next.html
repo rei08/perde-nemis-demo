@@ -1074,6 +1074,57 @@ table.data.matrix td.yes { color: var(--accent); }
 }
 /* the booking pill over the computer's first photograph: on cream, so its small capitals keep 4.5:1 */
 .is-home.at-top .top-cta { background: rgba(255, 253, 248, .94); }
+/* staff calendar after r36: photo viewer, pending change, what is in force, install columns on a phone */
+.ph-open { padding: 0; border: 0; background: none; cursor: zoom-in; border-radius: 8px; display: block; }
+.ph-open:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.ph-view { position: fixed; inset: 0; z-index: 90; background: rgba(255, 253, 248, .97); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 16px; }
+.ph-view img { max-width: 100%; max-height: calc(100vh - 96px); object-fit: contain; border-radius: 8px; }
+#cal-pend { background: var(--warn-bg); color: var(--warn); }
+#cal-pend .row { margin-top: 8px; }
+.in-force { margin: 12px 0 16px; }
+.in-force li { display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: baseline; padding: 4px 0; }
+.tabs { flex-wrap: wrap; }
+.inst-toggle { display: none; margin: 0 0 8px; }
+@media (max-width: 600px) {
+  .inst-toggle { display: block; }
+  table.cal:not(.show-inst) .inst { display: none; }
+  table.cal:not(.show-inst) { min-width: 0; }
+}
+/* after r34: one card for every model, a ring above the layer photographs */
+.chip-pic.is-empty { display: flex; align-items: center; justify-content: center; border: 1px dashed rgba(78, 78, 78, .3); color: var(--ink-2); font-size: .75rem; }
+.chip.pic .chip-name { font-size: .875rem; letter-spacing: .02em; }
+.chip.pic input:checked + .chip-body .chip-pic { outline: 3px solid var(--accent); outline-offset: -3px; }
+.lcard-pic { position: relative; }
+.lcard:has(input:checked) .lcard-pic { box-shadow: none; }
+.lcard:has(input:checked) .lcard-pic::after { content: ""; position: absolute; inset: 0; border-radius: 12px; box-shadow: inset 0 0 0 3px var(--accent); pointer-events: none; }
+@media (min-width: 900px) { .lcard-pic { aspect-ratio: auto; height: min(300px, 38vh); } }
+#bmore { margin-top: 12px; }
+/* after r35: the move's save button at the foot, the visit held, the promise off the bar on a narrow phone */
+.tr-save-row { position: sticky; bottom: 0; z-index: 2; background: var(--bg, #FFFDF8); padding: 10px 0; margin-top: 8px; box-shadow: 0 -1px 0 var(--line); }
+.tt-cell.is-mine > span { background: var(--surface-2); border-style: solid; border-color: var(--line); color: var(--ink); font-size: .75rem; line-height: 1.15; white-space: normal; text-align: center; padding: 2px; }
+.bk-promise-in { display: none; margin-top: 12px; }
+@media (max-width: 400px) { .bk-commit .bk-promise { display: none; } .bk-promise-in { display: block; } }
+#bk-zonec { margin: 8px 0; }
+.sum-pic figcaption { text-align: center; }
+/* r35 F4: on a phone the three areas stand on one row, so the first times are in sight on arrival */
+@media (max-width: 420px) {
+  .bk-zone { position: relative; }
+  .bk-zone legend { position: absolute; left: 0; top: 0; width: 1px; height: 1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; } /* the place names say what is asked */
+  .bk-zone .chips { gap: 6px; }
+  .bk-zone .chip-body { padding: 6px 12px; }
+}
+.chips.pics.models { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+@media (min-width: 700px) { .chips.pics.models { grid-template-columns: repeat(3, minmax(0, 170px)); justify-content: center; } }
+.chips.pics.models .chip-name { text-transform: none; letter-spacing: 0; overflow-wrap: anywhere; }
+.chip-pic.is-empty { width: 100%; height: auto; aspect-ratio: 1 / 1; }
+.chip.pic input:checked + .chip-body { box-shadow: none; }
+/* r34 N4: on a wide screen the lead room keeps its upright photograph, beside its words, instead of being stretched to 2:1 */
+@media (min-width: 1024px) {
+  .igrid.has-lead > .icard:first-child { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 3fr); grid-template-rows: 1fr 1fr; gap: 12px 40px; }
+  .igrid.has-lead > .icard:first-child .ph { grid-row: 1 / span 2; aspect-ratio: 3 / 4; max-height: 640px; }
+  .igrid.has-lead > .icard:first-child .icard-title { align-self: end; }
+  .igrid.has-lead > .icard:first-child p { display: block; align-self: start; }
+}
 </style>
 </head>
 <body>
@@ -1791,6 +1842,10 @@ var Ops = (function () {
     var measure = (input.measure && typeof input.measure === 'object') ? input.measure : null;
     var hasVisit = st.orders.some(function (o) { return active(o) && idx(o) <= 1 && o.measure && o.customer.phone === phone; });
     // A slot is held only when the zone takes online bookings, the request is not flagged, and this phone holds no other visit.
+    if (measure && P.travel[input.zone] !== null && (input.suspect === true || hasVisit)) { // the same answer as a normal booking: a window it could not have had is refused the same way
+      if (!validDate(measure.date) || MEASURE_SLOTS.indexOf(measure.slot) < 0 || !bookable(st, measure.date, true) || !publicSlotOpen(st, measure.date)) return { ok: false, error: 'slotInvalid' };
+      if (!publicFree(st, measure.date, measure.slot)) return { ok: false, error: 'slotTaken' };
+    }
     if (P.travel[input.zone] === null || input.suspect === true || hasVisit) measure = null;
     var asked = !!(input.measure && typeof input.measure === 'object');
     var r = createOrder(st, { name: input.name, phone: phone, email: email, zone: input.zone, address: input.address, city: input.city, addr2: input.addr2, access: input.access, notes: input.notes, whatsapp: input.whatsapp, contactBy: input.contactBy, callAt: input.callAt, interest: input.interest, source: 'web', windows: wins, extras: extras, measure: measure, suspect: input.suspect === true, isPublic: true });
@@ -1838,8 +1893,8 @@ var Ops = (function () {
     return avail.filter(function (m) { return used.indexOf(m) < 0; })[0] || avail[0];
   }
   function measureTaken(st, date, slot, exceptId) { return freeMeasurer(st, date, slot, exceptId) === null; }
-  function webCount(st, date) { return st.orders.filter(function (o) { return active(o) && o.source === 'web' && idx(o) <= 1 && o.measure && o.measure.date === date; }).length; }
-  function webCapFull(st, date) { return st.webCap > 0 && webCount(st, date) >= st.webCap; }
+  function webCount(st, date, exceptId) { return st.orders.filter(function (o) { return active(o) && o.id !== exceptId && idx(o) <= 1 && o.measure && o.measure.by === 'web' && o.measure.date === date; }).length; }
+  function webCapFull(st, date, exceptId) { return st.webCap > 0 && webCount(st, date, exceptId) >= st.webCap; }
   // what the public timetable may offer: a free place, a day not locked, online booking not paused, the day's web cap not reached
   function publicFree(st, date, slot) { return !st.paused && publicSlotOpen(st, date) && !webCapFull(st, date) && !measureTaken(st, date, slot, null); }
   function installTaken(st, date, slot, team, exceptId) {
@@ -1862,13 +1917,16 @@ var Ops = (function () {
     if (MEASURE_SLOTS.indexOf(slot) < 0 || !validDate(date)) return { ok: false, error: 'slotInvalid' };
     if (!force) {
       if (!bookable(st, date, mode === 'public') || (mode === 'public' && !publicSlotOpen(st, date))) return { ok: false, error: 'slotInvalid' };
-      if (measureTaken(st, date, slot, o.id) || (mode === 'public' && (st.paused || webCapFull(st, date)))) return { ok: false, error: 'slotTaken' };
+      if (measureTaken(st, date, slot, o.id) || (mode === 'public' && (st.paused || webCapFull(st, date, o.id)))) return { ok: false, error: 'slotTaken' };
     }
     var old = o.measure, same = !!old && old.date === date && old.slot === slot;
     if (pref === undefined && old) pref = old.pref; // the office's save keeps the hour the visitor asked for
     if (same && old.time) { old.pref = slotHours(slot).indexOf(pref) >= 0 ? pref : old.pref; return { ok: true, unchanged: true }; } // nothing moved: the confirmed time stands
     if (old && old.time) log(st, o, 'unconfirmed|' + old.date + '|' + old.time); // the customer must be told of the new time
-    o.measure = { date: date, slot: slot, pref: slotHours(slot).indexOf(pref) >= 0 ? pref : 'any', time: null, moved: old ? old.moved || 0 : 0, confirmedOn: null, res: force ? measurers(st)[0] : freeMeasurer(st, date, slot, o.id) }; // the window is booked; the hour is a wish until the office confirms one
+    var keepRes = same && old.res && measurers(st).indexOf(old.res) >= 0 && !offDay(st, date, old.res) && !holders(st, date, slot, o.id).some(function (x) { return x.measure.res === old.res; });
+    o.measure = { date: date, slot: slot, pref: slotHours(slot).indexOf(pref) >= 0 ? pref : 'any', time: null, moved: old ? old.moved || 0 : 0, confirmedOn: null,
+      res: force ? measurers(st)[0] : keepRes ? old.res : freeMeasurer(st, date, slot, o.id), by: mode === 'public' ? 'web' : force ? (o.source === 'web' ? 'web' : 'staff') : 'staff' };
+    if (o.wanted) delete o.wanted; if (o.released) delete o.released; if (o.visitCancelled) delete o.visitCancelled; // the window is booked; the hour is a wish until the office confirms one
     log(st, o, 'measure|' + date + '|' + slot);
     return { ok: true };
   }
@@ -1893,6 +1951,7 @@ var Ops = (function () {
   // The office confirms the exact time inside the booked window (it then tells the customer by WhatsApp or phone).
   function confirmMeasure(st, o, time) {
     if (!active(o) || idx(o) > 1 || !o.measure || o.measure.date < st.today) return { ok: false, error: 'state' };
+    if (blocked(st, o.measure.date, o.measure.slot)) return { ok: false, error: 'blocked' };
     if (!/^\d{2}:(00|30)$/.test(time || '')) return { ok: false, error: 'time' };
     var h = +String(time).slice(0, 2), a = +o.measure.slot.slice(0, 2), b = +o.measure.slot.slice(3, 5);
     if (!(h >= a && h < b)) return { ok: false, error: 'time' };
@@ -1924,7 +1983,7 @@ var Ops = (function () {
   }
   function customerCancel(st, o) { // the visit is freed; the order stays a lead the office may call
     if (!customerCanChange(st, o)) return { ok: false, error: 'late' };
-    o.measure = null; o.status = 'lead';
+    o.measure = null; o.status = 'lead'; o.visitCancelled = st.today; // tracking says so when the code is opened again
     (o.custChanges = o.custChanges || []).push(st.today);
     log(st, o, 'custCancelled');
     return { ok: true };
@@ -1954,8 +2013,9 @@ var Ops = (function () {
   // The office's tools for the calendar
   function assignMeasurer(st, o, m) {
     if (!active(o) || idx(o) > 1 || !o.measure || measurers(st).indexOf(m) < 0) return { ok: false, error: 'state' };
+    if (o.measure.res === m) return { ok: false, error: 'same' };
     if (offDay(st, o.measure.date, m) || holders(st, o.measure.date, o.measure.slot, o.id).some(function (x) { return x.measure.res === m; })) return { ok: false, error: 'slotTaken' };
-    o.measure.res = m; delete o.measure.rearrange; log(st, o, 'assigned|' + m);
+    o.measure.res = m; if (o.measure.rearrange !== 'blocked') delete o.measure.rearrange; log(st, o, 'assigned|' + m); // a blocked window stays to rearrange
     return { ok: true };
   }
   function flagRearrange(st, list, why) { list.forEach(function (o) { if (idx(o) <= 1 && !o.measure.rearrange) { o.measure.rearrange = why; log(st, o, 'rearrange|' + why); } }); return list; }
@@ -1963,7 +2023,10 @@ var Ops = (function () {
   function setBlock(st, date, slot, on) {
     if (!validDate(date) || (slot !== '*' && MEASURE_SLOTS.indexOf(slot) < 0)) return { ok: false, error: 'slotInvalid' };
     st.blocks = st.blocks || {}; var k = date + '|' + slot;
-    if (on) st.blocks[k] = true; else delete st.blocks[k];
+    if (on) st.blocks[k] = true;
+    else if (slot === '*') Object.keys(st.blocks).forEach(function (x) { if (x.indexOf(date + '|') === 0) delete st.blocks[x]; }); // opening the whole day opens every window of it
+    else delete st.blocks[k]; // a window inside a blocked day stays blocked: the day's block is still there
+    if (!on) st.orders.forEach(function (o) { if (o.measure && o.measure.rearrange === 'blocked' && o.measure.date === date && (slot === '*' || o.measure.slot === slot) && !blocked(st, date, o.measure.slot)) { delete o.measure.rearrange; log(st, o, 'rearrangeClear'); } });
     var hit = on ? st.orders.filter(function (o) { return active(o) && o.measure && o.measure.date === date && (slot === '*' || o.measure.slot === slot) && date >= st.today; }) : [];
     return { ok: true, affected: flagRearrange(st, hit, 'blocked') };
   }
@@ -1971,7 +2034,11 @@ var Ops = (function () {
   function setOff(st, date, m, on) {
     if (!validDate(date) || measurers(st).indexOf(m) < 0) return { ok: false, error: 'state' };
     st.off = st.off || {}; var k = date + '|' + m;
-    if (!on) { delete st.off[k]; return { ok: true, moved: [], affected: [] }; }
+    if (!on) {
+      delete st.off[k];
+      st.orders.forEach(function (o) { if (o.measure && o.measure.rearrange === 'off' && o.measure.date === date && o.measure.res === m) { delete o.measure.rearrange; log(st, o, 'rearrangeClear'); } });
+      return { ok: true, moved: [], affected: [] };
+    }
     st.off[k] = true;
     var moved = [], left = [];
     st.orders.forEach(function (o) {
@@ -1986,27 +2053,44 @@ var Ops = (function () {
     if (!list.length) return { ok: false, error: 'state' };
     var gone = measurers(st).filter(function (m) { return list.indexOf(m) < 0; });
     st.measurers = list;
+    st.orders.forEach(function (o) { if (o.measure && o.measure.rearrange === 'off' && list.indexOf(o.measure.res) >= 0 && !offDay(st, o.measure.date, o.measure.res)) { delete o.measure.rearrange; log(st, o, 'rearrangeClear'); } });
     var hit = st.orders.filter(function (o) { return active(o) && idx(o) <= 1 && o.measure && o.measure.date >= st.today && gone.indexOf(o.measure.res) >= 0; });
     hit.forEach(function (o) { var f = freeMeasurer(st, o.measure.date, o.measure.slot, o.id); if (f && gone.indexOf(f) < 0) { o.measure.res = f; } });
     return { ok: true, affected: flagRearrange(st, hit.filter(function (o) { return gone.indexOf(o.measure.res) >= 0; }), 'off') };
   }
-  function rearrangeList(st) { return st.orders.filter(function (o) { return active(o) && idx(o) <= 1 && o.measure && o.measure.rearrange; }); }
+  // What a change would touch, without changing anything: the office sees the list before it saves (plan, "Server rules")
+  function previewBlock(st, date, slot) { return st.orders.filter(function (o) { return active(o) && idx(o) <= 1 && o.measure && o.measure.date === date && (slot === '*' || o.measure.slot === slot) && date >= st.today; }); }
+  function previewOff(st, date, m) {
+    var mine = st.orders.filter(function (o) { return active(o) && idx(o) <= 1 && o.measure && o.measure.date === date && o.measure.res === m; }), moved = [], left = [];
+    mine.forEach(function (o) { var other = measurers(st).filter(function (x) { return x !== m && !offDay(st, date, x) && !holders(st, date, o.measure.slot, o.id).some(function (h) { return h.measure.res === x; }); })[0]; (other && !blocked(st, date, o.measure.slot) ? moved : left).push(o); });
+    return { moved: moved, left: left };
+  }
+  function previewMeasurers(st, list) { return st.orders.filter(function (o) { return active(o) && idx(o) <= 1 && o.measure && o.measure.date >= st.today && list.indexOf(o.measure.res) < 0; }); }
+  function previewRelease(st, from) { if (!validDate(from) || from < st.today) return []; return st.orders.filter(function (o) { return active(o) && idx(o) === 1 && o.measure && o.measure.by === 'web' && o.measure.date >= from && !(o.measure.time && !o.suspect); }); }
+  function rearrangeList(st) { return st.orders.filter(function (o) { return active(o) && idx(o) <= 1 && o.measure && o.measure.rearrange && o.measure.date >= st.today; }); }
+  // Customers the office must call: a window they asked for was not held (a number with a visit, a flagged request), or it was released
+  function toCall(st) { return st.orders.filter(function (o) { return active(o) && idx(o) === 0 && !o.measure && (o.wanted || o.released); }); }
   // Abuse of a small calendar: a burst of web bookings is shown to the office; flagged or unconfirmed web bookings can be released at once
   function webToday(st) { return st.orders.filter(function (o) { return o.source === 'web' && o.createdAt === st.today; }).length; }
   function burst(st) { return webToday(st) > (st.burstAt || 8); }
   function releaseWeb(st, from) {
+    if (!validDate(from) || from < st.today) return { ok: false, error: 'slotInvalid', released: 0 };
     var n = 0;
     st.orders.forEach(function (o) {
-      if (!active(o) || idx(o) !== 1 || o.source !== 'web' || !o.measure || o.measure.date < from || (o.measure.time && !o.suspect)) return;
-      o.measure = null; o.status = 'lead'; log(st, o, 'released'); n++;
+      if (!active(o) || idx(o) !== 1 || !o.measure || o.measure.by !== 'web' || o.measure.date < from || (o.measure.time && !o.suspect)) return;
+      o.released = { date: o.measure.date, slot: o.measure.slot, on: st.today }; o.measure = null; o.status = 'lead'; log(st, o, 'released'); n++;
     });
     return { ok: true, released: n };
   }
   // Photographs of the windows from the customer (phase 2): re-encoded in the browser as JPEG, so no metadata goes with them; four at most
   function addPhoto(st, o, url) {
-    if (!active(o) || typeof url !== 'string' || !/^data:image\/jpeg;base64,[A-Za-z0-9+\/=]+$/.test(url) || url.length > 1500000) return { ok: false, error: 'type' };
+    if (typeof url !== 'string' || url.length > 1500000) return { ok: false, error: 'tooLarge' }; // the size first: a huge string is not read
+    if (!/^data:image\/jpeg;base64,\/9j\/[A-Za-z0-9+\/=]+$/.test(url)) return { ok: false, error: 'type' }; // a JPEG begins FF D8 FF ("/9j/" in base64)
+    if (!active(o) || idx(o) > 2) return { ok: false, error: 'state' }; // until the quote: the measurer has been
     o.photos = o.photos || [];
     if (o.photos.length >= 4) return { ok: false, error: 'tooMany' };
+    var today = 0; st.orders.forEach(function (x) { if (x.customer.phone === o.customer.phone) (x.photos || []).forEach(function (p) { if (p.day === st.today) today++; }); });
+    if (today >= 8) return { ok: false, error: 'tooMany' };
     o.photos.push({ by: 'customer', url: url, day: st.today }); log(st, o, 'photo');
     return { ok: true, n: o.photos.length };
   }
@@ -2530,7 +2614,7 @@ var Ops = (function () {
   }
 
   return {
-    STATES: STATES, MEASURE_SLOTS: MEASURE_SLOTS, measurers: measurers, blocked: blocked, offDay: offDay, holders: holders, freeMeasurer: freeMeasurer, webCount: webCount, publicFree: publicFree, assignMeasurer: assignMeasurer, setBlock: setBlock, setOff: setOff, setMeasurers: setMeasurers, rearrangeList: rearrangeList, burst: burst, webToday: webToday, releaseWeb: releaseWeb, addPhoto: addPhoto, trackPhoto: trackPhoto, trackMove: trackMove, trackCancel: trackCancel, confirmLate: confirmLate, lockedDay: lockedDay, prevWorkday: prevWorkday, icsText: icsText, INTERESTS: INTERESTS, COUNT_BANDS: COUNT_BANDS, ROOMS: ROOMS, WISHES: WISHES, CONTACT_BY: CONTACT_BY, CALL_AT: CALL_AT, CUTOFF_HOUR: CUTOFF_HOUR, MAX_MOVES: MAX_MOVES, slotHours: slotHours,
+    STATES: STATES, MEASURE_SLOTS: MEASURE_SLOTS, previewBlock: previewBlock, previewOff: previewOff, previewMeasurers: previewMeasurers, previewRelease: previewRelease, toCall: toCall, measurers: measurers, blocked: blocked, offDay: offDay, holders: holders, freeMeasurer: freeMeasurer, webCount: webCount, publicFree: publicFree, assignMeasurer: assignMeasurer, setBlock: setBlock, setOff: setOff, setMeasurers: setMeasurers, rearrangeList: rearrangeList, burst: burst, webToday: webToday, releaseWeb: releaseWeb, addPhoto: addPhoto, trackPhoto: trackPhoto, trackMove: trackMove, trackCancel: trackCancel, confirmLate: confirmLate, lockedDay: lockedDay, prevWorkday: prevWorkday, icsText: icsText, INTERESTS: INTERESTS, COUNT_BANDS: COUNT_BANDS, ROOMS: ROOMS, WISHES: WISHES, CONTACT_BY: CONTACT_BY, CALL_AT: CALL_AT, CUTOFF_HOUR: CUTOFF_HOUR, MAX_MOVES: MAX_MOVES, slotHours: slotHours,
     confirmMeasure: confirmMeasure, customerCanChange: customerCanChange, customerMove: customerMove, customerCancel: customerCancel, toConfirm: toConfirm, publicSlotOpen: publicSlotOpen, INSTALL_SLOTS: INSTALL_SLOTS, TEAMS: TEAMS, SUBSTRATES: SUBSTRATES, HOLDS: HOLDS, SOURCES: SOURCES, HOLIDAYS: HOLIDAYS, HORIZON: HORIZON, MAX_WINDOWS: MAX_WINDOWS,
     iso: iso, parse: parse, validDate: validDate, addDays: addDays, addYears: addYears, addWorkdays: addWorkdays, daysBetween: daysBetween, isWorkday: isWorkday, workdaysFrom: workdaysFrom, businessToday: businessToday,
     cleanText: cleanText, normalizePhone: normalizePhone, last4: last4, normCode: normCode, normInvoice: normInvoice, seededRandom: seededRandom,
@@ -3227,7 +3311,7 @@ var I18N = {
     'bk.s.check': 'Përmbledhja',
     'bk.noEst': 'Nuk keni zgjedhur ende produkte: në hapin 3 na tregoni çfarë ju intereson.',
     'bk.when.q': 'Kur ju PËRSHTATET matja?',
-    'bk.when.t': 'Zgjidhni zonën, ditën dhe orarin. Matja është falas; orën e saktë jua konfirmojmë një ditë përpara.',
+    'bk.when.t': 'Falas. Orën e saktë jua konfirmojmë një ditë përpara.',
     'bk.pref': 'Cila orë ju përshtatet më shumë? ({date}, {slot})',
     'bk.pref.any': 'Çdo orë brenda kësaj kohe',
     'bk.pref.note': 'Është një dëshirë: e mbajmë nëse e lejon rruga e ditës dhe jua konfirmojmë një ditë përpara.',
@@ -3388,15 +3472,15 @@ var I18N = {
     'bk.ops.whoDone': 'Matës: {n}. Për t\'u rirregulluar: {left}.',
     'bk.ops.whoOne': 'Duhet të paktën një matës.',
     'bk.ops.offSet': 'Shëno pushimin',
-    'bk.ops.offClear': 'Hiqe pushimin',
+    'bk.ops.offClear': 'Hiq pushimin',
     'bk.ops.offDone': 'Matësi {m} pushon {date}: {moved} matje kaluan te një koleg, {left} për t\'u rirregulluar.',
     'bk.ops.offCleared': 'Matësi {m} punon përsëri {date}.',
     'bk.ops.block': 'Blloko',
     'bk.ops.unblock': 'Hape',
     'bk.ops.blockDone': 'U bllokua {date}, {slot}. Matje për t\'u rirregulluar: {n}.',
     'bk.ops.unblockDone': 'U hap përsëri {date}, {slot}.',
-    'bk.ops.cap': 'Kufiri i rezervimeve online në ditë',
-    'bk.ops.capHint': 'Bosh: pa kufi. Pas kufirit faqja ofron vetëm telefonatë.',
+    'bk.ops.cap': 'Rezervime online për çdo ditë matjeje',
+    'bk.ops.capHint': 'Kur mbushet, ajo ditë ofron vetëm telefonatë. Bosh: pa kufi.',
     'bk.ops.capSet': 'Kufiri: {n} rezervime online në ditë.',
     'bk.ops.capOff': 'Pa kufi për rezervimet online.',
     'bk.ops.pause': 'Ndalo rezervimet online (vetëm telefonatë)',
@@ -3440,7 +3524,50 @@ var I18N = {
     'cfg.railsOut.one': '{n} shinë tjetër nuk e mban këtë zgjedhje',
     'cfg.railsOut.other': '{n} shina të tjera nuk e mbajnë këtë zgjedhje',
     'cfg.shapeQ': 'Forma e dritares: {s} (ndryshoje nëse nuk është)',
-    'rails.d.own': 'Perdet varen në shinën që keni; masni gjatësinë e saj.'
+    'rails.d.own': 'Perdet varen në shinën që keni; masni gjatësinë e saj.',
+    'bk.pausedPublic': 'Rezervimi online është i ndalur për pak kohë. Na lini numrin: ju telefonojmë për ta caktuar matjen.',
+    'bk.tr.released': 'ju telefonojmë për një orë tjetër',
+    'bk.ops.toCall': 'Për t\'u telefonuar ({n})',
+    'bk.ops.callReleased': 'U lirua',
+    'bk.ops.callWanted': 'Ora nuk u mbajt',
+    'bk.ops.e.blocked': 'Orari është i bllokuar: zhvendoseni matjen para se ta konfirmoni.',
+    'log.rearrangeClear': 'Nuk ka më nevojë të rirregullohet',
+    'bk.ops.unsure': 'I pavendosur: do këshillë',
+    'bk.ops.nWin.one': '{n} dritare në kërkesë',
+    'bk.ops.nWin.other': '{n} dritare në kërkesë',
+    'bk.ops.pauseNow': 'Ndalo rezervimet online',
+    'bk.ops.pend.off': 'Pushimi prek {n} matje. Ato që kanë koleg të lirë kalojnë te ai; të tjerat shkojnë te «Për t\'u rirregulluar».',
+    'bk.ops.pend.block': 'Bllokimi prek {n} matje. Ato shkojnë te «Për t\'u rirregulluar»; asnjë nuk anulohet.',
+    'bk.ops.pend.ms': 'Heqja e matësit prek {n} matje. Ato që nuk kalojnë te një koleg shkojnë te «Për t\'u rirregulluar».',
+    'bk.ops.pend.release': 'Do të lirohen {n} rezervime online. Klientët dalin te «Për t\'u telefonuar».',
+    'bk.ops.pend.toColleague': 'kalon te një koleg',
+    'bk.ops.pend.yes.off': 'Po, shëno pushimin',
+    'bk.ops.pend.yes.block': 'Po, blloko',
+    'bk.ops.pend.yes.ms': 'Po, hiqe matësin',
+    'bk.ops.pend.yes.release': 'Po, liroji {n}',
+    'bk.ops.pendCancelled': 'Asgjë nuk ndryshoi.',
+    'bk.ops.freedH': 'U liruan këto {n}. Njoftojini:',
+    'bk.ops.freedWa': 'Përshëndetje nga Perde Nemis. Matja juaj ({code}) nuk mund të bëhet në orën e rezervuar. Ju telefonojmë për një orë tjetër.',
+    'bk.ops.releaseNone': 'Nga {date} nuk ka rezervime online për t\'u liruar.',
+    'bk.ops.inForce': 'Në fuqi tani',
+    'bk.ops.nothingInForce': 'Asnjë pushim dhe asnjë bllokim.',
+    'bk.ops.offItem': 'Matësi {m} pushon {date}',
+    'bk.ops.blockItem': 'E bllokuar: {date}, {slot}',
+    'bk.ops.unblockOne': 'Hap orarin',
+    'bk.ops.stillBlocked': 'Dita e plotë mbetet e bllokuar.',
+    'bk.ops.offLegend': 'Pushimi i një matësi',
+    'bk.ops.offDay': 'Dita e pushimit',
+    'bk.ops.blockLegend': 'Blloko një orar ose një ditë',
+    'bk.ops.blockDay': 'Dita për t\'u bllokuar',
+    'bk.ops.capLegend': 'Kufiri dhe ndalimi',
+    'bk.ops.releaseLegend': 'Liro rezervimet online',
+    'bk.ops.releaseFrom': 'Nga dita',
+    'bk.ops.capErr': 'Shkruani një numër nga 1 deri në 99, ose lëreni bosh.',
+    'bk.ops.e.same': 'Matja e ka tashmë këtë matës.',
+    'bk.ops.offShort': 'pushon: {m}',
+    'bk.ops.showInst': 'Shfaq/fshih montimet',
+    'bk.tr.wasCancelled': 'E anuluar nga ju më {date}. Kërkesa mbetet.',
+    'bl.more': '{m} · {s}. Ndryshoje'
   },
   en: {
     'demo.notePublic': 'Demo: models, fabrics, inspiration and availability are samples. Some photographs are our own work; the others are Unsplash samples that your own photographs replace. The empty frames hold the place of the ones still missing. The price comes with the quote, after the free measurement.', 
@@ -4001,7 +4128,7 @@ var I18N = {
     'bk.s.check': 'Check',
     'bk.noEst': 'You have not picked any products yet: in step 3 tell us what you are interested in.',
     'bk.when.q': 'When SUITS you for the visit?',
-    'bk.when.t': 'Choose the area, a day and a time. The visit is free; we confirm the exact hour the day before.',
+    'bk.when.t': 'Free. We confirm the exact hour the day before.',
     'bk.pref': 'Which hour suits you best? ({date}, {slot})',
     'bk.pref.any': 'Any time in this window',
     'bk.pref.note': 'It is a wish: we keep it if the day\'s route allows, and confirm it the day before.',
@@ -4169,8 +4296,8 @@ var I18N = {
     'bk.ops.unblock': 'Open',
     'bk.ops.blockDone': 'Blocked {date}, {slot}. Visits to rearrange: {n}.',
     'bk.ops.unblockDone': 'Opened again {date}, {slot}.',
-    'bk.ops.cap': 'Daily limit of online bookings',
-    'bk.ops.capHint': 'Empty: no limit. After the limit the page offers a call back only.',
+    'bk.ops.cap': 'Online bookings per visit day',
+    'bk.ops.capHint': 'When it is reached, that day offers a call back only. Empty: no limit.',
     'bk.ops.capSet': 'Limit: {n} online bookings a day.',
     'bk.ops.capOff': 'No limit on online bookings.',
     'bk.ops.pause': 'Pause online booking (call back only)',
@@ -4214,7 +4341,50 @@ var I18N = {
     'cfg.railsOut.one': '{n} other rail does not suit this choice',
     'cfg.railsOut.other': '{n} other rails do not suit this choice',
     'cfg.shapeQ': 'Window shape: {s} (change it if it is not)',
-    'rails.d.own': 'The curtains hang on the rail you have; measure its length.'
+    'rails.d.own': 'The curtains hang on the rail you have; measure its length.',
+    'bk.pausedPublic': 'Online booking is paused for a short while. Leave your number: we will call you to arrange the visit.',
+    'bk.tr.released': 'we will call you for another time',
+    'bk.ops.toCall': 'To call ({n})',
+    'bk.ops.callReleased': 'Released',
+    'bk.ops.callWanted': 'Time not held',
+    'bk.ops.e.blocked': 'The window is blocked: move the visit before confirming it.',
+    'log.rearrangeClear': 'No longer needs rearranging',
+    'bk.ops.unsure': 'Undecided: wants advice',
+    'bk.ops.nWin.one': '{n} window in the request',
+    'bk.ops.nWin.other': '{n} windows in the request',
+    'bk.ops.pauseNow': 'Pause online booking',
+    'bk.ops.pend.off': 'The day off touches {n} visits. Those with a free colleague go to them; the others go to "To rearrange".',
+    'bk.ops.pend.block': 'The block touches {n} visits. They go to "To rearrange"; none is cancelled.',
+    'bk.ops.pend.ms': 'Removing the measurer touches {n} visits. Those that cannot go to a colleague go to "To rearrange".',
+    'bk.ops.pend.release': '{n} online bookings will be released. The customers go to "To call".',
+    'bk.ops.pend.toColleague': 'goes to a colleague',
+    'bk.ops.pend.yes.off': 'Yes, mark the day off',
+    'bk.ops.pend.yes.block': 'Yes, block',
+    'bk.ops.pend.yes.ms': 'Yes, remove the measurer',
+    'bk.ops.pend.yes.release': 'Yes, release {n}',
+    'bk.ops.pendCancelled': 'Nothing changed.',
+    'bk.ops.freedH': 'These {n} were released. Let them know:',
+    'bk.ops.freedWa': 'Hello from Perde Nemis. Your visit ({code}) cannot take place at the booked time. We will call you for another time.',
+    'bk.ops.releaseNone': 'There are no online bookings to release from {date}.',
+    'bk.ops.inForce': 'In force now',
+    'bk.ops.nothingInForce': 'No days off and no blocks.',
+    'bk.ops.offItem': 'Measurer {m} is off on {date}',
+    'bk.ops.blockItem': 'Blocked: {date}, {slot}',
+    'bk.ops.unblockOne': 'Open it',
+    'bk.ops.stillBlocked': 'The whole day stays blocked.',
+    'bk.ops.offLegend': 'A measurer\'s day off',
+    'bk.ops.offDay': 'Day off',
+    'bk.ops.blockLegend': 'Block a window or a day',
+    'bk.ops.blockDay': 'Day to block',
+    'bk.ops.capLegend': 'Limit and pause',
+    'bk.ops.releaseLegend': 'Release online bookings',
+    'bk.ops.releaseFrom': 'From the day',
+    'bk.ops.capErr': 'Enter a number from 1 to 99, or leave it empty.',
+    'bk.ops.e.same': 'The visit already has this measurer.',
+    'bk.ops.offShort': 'off: {m}',
+    'bk.ops.showInst': 'Show/hide installations',
+    'bk.tr.wasCancelled': 'Cancelled by you on {date}. The request stays.',
+    'bl.more': '{m} · {s}. Change'
   }
 };
 if (typeof module !== 'undefined') module.exports = I18N;
@@ -4334,7 +4504,7 @@ if (typeof module !== 'undefined') module.exports = I18N;
   function radio(name, value, checked, label, opt) {
     opt = opt || {};
     var id = name + '-' + (opt.id || value);
-    var pic = opt.img && PH[opt.img] ? '<span class="chip-pic"><img src="' + PH[opt.img] + '" alt="" loading="lazy" decoding="async"></span>' : '';
+    var pic = !opt.img ? '' : PH[opt.img] ? '<span class="chip-pic"><img src="' + PH[opt.img] + '" alt="" loading="lazy" decoding="async"></span>' : '<span class="chip-pic is-empty"><span>' + t('ph.photo') + '</span></span>';
     return '<label class="chip' + (pic ? ' pic' : '') + (opt.off ? ' is-off' : '') + '" for="' + id + '"><input type="radio" id="' + id + '" name="' + name + '" value="' + esc(value) + '"' +
       (checked ? ' checked' : '') + (opt.off ? ' aria-disabled="true" data-off="1"' : '') + (opt.aria ? ' aria-label="' + esc(opt.aria) + '"' : '') +
       (opt.extra ? ' aria-describedby="' + id + '-x"' : '') + ' data-f="' + name + '"><span class="chip-body">' + pic + '<span class="chip-name">' + label + '</span>' + (opt.extra ? '<small id="' + id + '-x">' + opt.extra + '</small>' : '') + '</span></label>';
@@ -4654,7 +4824,10 @@ if (typeof module !== 'undefined') module.exports = I18N;
   function defaultBlind(model) { var m = blindById(model) || BLINDS[0]; return { model: m.id, color: m.colors[0].id, width: NaN, height: NaN, mount: 'inside', side: 'right' }; }
   function setKind(k) { // the product being built. A rail alone is a curtain window without a curtain.
     if (CATEGORIES.indexOf(k) < 0) return;
-    S.kind = k; S.added = false;
+    var wasBlind = isBlindKind(S.kind), from = wasBlind ? S.blind : S.cfg;
+    S.kind = k; S.added = false; S.sizeAsked = false; S.sizeSeen = {};
+    var into = isBlindKind(k) ? S.blind : S.cfg;
+    if (wasBlind !== isBlindKind(k)) ['width', 'height'].forEach(function (f) { if (typeof from[f] === 'number' && !isNaN(from[f]) && !(typeof into[f] === 'number' && !isNaN(into[f]))) into[f] = from[f]; });
     if (isBlindKind(k)) {
       var m = blindById(S.blind.model);
       if (!m || m.cat !== k) { var keep = S.blind; S.blind = defaultBlind(blindsOf(k)[0].id); ['width', 'height', 'mount', 'side'].forEach(function (f) { S.blind[f] = keep[f]; }); } // the sizes typed so far are kept
@@ -4749,13 +4922,14 @@ if (typeof module !== 'undefined') module.exports = I18N;
       h += notes();
     } else if (k === 'model') {
       var b = S.blind, m = blindById(b.model), col = blindColor(m, b.color);
-      h += '<fieldset><legend class="sr-only">' + t('step.model') + '</legend><div class="chips pics">' + blindsOf(S.kind).map(function (x) { return radio('bmodel', x.id, b.model === x.id, esc(blindName(x)), { img: 'blind-' + x.id }); }).join('') + '</div>' +
+      h += '<fieldset><legend class="sr-only">' + t('step.model') + '</legend><div class="chips pics models">' + blindsOf(S.kind).map(function (x) { return radio('bmodel', x.id, b.model === x.id, esc(blindName(x)), { img: 'blind-' + x.id }); }).join('') + '</div>' +
         '<p class="small" id="bmodel-text">' + t('bl.' + m.id + '.text') + '</p></fieldset>' +
         '<fieldset><legend id="bcol-label" class="sw-name">' + t('car.color') + ': <b>' + esc(bColorName(col)) + '</b></legend><div class="swatches" role="radiogroup" aria-labelledby="bcol-label">' +
         m.colors.map(function (x) { return bSwatch('bcol', m, x, x.id === b.color, 'bcolor'); }).join('') + '</div></fieldset>';
     } else if (k === 'bsize') {
-      h += '<fieldset><legend>' + t('bl.mount') + '</legend><div class="chips">' + BLIND_MOUNTS.map(function (x) { return radio('bmount', x, S.blind.mount === x, t('bl.mount.' + x)); }).join('') + '</div></fieldset>' +
-        '<fieldset><legend>' + t('bl.side') + '</legend><div class="chips">' + BLIND_SIDES.map(function (x) { return radio('bside', x, S.blind.side === x, t('bl.side.' + x)); }).join('') + '</div></fieldset>';
+      h += '<details class="shape-more" id="bmore"' + (S.bMore ? ' open' : '') + '><summary>' + t('bl.more', { m: t('bl.mount.' + S.blind.mount), s: lc1(t('bl.side.' + S.blind.side)) }) + '</summary>' +
+        '<fieldset><legend>' + t('bl.mount') + '</legend><div class="chips">' + BLIND_MOUNTS.map(function (x) { return radio('bmount', x, S.blind.mount === x, t('bl.mount.' + x)); }).join('') + '</div></fieldset>' +
+        '<fieldset><legend>' + t('bl.side') + '</legend><div class="chips">' + BLIND_SIDES.map(function (x) { return radio('bside', x, S.blind.side === x, t('bl.side.' + x)); }).join('') + '</div></fieldset></details>';
     } else {
       if (S.added) h += '<p class="note added" id="cfg-added" tabindex="-1">' + t('cfg.added') + '</p>';
       h += sumPic() + '<ol class="sumlist" id="cfg-sumlist">' + sumListHtml() + '</ol>';
@@ -4898,6 +5072,7 @@ if (typeof module !== 'undefined') module.exports = I18N;
   }
   function sumPic() { // the chosen cloth or blind heads the summary; a colour the photograph does not show is named under it
     var c = S.cfg, blind = isBlindKind(S.kind), f = blind ? null : fabricById(c.layers === 'sheer' ? c.sheerId : c.mainId || c.sheerId), pk = blind ? 'blind-' + S.blind.model : f && c.layers !== 'none' ? 'fab-' + f.fam : '';
+    if (!blind && c.layers === 'none') { var rk = PH['rail-' + c.rail] ? 'rail-' + c.rail : 'cat-shina'; return PH[rk] ? '<figure class="sum-pic" id="cfg-pic"><img src="' + PH[rk] + '" alt="" decoding="async">' + (c.rail ? '<figcaption>' + t('rail.' + c.rail) + '</figcaption>' : '') + '</figure>' : ''; }
     if (!pk || !PH[pk]) return '';
     var shown = blind ? '' : FAB_PHOTO_COL[f.fam] && fabricById(FAB_PHOTO_COL[f.fam]), cap = shown && shown.id !== f.id ? t('ph.shows', { c: colorName(shown) }) : '';
     return '<figure class="sum-pic" id="cfg-pic"><img src="' + PH[pk] + '" alt="" decoding="async">' + (f && cap ? '<i class="sum-sw" style="--c:' + f.hex + '" aria-hidden="true"></i><figcaption>' + cap + '</figcaption>' : '') + '</figure>';
@@ -4942,7 +5117,7 @@ if (typeof module !== 'undefined') module.exports = I18N;
     var qk = w === 'heading' && S.kind === 'shina' ? 'step.headingOwn' : 'step.' + w;
     return have + '<div class="step-head"><h2 id="cfg-step-h" tabindex="-1"><span class="sr-only" id="cfg-step-of">' + t('step.of', { i: S.step, n: path().length }) + ': </span>' + t(qk + '.q') + '</h2>' +
       '<p class="step-help">' + t(qk + '.t') + '</p></div>' +
-      (w === 'size' || w === 'bsize' ? '<div id="cfg-dyn">' + stepDyn() + '</div><div id="cfg-static">' + stepStatic() + '</div>' : '<div id="cfg-static">' + stepStatic() + '</div><div id="cfg-dyn">' + stepDyn() + '</div>') + '<div class="cfg-bar" id="cfg-bar">' + barHtml() + '</div>';
+      (stepKey() === 'size' ? '<div id="cfg-dyn">' + stepDyn() + '</div><div id="cfg-static">' + stepStatic() + '</div>' : '<div id="cfg-static">' + stepStatic() + '</div><div id="cfg-dyn">' + stepDyn() + '</div>') + '<div class="cfg-bar" id="cfg-bar">' + barHtml() + '</div>';
   }
   function viewConfig() {
     if (!S.introDone && S.step === 1 && S.reach <= 1) return '<div class="wiz-band"><div class="wrap wiz cfg-intro" id="cfg-intro"><h1 id="cfg-intro-h" tabindex="-1">' + t('cfg.intro.h') + '</h1><p>' + t('cfg.intro.t') + '</p>' +
@@ -4964,7 +5139,7 @@ if (typeof module !== 'undefined') module.exports = I18N;
     setHash(hashFor());
     setHTML($('cfg-steps'), stepperHtml()); setHTML($('cfg-form'), formInner()); setSum(); paintSizeErrors();
     var hd = $('cfg-step-h'), top = $('cfg-steps');
-    if (top) { try { var y = top.getBoundingClientRect().top + window.scrollY - stickyTop() - 8; if (window.scrollY > y) window.scrollTo(0, y); } catch (e) { /* stays where it is */ } }
+    if (top) { try { var y = top.getBoundingClientRect().top + window.scrollY - stickyTop() - 8; if (window.scrollY > y) window.scrollTo(0, y < window.innerHeight / 2 ? 0 : y); } catch (e) { /* stays where it is */ } }
     if (hd) hd.focus({ preventScroll: true });
     say(t('step.of', { i: S.step, n: path().length }) + ': ' + t('step.' + stepWord(stepKey())));
   }
@@ -4998,7 +5173,7 @@ if (typeof module !== 'undefined') module.exports = I18N;
   var BOOK_FIELDS = { when: ['slot', 'city'], what: [], who: ['name', 'phone', 'email', 'address'], check: ['consent'] }; // which step asks for what
   function bkey() { return BSTEPS[S.bstep - 1] || 'when'; }
   function stepOfField(k) { for (var s in BOOK_FIELDS) if (BOOK_FIELDS[s].indexOf(k) >= 0) return BSTEPS.indexOf(s) + 1; return 1; }
-  function isCallback() { return S.zone === 'C' || S.book.callback; }
+  function isCallback() { return S.zone === 'C' || S.book.callback || !!st.paused; } // another city, "call me", or online booking paused by the office
   function tiranaNow() { // the date and hour in Tirana, read again whenever a choice depends on them
     try {
       var nh = Number(new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/Tirane', hour: '2-digit', hour12: false }).format(new Date())) % 24;
@@ -5029,7 +5204,7 @@ if (typeof module !== 'undefined') module.exports = I18N;
       : '<button type="button" class="btn" data-act="bk-next" id="bk-next"' + (S.bFromSum ? ' data-sum="1"' : '') + '>' + t(S.bFromSum ? 'step.save' : 'step.next') + '</button>';
     // on the last step the consent and the promise stand in the bar, by the button that sends
     var pre = last ? '<div class="bk-commit"><label class="check" for="book-consent"><input type="checkbox" id="book-consent" required aria-required="true"' + (b.consent ? ' checked' : '') + ' data-f="b-consent"' + bkAria('consent') + '><span>' + t('book.consent') + '</span></label>' + bkErr('consent') +
-      '<p class="muted small">' + t(S.zone === 'C' ? 'bk.promise.c' : 'bk.promise') + '</p></div>' : '';
+      '<p class="muted small bk-promise">' + t(S.zone === 'C' ? 'bk.promise.c' : 'bk.promise') + '</p></div>' : '';
     return pre + '<div class="bar-btns' + (back ? '' : ' one') + '">' + back + fwd + '</div>';
   }
   function bkErr(k) { var b = S.book; return '<p class="field-err" id="book-' + k + '-err">' + (b.errors[k] ? t('book.e.' + b.errors[k]) : '') + '</p>'; }
@@ -5055,26 +5230,24 @@ if (typeof module !== 'undefined') module.exports = I18N;
     return '<fieldset class="kinds"><legend>' + t('bk.kinds') + '</legend><div class="kcards">' + list.map(function (k) {
       var pic = k !== 'unsure' && PH['cat-' + k] ? '<span class="kc-pic"><img src="' + PH['cat-' + k] + '" alt="" loading="lazy" decoding="async"></span>' : '<span class="kc-pic kc-q" aria-hidden="true">?</span>';
       return '<label class="kcard" for="b-kind-' + k + '"><input type="checkbox" id="b-kind-' + k + '" value="' + k + '"' + (b.kinds.indexOf(k) >= 0 ? ' checked' : '') + ' data-f="b-kind">' + pic +
-        '<span class="kc-name">' + (k === 'unsure' ? t('bk.unsure') : catName(k)) + '</span>' + (k !== 'unsure' && catShort(k) !== catName(k) ? '<small class="kc-short">' + catShort(k) + '</small>' : '') + '</label>';
+        '<span class="kc-name">' + (k === 'unsure' ? t('bk.unsure') : catName(k).replace(/\s*\([^)]*\)$/, '')) + '</span>' + (k !== 'unsure' && catShort(k) !== catName(k) ? '<small class="kc-short">' + catShort(k) + '</small>' : '') + '</label>';
     }).join('') + '</div></fieldset>';
   }
   function zoneChips() {
     return '<fieldset class="bk-zone"><legend>' + t('bk.zoneQ') + '</legend><div class="chips">' + ZONES.map(function (z) { return radio('b-zone', z, S.zone === z, t('zone.' + z)); }).join('') + '</div>' +
-      (S.zone === 'C' ? '<div class="bk-fields">' + bkFld('city', t('bk.city'), '<input type="text" id="book-city" maxlength="40" autocomplete="address-level2" enterkeyhint="done" value="' + esc(S.book.city) + '" data-f="b-city"' + bkAria('city') + '>') + '</div>' : '') + '</fieldset>';
+      (S.zone === 'C' ? '<p class="note" id="bk-zonec">' + t('book.zoneC') + '</p><div class="bk-fields">' + bkFld('city', t('bk.city'), '<input type="text" id="book-city" maxlength="40" autocomplete="address-level2" enterkeyhint="done" value="' + esc(S.book.city) + '" data-f="b-city"' + bkAria('city') + '>') + '</div>' : '') + '</fieldset>';
   }
   function bkBody() {
     var b = S.book, k = bkey();
     if (k === 'when') {
       return '<div id="bk-zone">' + zoneChips() + '</div>' + altHtml() +
-        (S.zone === 'C' ? '' : '<p class="center small"><button type="button" class="link" data-act="bk-call" id="bk-call-link">' + t('bk.callLink') + '</button></p>') +
         '<div id="book-slots">' + slotsHtml() + '</div><div id="book-pref">' + prefHtml() + '</div>' +
         '<p class="' + (S.est.length ? 'note quiet' : 'muted small') + '" id="book-attached">' + attachedText() + '</p>';
     }
     if (k === 'what') {
       if (S.est.length) return '<div class="review">' + estListHtml(S.est, estCalc(), false) + '</div><p class="center"><a class="link" href="#config" data-go="config" id="bk-edit-req">' + t('bk.editReq') + '</a></p>' +
         bkFld('notes', t('bk.notes'), '<textarea id="book-notes" rows="2" maxlength="300" data-f="b-notes">' + esc(b.notes) + '</textarea>', '', true);
-      return kindsHtml() +
-        '<fieldset><legend>' + t('bk.count') + '</legend><div class="chips">' + Ops.COUNT_BANDS.map(function (x) { return radio('b-count', x, b.count === x, t('bk.count.' + x)); }).join('') + '</div></fieldset>' +
+      return '<fieldset><legend>' + t('bk.count') + '</legend><div class="chips">' + Ops.COUNT_BANDS.map(function (x) { return radio('b-count', x, b.count === x, t('bk.count.' + x)); }).join('') + '</div></fieldset>' + kindsHtml() +
         '<details class="bk-more"' + (b.rooms.length || b.wishes.length || b.notes ? ' open' : '') + '><summary>' + t('bk.more') + '</summary>' +
         '<fieldset><legend>' + t('bk.rooms') + '</legend><div class="chips">' + Ops.ROOMS.map(function (x) { return chk('b-room', x, b.rooms.indexOf(x) >= 0, t('bk.room.' + x)); }).join('') + '</div></fieldset>' +
         '<fieldset><legend>' + t('bk.wishes') + '</legend><div class="chips">' + Ops.WISHES.map(function (x) { return chk('b-wish', x, b.wishes.indexOf(x) >= 0, t('bk.wish.' + x)); }).join('') + '</div></fieldset>' +
@@ -5098,6 +5271,7 @@ if (typeof module !== 'undefined') module.exports = I18N;
         '<a class="sl-edit" href="#' + (go > 1 ? 'book-' + BSTEPS[go - 1] : 'book') + '" data-act="bk-go" data-i="' + go + '" id="bk-go-' + r[0] + '" aria-label="' + t('step.edit') + ': ' + t('bk.row.' + r[0]) + '"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10.5"/><path d="M8 16l1-3.5 6.5-6.5 2.5 2.5L11.5 15 8 16zM14.5 7l2.5 2.5"/></svg></a></li>';
     }).join('') + '</ol>' +
       '<label class="hp" aria-hidden="true">Website<input type="text" id="book-website" tabindex="-1" autocomplete="off" data-f="b-hp"></label>' +
+      '<p class="muted small bk-promise-in">' + t(S.zone === 'C' ? 'bk.promise.c' : 'bk.promise') + '</p>' +
       '<p class="or-wa center">' + waBtn('link', t('wa.hello'), t('book.orWa'), 'book-wa-link') + '</p>';
   }
   function whenText() {
@@ -5126,7 +5300,7 @@ if (typeof module !== 'undefined') module.exports = I18N;
         (d.slot ? '<p class="done-when">' + esc(fmtDate(d.date, 'day')) + ' · ' + t('slot.' + d.slot) + '</p>' + (d.pref && d.pref !== 'any' ? '<p class="done-pref">' + t('bk.done.pref', { h: d.pref }) + '</p>' : '')
           : '<p>' + (d.notHeld ? t('book.done.notHeld') : t('bk.done.call', { at: t('bk.callAt.' + d.callAt).toLowerCase() })) + '</p>') +
         '<p>' + (d.slot ? t('bk.done.confirm.' + d.contactBy) + ' ' + t('bk.done.free') : t('book.done.callback') + (d.zone !== 'C' ? ' ' + t('bk.done.free') : '')) + ' ' + t('book.done.phone', { phone: '<bdi dir="ltr">' + esc(fmtPhone(d.phone)) + '</bdi>' }) + '</p>' +
-        '<div class="btn-row">' + waBtn('btn', t('wa.booked', { code: d.code }), t('wa.ask'), 'done-wa') + (d.slot ? '<a class="btn ghost" id="done-ics" download="perde-nemis-matje-' + esc(d.code) + '.ics" href="' + icsHref(d) + '">' + t('bk.ics') + '</a>' : '') + '</div>';
+        '<div class="btn-row">' + waBtn('btn', t('wa.booked', { code: d.code }), t('wa.ask'), 'done-wa') + (d.slot && d.held ? '<a class="btn ghost" id="done-ics" download="perde-nemis-matje-' + esc(d.code) + '.ics" href="' + icsHref(d) + '">' + t('bk.ics') + '</a>' : '') + '</div>';
       if (d.items.length) {
         var de = Pricing.computeEstimate(winsOf(d.items).map(function (x) { return x.cfg; }), d.zone);
         h += '<h2 class="h3">' + t('book.done.windows') + '</h2>' + estListHtml(d.items, de, false);
@@ -5161,7 +5335,7 @@ if (typeof module !== 'undefined') module.exports = I18N;
     var msg = $('ph-msg'); if (msg) msg.textContent = t('bk.ph.working');
     files.forEach(function (f) {
       var fin = function () { done++; if (done < files.length) return; var box = $('bk-photos'); if (box) box.outerHTML = photosBlock(code, pin); var m2 = $('ph-msg'); if (m2) m2.textContent = bad ? t('bk.ph.bad', { n: bad }) : t('bk.ph.ok'); say(bad ? t('bk.ph.bad', { n: bad }) : t('bk.ph.ok')); };
-      if (!/^image\//.test(f.type) || f.size > 15000000) { bad++; fin(); return; }
+      if (!/^image\//.test(f.type) || f.size > 8000000) { bad++; fin(); return; }
       try {
         var rd = new FileReader();
         rd.onload = function () {
@@ -5188,12 +5362,12 @@ if (typeof module !== 'undefined') module.exports = I18N;
   // A new week starts a new part of the table. The cells are one group of radio buttons, so one time is chosen.
   function slotsHtml() {
     tiranaNow();
-    var b = S.book, zoneC = S.zone === 'C', off = zoneC || b.callback;
+    var b = S.book, zoneC = S.zone === 'C' || !!st.paused, off = zoneC || b.callback;
     var h = '<fieldset aria-describedby="book-slot-err"><legend class="sr-only">' + t(zoneC ? 'book.when.call' : 'book.when') + '</legend>' +
       '<p class="field-err" id="book-slot-err">' + (b.errors.slot ? t('book.e.' + b.errors.slot) : '') + '</p>'; // right under the heading, where the eye lands
-    if (zoneC) h += '<p class="note">' + t('book.zoneC') + '</p>';
+    if (zoneC) h += S.zone === 'C' ? '' : '<p class="note">' + t('bk.pausedPublic') + '</p>';
     else {
-      var days = Ops.freeMeasureSlots(st), prev = 7;
+      var days = Ops.freeMeasureSlots(st).filter(function (d) { return Ops.publicSlotOpen(st, d.date); }), prev = 7;
       h += '<table class="tt' + (off ? ' is-dim' : '') + '" id="book-table"><caption class="sr-only">' + t('book.tt.cap') + '</caption><thead><tr><th scope="col">' + t('book.day') + '</th>' + Ops.MEASURE_SLOTS.map(function (x) {
         return '<th scope="col"><span aria-hidden="true">' + x.replace('-', '–') + '</span><span class="sr-only">' + t('slot.' + x) + '</span></th>';
       }).join('') + '</tr></thead>';
@@ -5239,10 +5413,13 @@ if (typeof module !== 'undefined') module.exports = I18N;
   function setBStep(i, quiet) {
     S.bstep = Math.max(1, Math.min(BSTEPS.length, Number(i) || 1));
     if (quiet || S.view !== 'book' || S.book.done) return;
-    var hh = hashFor(); if (location.hash.replace('#', '') !== hh) { S.bStack = (S.bStack && S.bStack.length ? S.bStack : ['book']); S.bStack.push(hh); }
-    setHash(hh);
+    var hh = hashFor();
+    if (location.hash.replace('#', '') !== hh) { // a new entry one step deeper than the one on show
+      var depth = (history.state && typeof history.state.bk === 'number' ? history.state.bk : 0) + 1;
+      try { history.pushState({ bk: depth }, '', '#' + hh); } catch (e) { setHash(hh); }
+    }
     setHTML($('bk-top'), bkTop()); setHTML($('book-form'), bkInner());
-    var top = $('bk-top'); if (top) { try { var y = top.getBoundingClientRect().top + window.scrollY - stickyTop() - 8; if (window.scrollY > y) window.scrollTo(0, y); } catch (e) { /* stays */ } }
+    var top = $('bk-top'); if (top) { try { var y = top.getBoundingClientRect().top + window.scrollY - stickyTop() - 8; if (window.scrollY > y) window.scrollTo(0, y < window.innerHeight / 2 ? 0 : y); } catch (e) { /* stays */ } }
     var hd = $('bk-step-h'); if (hd) hd.focus({ preventScroll: true }); // the heading, with its "step n of 4", is read once
     saveBook();
   }
@@ -5257,6 +5434,10 @@ if (typeof module !== 'undefined') module.exports = I18N;
   function bookNext() {
     var e = stepErrors(S.bstep);
     if (Object.keys(e).length) { showStepErrors(e); return; }
+    var bp = $('book-pref'), bar = $('bk-bar');
+    if (bkey() === 'when' && !isCallback() && !S.bFromSum && !S.book.prefSeen && bp && bar && bp.firstChild && bp.getBoundingClientRect().top > bar.getBoundingClientRect().top - 40) { // the hour question was never in sight: it is shown first
+      S.book.prefSeen = true; var pc = bp.querySelector('input:checked') || bp.querySelector('input'); bringUp(bp); if (pc) pc.focus({ preventScroll: true }); say(bp.querySelector('legend').textContent); return;
+    }
     if (S.bFromSum) { S.bFromSum = false; setBStep(BSTEPS.length); return; }
     setBStep(S.bstep + 1);
   }
@@ -5286,15 +5467,15 @@ if (typeof module !== 'undefined') module.exports = I18N;
     }
     var o = res.order;
     var shown = o.measure || res.asIf; // a number that already holds a visit gets the same page; the office sorts it out on the phone
-    var done = { code: o.code, pin: Ops.last4(o.customer.phone), phone: o.customer.phone, slot: shown ? shown.slot : null, date: shown ? shown.date : null, pref: shown ? shown.pref : null,
+    var done = { held: !!o.measure, code: o.code, pin: Ops.last4(o.customer.phone), phone: o.customer.phone, slot: shown ? shown.slot : null, date: shown ? shown.date : null, pref: shown ? shown.pref : null,
       notHeld: !!res.notHeld, items: items, zone: S.zone, contactBy: o.customer.contactBy, callAt: o.customer.callAt, address: [o.customer.address, o.customer.addr2].filter(Boolean).join(', '), what: S.est.length ? '' : whatText() };
     saveCode(o.code);
     S.est = []; S.added = false; S.wa = null; saveEst();
     S.book = emptyBook(); S.book.done = done; S.bstep = 1; S.bFromSum = false; dropBook();
     S.track = { code: '', pin: '', result: undefined };
     render();
-    var back = (S.bStack || []).length - 1; S.bStack = [];
-    if (back > 0) { S.bJump = true; try { history.go(-back); } catch (e4) { setHash('book'); } } else setHash('book'); // the step addresses walked are left behind, so Back leaves the booking
+    var back = history.state && typeof history.state.bk === 'number' ? history.state.bk : 0;
+    if (back > 0) { S.bJump = true; try { history.go(-back); } catch (e4) { setHash('book'); } } else { try { history.replaceState(null, '', '#book'); } catch (e5) { setHash('book'); } } // the step addresses walked are left behind, so Back leaves the booking
     try { window.scrollTo(0, 0); } catch (e3) { /* ignore */ }
     var d = $('book-done-h'); if (d) d.focus({ preventScroll: true }); // the result is the first thing in sight
     say(t('book.done') + '. ' + t('book.done.code') + ': ' + done.code);
@@ -5324,9 +5505,11 @@ if (typeof module !== 'undefined') module.exports = I18N;
     var idx = Ops.STATES.indexOf(o.status);
     if (o.hold) h += '<p class="note">' + t('track.hold.' + o.hold) + '</p>';
     h += '<ol class="timeline">' + Ops.STATES.map(function (s, i) {
-      return '<li class="' + (i < idx ? 'is-past' : i === idx ? 'is-now' : 'is-todo') + '"' + (i === idx ? ' aria-current="step"' : '') + '><span>' + t(s === 'measure_booked' && o.measure && !o.measure.time && i === idx ? 'bk.c.requested' : 'c.' + s) + '</span></li>';
+      return '<li class="' + (i < idx ? 'is-past' : i === idx ? 'is-now' : 'is-todo') + '"' + (i === idx ? ' aria-current="step"' : '') + '><span>' + t((s === 'measure_booked' && o.measure && !o.measure.time && i === idx) || (s === 'lead' && i === idx && (o.wanted || o.released)) ? 'bk.c.requested' : 'c.' + s) + '</span></li>';
     }).join('') + '</ol><dl class="specs">';
     if (o.measure && idx <= 1) h += '<dt>' + t('ops.measure') + '</dt><dd id="track-visit">' + visitText(o) + '</dd>';
+    else if (idx === 0 && o.visitCancelled && !o.wanted && !o.released) h += '<dt>' + t('ops.measure') + '</dt><dd id="track-visit">' + t('bk.tr.wasCancelled', { date: fmtDate(o.visitCancelled, 'day') }) + '</dd>';
+    else if (idx === 0 && (o.wanted || o.released)) { var wv = o.wanted || o.released; h += '<dt>' + t('ops.measure') + '</dt><dd id="track-visit">' + (wv.slot ? fmtDate(wv.date, 'day') + ', ' + t('slot.' + wv.slot) + ' · ' : '') + t(o.released ? 'bk.tr.released' : 'bk.visit.unconfirmed') + '</dd>'; }
     if (o.install && idx === 7) h += '<dt>' + t('ops.install') + '</dt><dd>' + fmtDate(o.install.date, 'day') + ', ' + t('slot.' + o.install.slot) + '</dd>';
     var expired = Ops.quoteExpired(st, o);
     if (o.quote) { // the amounts stay in the quote itself; here the customer sees where things stand
@@ -5342,12 +5525,12 @@ if (typeof module !== 'undefined') module.exports = I18N;
     if (o.quote) h += '<p class="muted small">' + t('track.amounts') + '</p>';
     var asked = o.windows.concat((o.extras || []).map(function (x) { return { room: x.room, blind: x }; }));
     if (!o.quote && asked.length) h += '<h3>' + t('track.request') + '</h3>' + estListHtml(asked, Ops.estimate(o), false); // until a quote replaces it, the customer sees what was asked for
-    return h + trChangeHtml(o) + (idx <= 1 ? photosBlock(o.code, S.track.pin) : '') + '</div>';
+    return h + trChangeHtml(o) + (idx <= 1 && o.measure ? photosBlock(o.code, S.track.pin) : '') + '</div>';
   }
 
   // The visit as the customer reads it: the exact time once the office has confirmed it, else the window and the hour asked for
   function interestText(x) { // what a visitor said they are interested in, for the office and the measurer
-    return x.kinds.map(function (k) { return k === 'unsure' ? t('bk.unsure') : catShort(k); }).join(', ') + (x.count ? ' · ' + t('bk.count.' + x.count) : '') +
+    return x.kinds.map(function (k) { return k === 'unsure' ? t('bk.ops.unsure') : catShort(k); }).join(', ') + (x.count ? ' · ' + bandText(x.count) : '') +
       (x.rooms.length ? ' · ' + x.rooms.map(function (r2) { return lc1(t('bk.room.' + r2)); }).join(', ') : '') + (x.wishes.length ? ' · ' + x.wishes.map(function (w) { return lc1(t('bk.wish.' + w)); }).join(', ') : '');
   }
   function visitText(o) {
@@ -5359,7 +5542,7 @@ if (typeof module !== 'undefined') module.exports = I18N;
   function trChangeHtml(o) {
     var tr = S.track, h = '';
     if (tr.msg) h += '<p class="note quiet" id="tr-msg" tabindex="-1">' + tr.msg + '</p>';
-    if (tr.gone && !o.measure) return h + '<div class="btn-row"><a class="btn" href="#book" data-go="book" id="tr-rebook">' + t('bk.tr.rebook') + '</a>' + waBtn('btn ghost', t('wa.booked', { code: o.code }), t('wa.ask'), 'tr-wa2') + '</div>';
+    if ((tr.gone || o.visitCancelled) && !o.measure) return h + '<div class="btn-row"><a class="btn" href="#book" data-go="book" id="tr-rebook">' + t('bk.tr.rebook') + '</a>' + waBtn('btn ghost', t('wa.booked', { code: o.code }), t('wa.ask'), 'tr-wa2') + '</div>';
     if (!o.measure || Ops.STATES.indexOf(o.status) !== 1) return h;
     if (tr.msg && o.measure.moved) h += '<p><a class="btn ghost small" id="tr-ics" download="perde-nemis-matje-' + esc(o.code) + '.ics" href="' + icsHref({ code: o.code, date: o.measure.date, slot: o.measure.slot, address: [o.customer.address, o.customer.addr2].filter(Boolean).join(', '), seq: o.measure.moved }) + '">' + t('bk.ics.again') + '</a></p>';
     if (!Ops.customerCanChange(st, o)) return h + '<p class="muted small">' + t('bk.tr.late') + '</p><div class="btn-row">' + waBtn('btn ghost small', t('wa.booked', { code: o.code }), t('wa.ask'), 'tr-wa') + '</div>';
@@ -5367,13 +5550,13 @@ if (typeof module !== 'undefined') module.exports = I18N;
     if (tr.move) {
       var off = function (d, s2) { return d === o.measure.date && s2 === o.measure.slot; };
       h += '<fieldset class="tr-move" id="tr-move" tabindex="-1"><legend>' + t('bk.tr.pick') + '</legend><table class="tt" id="tr-table"><caption class="sr-only">' + t('book.tt.cap') + '</caption><thead><tr><th scope="col">' + t('book.day') + '</th>' + Ops.MEASURE_SLOTS.map(function (x) { return '<th scope="col"><span aria-hidden="true">' + x.replace('-', '–') + '</span><span class="sr-only">' + t('slot.' + x) + '</span></th>'; }).join('') + '</tr></thead><tbody>' +
-        (function () { var prev = 7; return Ops.freeMeasureSlots(st).map(function (d, n) {
+        (function () { var prev = 7; return Ops.freeMeasureSlots(st).filter(function (d) { return Ops.publicSlotOpen(st, d.date); }).map(function (d, n) {
           var dt = Ops.parse(d.date), name = WDL[S.lang][dt.getDay()], wd = (dt.getDay() + 6) % 7, full = !d.slots.some(function (x) { return x.free; }), brk = n && wd < prev ? '</tbody><tbody>' : ''; prev = wd;
           return brk + '<tr' + (full ? ' class="is-full"' : '') + '><th scope="row"><b>' + name.charAt(0).toUpperCase() + name.slice(1) + '</b><span>' + dt.getDate() + ' ' + MOL[S.lang][dt.getMonth()] + (full ? ' · ' + t('bk.full') : '') + '</span></th>' + d.slots.map(function (x) {
             var v = d.date + '|' + x.slot, mine = off(d.date, x.slot), free = x.free && !mine, on = tr.pick === v, id = 'tr-slot-' + d.date + '-' + x.slot;
             return '<td><label class="tt-cell' + (mine ? ' is-mine' : free ? '' : ' is-taken') + '" for="' + id + '"><input type="radio" name="trslot" id="' + id + '" value="' + v + '"' + (on ? ' checked' : '') + (free ? '' : ' aria-disabled="true" data-off="1"') + ' data-f="tr-slot" aria-label="' + esc(fmtDate(d.date, 'day') + ', ' + t('slot.' + x.slot) + ', ' + t(mine ? 'bk.tr.now' : on ? 'book.tt.yours' : x.free ? 'book.tt.free' : 'book.tt.taken')) + '"><span aria-hidden="true">' + (on ? TICK : '') + (mine ? t('bk.tr.now') : x.free ? x.slot.replace('-', '–') : t('book.tt.taken')) + '</span></label></td>';
           }).join('') + '</tr>';
-        }).join(''); })() + '</tbody></table></fieldset><div class="btn-row"><button type="button" class="btn" data-act="tr-move-save" id="tr-move-save"' + (tr.pick ? '' : ' disabled') + '>' + t('bk.tr.save') + '</button><button type="button" class="btn ghost" data-act="tr-move-off" id="tr-move-off">' + t('bk.tr.keep') + '</button></div>';
+        }).join(''); })() + '</tbody></table></fieldset><div class="btn-row tr-save-row"><button type="button" class="btn" data-act="tr-move-save" id="tr-move-save"' + (tr.pick ? '' : ' disabled') + '>' + t('bk.tr.save') + '</button><button type="button" class="btn ghost" data-act="tr-move-off" id="tr-move-off">' + t('bk.tr.keep') + '</button></div>';
       return h;
     }
     if (tr.ask) return h + '<p class="alert" id="tr-ask" tabindex="-1">' + t('bk.tr.ask') + '</p><div class="btn-row"><button type="button" class="btn" data-act="tr-cancel-yes" id="tr-cancel-yes">' + t('bk.tr.yes') + '</button><button type="button" class="btn ghost" data-act="tr-cancel-no" id="tr-cancel-no">' + t('bk.tr.no') + '</button></div>';
@@ -5574,10 +5757,10 @@ if (typeof module !== 'undefined') module.exports = I18N;
     var h = '<div class="scrim" data-act="ops-close"></div><div class="drawer" role="dialog" aria-modal="true" aria-labelledby="od-title" id="drawer"><div class="drawer-head"><div><h2 id="od-title">' + esc(o.code) + ' · ' + bdi(o.customer.name) + '</h2>' +
       '<span class="pill ' + (cancelled ? 'bad' : 'accent') + '">' + t('s.' + o.status) + '</span>' + orderFlags(o) + '</div><button class="btn small ghost" data-act="ops-close" id="od-close">' + t('ops.close') + '</button></div><div class="drawer-body" id="od-body">';
 
-    h += '<section><dl class="specs"><dt>' + t('ops.customer') + '</dt><dd>' + bdi(o.customer.name) + ', <bdi dir="ltr">' + esc(o.customer.phone) + '</bdi></dd><dt>' + t('book.address') + '</dt><dd>' + bdi(o.customer.address || '–') + ' (' + t('zone.' + o.customer.zone) + ')</dd>' +
+    h += '<section><dl class="specs"><dt>' + t('ops.customer') + '</dt><dd>' + bdi(o.customer.name) + ', <bdi dir="ltr">' + esc(o.customer.phone) + '</bdi></dd><dt>' + t('book.address') + '</dt><dd>' + bdi(o.customer.address || '–') + ' (' + (o.customer.zone === 'C' && o.customer.city ? bdi(o.customer.city) : t('zone.' + o.customer.zone)) + ')' + (o.customer.address ? ' <a class="link" target="_blank" rel="noopener" id="od-map" href="https://www.google.com/maps/search/?api=1&amp;query=' + encodeURIComponent(o.customer.address + ', ' + (o.customer.city || t('zone.' + o.customer.zone))) + '">' + t('bk.ops.map') + '</a>' : '') + '</dd>' +
       (o.customer.email ? '<dt>Email</dt><dd><bdi dir="ltr">' + esc(o.customer.email) + '</bdi></dd>' : '') +
       (o.customer.addr2 ? '<dt>' + t('bk.ops.addr2') + '</dt><dd>' + bdi(o.customer.addr2) + '</dd>' : '') + (o.customer.access ? '<dt>' + t('bk.ops.access') + '</dt><dd>' + bdi(o.customer.access) + '</dd>' : '') +
-      (o.customer.address ? '<dt class="sr-only">' + t('bk.ops.map') + '</dt><dd><a class="link" target="_blank" rel="noopener" id="od-map" href="https://www.google.com/maps/search/?api=1&amp;query=' + encodeURIComponent(o.customer.address + ', ' + t('zone.' + o.customer.zone)) + '">' + t('bk.ops.map') + '</a></dd>' : '') +
+
       '<dt>' + t('bk.ops.by') + '</dt><dd>' + t('bk.by.' + (o.customer.contactBy || 'call')) + (o.customer.whatsapp === false ? ' · ' + t('bk.ops.noWa') : '') + (!o.measure && o.customer.callAt && o.customer.callAt !== 'any' ? ' · ' + t('bk.ops.callAt', { at: t('bk.callAt.' + o.customer.callAt).toLowerCase() }) : '') + '</dd>' +
       (o.interest && (o.interest.kinds.length || o.interest.wishes.length) ? '<dt>' + t('bk.ops.interest') + '</dt><dd id="od-interest">' + interestText(o.interest) + '</dd>' : '') +
       '<dt>' + t('ops.source') + '</dt><dd>' + t('src.' + o.source) + '</dd><dt>' + t('ops.created') + '</dt><dd>' + fmtDate(o.createdAt, 'long') + '</dd>' + (o.customer.notes ? '<dt>' + t('book.notes') + '</dt><dd>' + bdi(o.customer.notes) + '</dd>' : '') + '</dl>';
@@ -5596,7 +5779,7 @@ if (typeof module !== 'undefined') module.exports = I18N;
     }
     h += '</section>';
 
-    if (o.photos && o.photos.length) h += '<section id="od-photos"><h3>' + tn('bk.ops.photos', o.photos.length) + '</h3><div class="od-pics">' + o.photos.map(function (p2, n) { return '<a href="' + p2.url + '" target="_blank" rel="noopener"><img src="' + p2.url + '" alt="' + t('bk.ops.photoN', { n: n + 1 }) + '"></a>'; }).join('') + '</div></section>';
+    if (o.photos && o.photos.length) h += '<section id="od-photos"><h3>' + tn('bk.ops.photos', o.photos.length) + '</h3><div class="od-pics">' + o.photos.map(function (p2, n) { return '<button type="button" class="ph-open" data-act="ph-view" data-id="' + o.id + '" data-i="' + n + '" id="ph-open-' + n + '"><img src="' + p2.url + '" alt="' + t('bk.ops.photoN', { n: n + 1 }) + '"></button>'; }).join('') + '</div></section>';
     h += '<section class="next" id="od-next">' + nextHtml(o) + '</section>';
 
     // windows and rails
@@ -5674,7 +5857,7 @@ if (typeof module !== 'undefined') module.exports = I18N;
         var hrs = []; Ops.slotHours(o.measure.slot).forEach(function (x) { hrs.push(x); hrs.push(x.slice(0, 3) + '30'); });
         var ct2 = dr.mTime !== undefined ? dr.mTime : (o.measure.time || (o.measure.pref !== 'any' ? o.measure.pref : ''));
         h += '<div class="pair three"><label class="field" for="od-mtime"><span>' + t('bk.ops.time') + '</span><select id="od-mtime" data-f="od-pick" data-k="mTime" aria-describedby="od-t-err"' + (err.mtime ? ' aria-invalid="true"' : '') + '><option value="">' + t('bk.ops.time') + '</option>' + hrs.map(function (x) { return '<option value="' + x + '"' + (ct2 === x ? ' selected' : '') + '>' + x + '</option>'; }).join('') + '</select></label>' +
-          '<button class="btn small" data-act="ops-confirm-measure" id="od-mconfirm">' + t('bk.ops.confirm') + '</button></div><p class="field-err" id="od-t-err">' + (err.mtime ? t('bk.ops.e.time') : '') + '</p>';
+          '<button class="btn small" data-act="ops-confirm-measure" id="od-mconfirm">' + t('bk.ops.confirm') + '</button></div><p class="field-err" id="od-t-err">' + (err.mtime ? t(err.mtime === 'blocked' ? 'bk.ops.e.blocked' : 'bk.ops.e.time') : '') + '</p>';
         if (o.measure.time) {
           var msg = t('bk.ops.waText', { code: o.code, date: fmtDate(o.measure.date, 'day'), time: o.measure.time });
           h += o.customer.contactBy === 'wa' ? '<p><a class="btn small ghost" target="_blank" rel="noopener" id="od-wa-confirm" href="https://wa.me/' + o.customer.phone.replace(/\D/g, '') + '?text=' + encodeURIComponent(msg) + '">' + t('bk.ops.sendWa') + '</a></p>'
@@ -5762,8 +5945,8 @@ if (typeof module !== 'undefined') module.exports = I18N;
   }
   // The office's calendar (plan, "Booking a measurement: the calendar", "The office's calendar"): what needs doing first
   // (visits to confirm, visits to rearrange, a burst of web bookings), then the week, one day by measurer, or one measurer's route.
-  function calVisitLine(o) {
-    return '<button class="link" data-act="ops-open" data-id="' + o.id + '" id="tc-' + o.id + '">' + esc(o.code) + '</button> · ' + bdi(o.customer.name) + ' · ' + fmtDate(o.measure.date, 'day') + ', ' + t('slot.' + o.measure.slot) +
+  function calVisitLine(o, pre) {
+    return '<button class="link" data-act="ops-open" data-id="' + o.id + '" id="' + (pre || 'tc') + '-' + o.id + '"' + (pre ? '' : ' data-to="od-mtime"') + '>' + esc(o.code) + '</button> · ' + bdi(o.customer.name) + ' · ' + fmtDate(o.measure.date, 'day') + ', ' + t('slot.' + o.measure.slot) +
       (o.measure.pref && o.measure.pref !== 'any' ? ' (' + t('bk.pref.short', { h: o.measure.pref }) + ')' : '') + (o.measure.res ? ' · ' + t('bk.ops.res', { m: o.measure.res }) : '') +
       (o.interest && o.interest.kinds.length ? '<br><span class="muted small">' + interestText(o.interest) + '</span>' : '');
   }
@@ -5778,14 +5961,23 @@ if (typeof module !== 'undefined') module.exports = I18N;
     var days = Ops.workdaysFrom(st.today, Ops.HORIZON, true), cv = S.ops.cv || 'week', ms = Ops.measurers(st);
     var cday = S.ops.cday && days.indexOf(S.ops.cday) >= 0 ? S.ops.cday : days[1], cres = ms.indexOf(S.ops.cres) >= 0 ? S.ops.cres : ms[0];
     var h = S.ops.cmsg ? '<p class="note" id="cal-msg" tabindex="-1">' + S.ops.cmsg + '</p>' : '';
-    if (Ops.burst(st)) h += '<p class="alert" id="cal-burst">' + t('bk.ops.burst', { n: Ops.webToday(st) }) + '</p>';
+    if (Ops.burst(st)) {
+      var tw = st.orders.filter(function (o) { return o.source === 'web' && o.createdAt === st.today; });
+      h += '<div class="alert" id="cal-burst"><p>' + t('bk.ops.burst', { n: tw.length }) + '</p><p class="small">' + tw.map(function (o) { return '<button class="link" data-act="ops-open" data-id="' + o.id + '" id="bu-' + o.id + '">' + esc(o.code) + '</button> ' + bdi(o.customer.name) + (o.suspect ? ' (' + t('ops.flag.suspect') + ')' : ''); }).join(' · ') + '</p>' +
+        (st.paused ? '' : '<button class="btn small" data-act="cal-pause-now" id="cal-pause-now">' + t('bk.ops.pauseNow') + '</button>') + '</div>';
+    }
     if (st.paused) h += '<p class="alert" id="cal-paused">' + t('bk.ops.pausedNote') + '</p>';
     var tc = Ops.toConfirm(st);
     h += '<section class="to-confirm" id="cal-confirm"><h2>' + t('bk.ops.list', { n: tc.length }) + '</h2>' + (tc.length ? '<ul class="plain">' + tc.map(function (o) {
       return '<li>' + (Ops.confirmLate(st, o) ? '<span class="pill bad">' + t('bk.ops.late') + '</span> ' : '') + (o.dup ? '<span class="pill warn">' + t('bk.ops.dup') + '</span> ' : '') + calVisitLine(o) + '</li>';
     }).join('') + '</ul>' : '<p class="muted small">' + t('bk.ops.none') + '</p>') + '</section>';
+    var tcl = Ops.toCall(st);
+    if (tcl.length) h += '<section class="to-confirm" id="cal-call"><h2>' + t('bk.ops.toCall', { n: tcl.length }) + '</h2><ul class="plain">' + tcl.map(function (o) {
+      var wv = o.wanted || o.released;
+      return '<li><span class="pill warn">' + t(o.released ? 'bk.ops.callReleased' : o.dup ? 'bk.ops.dup' : o.suspect ? 'ops.flag.suspect' : 'bk.ops.callWanted') + '</span> <button class="link" data-act="ops-open" data-id="' + o.id + '" id="tl-' + o.id + '">' + esc(o.code) + '</button> · ' + bdi(o.customer.name) + (wv && wv.slot ? ' · ' + fmtDate(wv.date, 'day') + ', ' + t('slot.' + wv.slot) : '') + '</li>';
+    }).join('') + '</ul></section>';
     var ra = Ops.rearrangeList(st);
-    if (ra.length) h += '<section class="to-confirm" id="cal-rearrange"><h2>' + t('bk.ops.rearr', { n: ra.length }) + '</h2><ul class="plain">' + ra.map(function (o) { return '<li><span class="pill bad">' + t('bk.ops.rearr.' + o.measure.rearrange) + '</span> ' + calVisitLine(o) + '</li>'; }).join('') + '</ul></section>';
+    if (ra.length) h += '<section class="to-confirm" id="cal-rearrange"><h2>' + t('bk.ops.rearr', { n: ra.length }) + '</h2><ul class="plain">' + ra.map(function (o) { return '<li><span class="pill bad">' + t('bk.ops.rearr.' + o.measure.rearrange) + '</span> ' + calVisitLine(o, 'ra') + '</li>'; }).join('') + '</ul></section>';
     h += '<div class="tabs" role="group" aria-label="' + t('bk.ops.views') + '">' + ['week', 'day', 'route', 'set'].map(function (k) { return '<button class="tab" id="cv-' + k + '" data-act="cal-view" data-v="' + k + '" aria-pressed="' + (cv === k) + '">' + t('bk.ops.v.' + k) + '</button>'; }).join('') + '</div>';
     var dayOpt = function (id, cur, k) { return '<label class="field" for="' + id + '"><span>' + t('ops.date') + '</span><select id="' + id + '" data-f="cal-pick" data-k="' + k + '">' + days.map(function (d) { return '<option value="' + d + '"' + (cur === d ? ' selected' : '') + '>' + fmtDate(d, 'day') + '</option>'; }).join('') + '</select></label>'; };
     var resOpt = function (id, cur, k) { return '<label class="field" for="' + id + '"><span>' + t('bk.ops.measurer') + '</span><select id="' + id + '" data-f="cal-pick" data-k="' + k + '">' + ms.map(function (m) { return '<option value="' + m + '"' + (cur === m ? ' selected' : '') + '>' + t('bk.ops.res', { m: m }) + '</option>'; }).join('') + '</select></label>'; };
@@ -5811,37 +6003,48 @@ if (typeof module !== 'undefined') module.exports = I18N;
         var c = o.customer, addr = [c.address, c.addr2, c.zone === 'C' ? c.city : t('zone.' + c.zone)].filter(Boolean).join(', ');
         return '<li><p><b>' + (o.measure.time || t('slot.' + o.measure.slot) + (o.measure.pref && o.measure.pref !== 'any' ? ' (' + t('bk.pref.short', { h: o.measure.pref }) + ')' : '')) + '</b> · ' + bdi(c.name) + ' · <bdi dir="ltr">' + esc(fmtPhone(c.phone)) + '</bdi></p>' +
           '<p>' + bdi(addr) + (c.access ? '<br><span class="muted">' + bdi(c.access) + '</span>' : '') + '</p>' +
-          '<p class="small">' + t('bk.ops.books', { k: sampleBooks(o) }) + (o.windows.length + (o.extras || []).length ? ' · ' + tn('est.count', o.windows.length + (o.extras || []).length) : '') + (o.photos && o.photos.length ? ' · ' + tn('bk.ops.photos', o.photos.length) : '') + '</p>' +
+          '<p class="small">' + t('bk.ops.books', { k: sampleBooks(o) }) + (o.windows.length + (o.extras || []).length ? ' · ' + tn('bk.ops.nWin', o.windows.length + (o.extras || []).length) : '') + (o.photos && o.photos.length ? ' · ' + tn('bk.ops.photos', o.photos.length) : '') + '</p>' +
           (c.notes ? '<p class="small muted">' + bdi(c.notes) + '</p>' : '') +
           '<p class="btn-row"><a class="btn small ghost" target="_blank" rel="noopener" href="https://wa.me/' + c.phone.replace(/\D/g, '') + '">WhatsApp</a>' + (c.address ? '<a class="btn small ghost" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&amp;query=' + encodeURIComponent(addr) + '">' + t('bk.ops.map') + '</a>' : '') + '<button class="link" data-act="ops-open" data-id="' + o.id + '">' + esc(o.code) + '</button></p></li>';
       }).join('') + '</ol>';
     }
-    if (cv === 'set') { // who works, days off, blocked windows, the web cap, the pause switch, releasing web bookings
-      var cfg = S.ops.cset || {};
-      h += '<section class="panel" id="cal-settings"><h2>' + t('bk.ops.v.set') + '</h2>' +
+    if (cv === 'set') { // who works, days off, blocked windows, the web limit, the pause switch, releasing web bookings; what is in force is listed first
+      var cfg = S.ops.cset || {}, sday = function (id, cur, k, lab) { return '<label class="field" for="' + id + '"><span>' + t(lab) + '</span><select id="' + id + '" data-f="cal-pick" data-k="' + k + '">' + days.map(function (d) { return '<option value="' + d + '"' + (cur === d ? ' selected' : '') + '>' + fmtDate(d) + '</option>'; }).join('') + '</select></label>'; };
+      var offs = Object.keys(st.off || {}).filter(function (k) { return k.slice(0, 10) >= st.today; }).sort(), blks = Object.keys(st.blocks || {}).filter(function (k) { return k.slice(0, 10) >= st.today; }).sort();
+      h += '<section class="panel" id="cal-settings"><h2>' + t('bk.ops.v.set') + '</h2>';
+      if (S.ops.pend) { // a change that touches visits waits for a second press, with the list of what it touches
+        var pd = S.ops.pend;
+        h += '<div class="alert" id="cal-pend" tabindex="-1"><p>' + t('bk.ops.pend.' + pd.kind, { n: pd.list.length }) + '</p><ul class="plain small">' + pd.list.map(function (o) {
+          return '<li>' + esc(o.code) + ' · ' + bdi(o.customer.name) + ' · ' + fmtDate(o.measure.date) + ', ' + t('slot.' + o.measure.slot) + ' · <bdi dir="ltr">' + esc(fmtPhone(o.customer.phone)) + '</bdi>' + (pd.moved && pd.moved.indexOf(o) >= 0 ? ' · ' + t('bk.ops.pend.toColleague') : '') + '</li>';
+        }).join('') + '</ul><div class="btn-row"><button class="btn small' + (pd.kind === 'release' ? ' danger' : '') + '" data-act="cal-pend-yes" id="cal-pend-yes">' + t('bk.ops.pend.yes.' + pd.kind, { n: pd.list.length }) + '</button><button class="btn small ghost" data-act="cal-pend-no" id="cal-pend-no">' + t('ops.cancel.no') + '</button></div></div>';
+      }
+      if (S.ops.freed && S.ops.freed.length) h += '<div class="note" id="cal-freed"><p>' + t('bk.ops.freedH', { n: S.ops.freed.length }) + '</p><ul class="plain small">' + S.ops.freed.map(function (o) { return '<li>' + esc(o.code) + ' · ' + bdi(o.customer.name) + ' · <a class="link" target="_blank" rel="noopener" href="https://wa.me/' + o.customer.phone.replace(/\D/g, '') + '?text=' + encodeURIComponent(t('bk.ops.freedWa', { code: o.code })) + '">WhatsApp</a></li>'; }).join('') + '</ul></div>';
+      h += '<div class="in-force"><h3>' + t('bk.ops.inForce') + '</h3>' + (offs.length || blks.length ? '<ul class="plain">' +
+        offs.map(function (k) { return '<li>' + t('bk.ops.offItem', { m: k.slice(11), date: fmtDate(k.slice(0, 10), 'day') }) + ' <button class="link" data-act="cal-unoff" data-k="' + k + '" id="un-' + k.replace('|', '-') + '">' + t('bk.ops.offClear') + '</button></li>'; }).join('') +
+        blks.map(function (k) { var sl = k.slice(11); return '<li>' + t('bk.ops.blockItem', { date: fmtDate(k.slice(0, 10), 'day'), slot: sl === '*' ? t('bk.ops.wholeDay').toLowerCase() : t('slot.' + sl) }) + ' <button class="link" data-act="cal-unblock" data-k="' + k + '" id="ub-' + k.replace('|', '-').replace('*', 'all') + '">' + t('bk.ops.unblockOne') + '</button></li>'; }).join('') + '</ul>' : '<p class="muted small">' + t('bk.ops.nothingInForce') + '</p>') + '</div>' +
         '<fieldset><legend>' + t('bk.ops.who') + '</legend><div class="chips">' + ['A', 'B', 'C'].map(function (m) { return chk('cal-ms', m, ms.indexOf(m) >= 0, t('bk.ops.res', { m: m })); }).join('') + '</div></fieldset>' +
-        '<div class="pair three">' + dayOpt('cal-odate', cfg.odate || days[1], 'odate') + resOpt('cal-ores', cfg.ores || ms[0], 'ores') + '<div class="btn-row"><button class="btn small" data-act="cal-off" data-on="1" id="cal-off-on">' + t('bk.ops.offSet') + '</button><button class="btn small ghost" data-act="cal-off" data-on="0" id="cal-off-off">' + t('bk.ops.offClear') + '</button></div></div>' +
-        '<div class="pair three">' + dayOpt('cal-bdate', cfg.bdate || days[1], 'bdate') + '<label class="field" for="cal-bslot"><span>' + t('ops.slot') + '</span><select id="cal-bslot" data-f="cal-pick" data-k="bslot"><option value="*">' + t('bk.ops.wholeDay') + '</option>' + Ops.MEASURE_SLOTS.map(function (s) { return '<option value="' + s + '"' + (cfg.bslot === s ? ' selected' : '') + '>' + t('slot.' + s) + '</option>'; }).join('') + '</select></label>' +
-        '<div class="btn-row"><button class="btn small" data-act="cal-block" data-on="1" id="cal-block-on">' + t('bk.ops.block') + '</button><button class="btn small ghost" data-act="cal-block" data-on="0" id="cal-block-off">' + t('bk.ops.unblock') + '</button></div></div>' +
-        '<div class="pair three"><label class="field" for="cal-cap"><span>' + t('bk.ops.cap') + '</span><input type="text" inputmode="numeric" id="cal-cap" maxlength="2" value="' + (st.webCap || '') + '" data-f="cal-cap" aria-describedby="cal-cap-hint"><small id="cal-cap-hint">' + t('bk.ops.capHint') + '</small></label>' +
-        '<label class="check" for="cal-pause"><input type="checkbox" id="cal-pause"' + (st.paused ? ' checked' : '') + ' data-f="cal-pause"><span>' + t('bk.ops.pause') + '</span></label></div>' +
-        '<div class="pair three">' + dayOpt('cal-rfrom', cfg.rfrom || days[1], 'rfrom') + '<div class="btn-row"><button class="btn small danger" data-act="cal-release" id="cal-release">' + t('bk.ops.release') + '</button></div></div><p class="muted small">' + t('bk.ops.releaseHint') + '</p></section>';
+        '<fieldset><legend>' + t('bk.ops.offLegend') + '</legend><div class="pair three">' + sday('cal-odate', cfg.odate || days[1], 'odate', 'bk.ops.offDay') + resOpt('cal-ores', cfg.ores || ms[0], 'ores') + '<div class="btn-row"><button class="btn small" data-act="cal-off" data-on="1" id="cal-off-on">' + t('bk.ops.offSet') + '</button></div></div></fieldset>' +
+        '<fieldset><legend>' + t('bk.ops.blockLegend') + '</legend><div class="pair three">' + sday('cal-bdate', cfg.bdate || days[1], 'bdate', 'bk.ops.blockDay') + '<label class="field" for="cal-bslot"><span>' + t('ops.slot') + '</span><select id="cal-bslot" data-f="cal-pick" data-k="bslot"><option value="*">' + t('bk.ops.wholeDay') + '</option>' + Ops.MEASURE_SLOTS.map(function (s) { return '<option value="' + s + '"' + (cfg.bslot === s ? ' selected' : '') + '>' + t('slot.' + s) + '</option>'; }).join('') + '</select></label>' +
+        '<div class="btn-row"><button class="btn small" data-act="cal-block" data-on="1" id="cal-block-on">' + t('bk.ops.block') + '</button></div></div></fieldset>' +
+        '<fieldset><legend>' + t('bk.ops.capLegend') + '</legend><div class="pair three"><label class="field" for="cal-cap"><span>' + t('bk.ops.cap') + '</span><input type="text" inputmode="numeric" id="cal-cap" maxlength="2" value="' + (st.webCap || '') + '" data-f="cal-cap" aria-describedby="cal-cap-hint cal-cap-err"' + (S.ops.capErr ? ' aria-invalid="true"' : '') + '><small id="cal-cap-hint">' + t('bk.ops.capHint') + '</small><span class="field-err" id="cal-cap-err">' + (S.ops.capErr ? t('bk.ops.capErr') : '') + '</span></label>' +
+        '<label class="check" for="cal-pause"><input type="checkbox" id="cal-pause"' + (st.paused ? ' checked' : '') + ' data-f="cal-pause"><span>' + t('bk.ops.pause') + '</span></label></div></fieldset>' +
+        '<fieldset><legend>' + t('bk.ops.releaseLegend') + '</legend><div class="pair three">' + sday('cal-rfrom', cfg.rfrom || days[1], 'rfrom', 'bk.ops.releaseFrom') + '<div class="btn-row"><button class="btn small danger" data-act="cal-release" id="cal-release">' + t('bk.ops.release') + '</button></div></div><p class="muted small">' + t('bk.ops.releaseHint') + '</p></fieldset></section>';
       return h;
     }
     // the week: days down, windows across; a cell shows each of its visits, its free places, or that it is blocked
-    h += '<h2>' + t('cal.h', { n: Ops.HORIZON }) + '</h2><div class="scroll-x" tabindex="0" role="region" aria-label="' + t('cal.h', { n: Ops.HORIZON }) + '"><table class="data cal sticky-col"><thead><tr><th scope="col">' + t('cal.day') + '</th>' +
+    h += '<h2>' + t('cal.h', { n: Ops.HORIZON }) + '</h2><p class="inst-toggle"><button class="link" data-act="cal-inst" id="cal-inst" aria-pressed="' + !!S.ops.inst + '">' + t('bk.ops.showInst') + '</button></p><div class="scroll-x" tabindex="0" role="region" aria-label="' + t('cal.h', { n: Ops.HORIZON }) + '"><table class="data cal sticky-col' + (S.ops.inst ? ' show-inst' : '') + '"><thead><tr><th scope="col">' + t('cal.day') + '</th>' +
       Ops.MEASURE_SLOTS.map(function (s) { return '<th scope="col">' + t('cal.measure') + '<br><span class="muted small">' + t('slot.' + s) + '</span></th>'; }).join('') +
-      Ops.TEAMS.map(function (tm) { return Ops.INSTALL_SLOTS.map(function (s) { return '<th scope="col">' + t('team.n', { t: tm }) + '<br><span class="muted small">' + t('slot.' + s) + '</span></th>'; }).join(''); }).join('') + '</tr></thead><tbody>';
+      Ops.TEAMS.map(function (tm) { return Ops.INSTALL_SLOTS.map(function (s) { return '<th scope="col" class="inst">' + t('team.n', { t: tm }) + '<br><span class="muted small">' + t('slot.' + s) + '</span></th>'; }).join(''); }).join('') + '</tr></thead><tbody>';
     function icell(o, key, done) {
-      return o ? '<td class="' + (done ? 'done' : 'busy') + '"><button class="link" data-act="ops-open" data-id="' + o.id + '" id="cal-' + key + '">' + esc(o.code) + '</button><br><span class="small">' + bdi(o.customer.name) + (done ? ' · ' + t('cal.done') : '') + '</span></td>' : '<td class="free">' + t('cal.free') + '</td>';
+      return o ? '<td class="inst ' + (done ? 'done' : 'busy') + '"><button class="link" data-act="ops-open" data-id="' + o.id + '" id="cal-' + key + '">' + esc(o.code) + '</button><br><span class="small">' + bdi(o.customer.name) + (done ? ' · ' + t('cal.done') : '') + '</span></td>' : '<td class="inst free">' + t('cal.free') + '</td>';
     }
     days.forEach(function (d) {
       h += '<tr><th scope="row">' + fmtDate(d) + '</th>';
       Ops.MEASURE_SLOTS.forEach(function (s) {
-        var hs = Ops.holders(st, d, s, null), bl = Ops.blocked(st, d, s), places = bl ? 0 : ms.filter(function (m) { return !Ops.offDay(st, d, m); }).length, free = Math.max(0, places - hs.length);
+        var hs = Ops.holders(st, d, s, null), bl = Ops.blocked(st, d, s), offm = ms.filter(function (m) { return Ops.offDay(st, d, m); }), places = bl ? 0 : ms.length - offm.length, free = Math.max(0, places - hs.length);
         h += '<td class="' + (bl ? 'blocked' : hs.length ? 'busy' : 'free') + '">' + hs.map(function (o, n) {
           return '<button class="link" data-act="ops-open" data-id="' + o.id + '" id="cal-' + d + '-m-' + s + (n ? '-' + n : '') + '">' + esc(o.code) + '</button><br><span class="small">' + bdi(o.customer.name) + ' · ' + (o.measure.res || '') + ' · ' + (Ops.STATES.indexOf(o.status) > 1 ? t('cal.done') : o.measure.time || t('bk.ops.requestedShort')) + '</span>';
-        }).join('<br>') + (bl ? '<span class="small">' + t('bk.ops.blocked') + '</span>' : free ? (hs.length ? '<br>' : '') + '<span class="small muted">' + tn('bk.ops.freeN', free) + '</span>' : '') + '</td>';
+        }).join('<br>') + (bl ? (hs.length ? '<br>' : '') + '<span class="small">' + t('bk.ops.blocked') + '</span>' : free ? (hs.length ? '<br>' : '') + '<span class="small muted">' + tn('bk.ops.freeN', free) + '</span>' : '') + (offm.length && !bl ? '<br><span class="small muted">' + t('bk.ops.offShort', { m: offm.join(', ') }) + '</span>' : '') + '</td>';
       });
       Ops.TEAMS.forEach(function (tm) { Ops.INSTALL_SLOTS.forEach(function (s) {
         var n = st.orders.filter(function (o) { return o.status !== 'cancelled' && o.install && o.install.date === d && o.install.slot === s && o.install.team === tm; })[0];
@@ -5933,7 +6136,7 @@ if (typeof module !== 'undefined') module.exports = I18N;
     try { SCROLLS[hashFor()] = window.scrollY || 0; } catch (e0) { /* ignore */ }
     if (view === 'config' && !fromHash) S.introDone = true;
     if (view === 'config' && param) { var si = path().map(stepWord).indexOf(param); S.step = si < 0 ? 1 : si + 1; S.reach = Math.max(S.reach, S.step); }
-    if (view === 'book') { S.bstep = param ? Math.max(1, BSTEPS.indexOf(param) + 1) : 1; S.bFromSum = false; S.bStack = [param ? 'book-' + param : 'book']; }
+    if (view === 'book') { S.bstep = param ? Math.max(1, BSTEPS.indexOf(param) + 1) : 1; S.bFromSum = false; }
     if (view === 'fabric') { if (param && FAMILIES.indexOf(param) >= 0) S.fab = param; else if (param) { view = 'catalog'; param = 'perde'; } }
     if (view === 'item') { if (param && blindById(param)) S.item = param; else if (param) { view = 'catalog'; param = ''; } }
     if (view === 'catalog') S.cat = param && CATEGORIES.indexOf(param) >= 0 ? param : '';
@@ -5998,6 +6201,11 @@ if (typeof module !== 'undefined') module.exports = I18N;
     var el = ev.target.closest('[data-go],[data-lang],[data-act]');
     if (!el || el.disabled) return;
     if (el.tagName === 'A') { if (ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.button) return; ev.preventDefault(); } // a plain tap on a link stays inside the page
+    if (el.id === 'tr-rebook') { // a new booking for the same request: the old result page is gone and what the office knows is filled in
+      var ro = S.track.result && S.track.result.order; S.book = emptyBook(); S.bstep = 1; S.bFromSum = false;
+      if (ro) { S.book.name = ro.customer.name; S.book.phone = ro.customer.phone; S.book.email = ro.customer.email || ''; S.book.address = ro.customer.address || ''; S.book.addr2 = ro.customer.addr2 || ''; S.book.access = ro.customer.access || ''; if (ro.customer.zone) S.zone = ro.customer.zone; if (ro.customer.city) S.book.city = ro.customer.city; }
+      saveBook();
+    }
     if (el.hasAttribute('data-go')) { go(el.getAttribute('data-go')); return; }
     if (el.hasAttribute('data-lang')) { S.lang = el.getAttribute('data-lang'); savePrefs(); S.railNote = ''; S.ops.notes = {}; S.ops.flash = ''; render(); var lb = $('lang-' + S.lang); if (lb) lb.focus({ preventScroll: true }); return; }
     var act = el.getAttribute('data-act'), o = S.ops.open ? orderById(S.ops.open) : null, i = Number(el.getAttribute('data-i')), r, v;
@@ -6046,7 +6254,7 @@ if (typeof module !== 'undefined') module.exports = I18N;
         if (smr && S.cfg.mode !== x.mode && Pricing.railIssues(smr, S.cfg).length) { S.cfg.mode = x.mode; modeNote = t('cfg.modeAuto', { v: t('cfg.mode.' + x.mode, { n: PARAMS.overhang }) }); }
         S.wantMount = x.mount; S.railNote = (modeNote + ' ' + changeNote(Ops.fixRail(S.cfg, S.wantMount))).trim();
         setStepKey('size', true); go('config'); break;
-      case 'step-go': S.fromSum = /^sum-go-/.test(el.id) && i < path().length; setStep(i); break;
+      case 'step-go': S.fromSum = /^sum-go-/.test(el.id) && i < path().length; S.famChanged = false; setStep(i); break;
       case 'step-back': S.fromSum = false; setStep(S.step - 1); break;
       case 'cfg-start': S.introDone = true; render(); var rq = $('cfg-room'); if (rq) rq.focus({ preventScroll: true }); else { var sh = $('cfg-step-h'); if (sh) sh.focus({ preventScroll: true }); } break;
       case 'cfg-intro': S.introDone = false; render(); var ih = $('cfg-intro-h'); if (ih) ih.focus({ preventScroll: true }); break;
@@ -6054,6 +6262,7 @@ if (typeof module !== 'undefined') module.exports = I18N;
       case 'step-next':
         var blk = stepBlock();
         if (blk) { S.sizeAsked = true; paintSizeErrors(); var be = $(blk); if (be) { if (be.focus) be.focus(); if (be.scrollIntoView) be.scrollIntoView({ block: 'center' }); } say(curIssues(curCheck()) || t('cfg.noRail')); break; }
+        if (S.fromSum && S.famChanged && stepKey() === 'fabric') { S.famChanged = false; setStepKey('color'); break; } // the new fabric's colour is shown, then back
         if (S.fromSum) { S.fromSum = false; setStep(path().length); break; }
         setStep(S.step + 1); break;
       case 'step-again': S.room = ''; S.sizeAsked = false; S.sizeSeen = {}; setStep(1); break; // the same choices stay as a start for the next window
@@ -6090,6 +6299,7 @@ if (typeof module !== 'undefined') module.exports = I18N;
         tiranaNow(); var mr = Ops.trackMove(st, S.track.code, S.track.pin, S.track.pick.split('|')[0], S.track.pick.split('|')[1]); // through the code and the four digits, as the real API does
         S.track.move = mr.ok ? false : S.track.move; S.track.pick = '';
         S.track.msg = mr.ok ? t('bk.tr.moved', { when: visitText(tm) }) : t('bk.tr.e.' + mr.error);
+        if (mr.ok && S.book.done && S.book.done.code === tm.code) { S.book.done.date = tm.measure.date; S.book.done.slot = tm.measure.slot; S.book.done.pref = tm.measure.pref; }
         trRedraw('tr-msg'); say(S.track.msg); break;
       case 'tr-cancel': S.track.ask = true; S.track.msg = ''; trRedraw('tr-ask'); break;
       case 'tr-cancel-no': S.track.ask = false; trRedraw('tr-cancel'); break;
@@ -6097,6 +6307,7 @@ if (typeof module !== 'undefined') module.exports = I18N;
         var tc = S.track.result && S.track.result.order; if (!tc) break;
         tiranaNow(); var cr = Ops.trackCancel(st, S.track.code, S.track.pin); S.track.ask = false; S.track.gone = cr.ok;
         S.track.msg = cr.ok ? t('bk.tr.cancelled') : t('bk.tr.e.' + cr.error);
+        if (cr.ok && S.book.done && S.book.done.code === tc.code) S.book.done = null;
         trRedraw('tr-msg'); say(S.track.msg); break;
       case 'bk-back': S.bFromSum = false; setBStep(S.bstep - 1); break;
       case 'bk-go': S.bFromSum = Number(el.getAttribute('data-i')) < BSTEPS.length; setBStep(el.getAttribute('data-i')); break;
@@ -6110,24 +6321,49 @@ if (typeof module !== 'undefined') module.exports = I18N;
         go('track'); var tr0 = $('track-res'); if (tr0) { bringUp(tr0); tr0.focus({ preventScroll: true }); } break; // the answer, not the form, is what comes into sight
       case 'ops-tab': S.ops.tab = el.getAttribute('data-tab'); render(); var tb = $('tab-' + S.ops.tab); if (tb) tb.focus(); break;
       case 'cal-view': S.ops.cv = el.getAttribute('data-v'); S.ops.cmsg = ''; refreshOps('cv-' + S.ops.cv); break;
-      case 'cal-off':
-        var cs = S.ops.cset || {}, odays = Ops.workdaysFrom(st.today, Ops.HORIZON, true), od2 = cs.odate || odays[1], or2 = cs.ores || Ops.measurers(st)[0], on2 = el.getAttribute('data-on') === '1';
-        r = Ops.setOff(st, od2, or2, on2);
-        S.ops.cmsg = on2 ? t('bk.ops.offDone', { m: or2, date: fmtDate(od2, 'day'), moved: r.moved.length, left: r.affected.length }) : t('bk.ops.offCleared', { m: or2, date: fmtDate(od2, 'day') });
-        refreshOps('cal-msg', S.ops.cmsg); break;
+      case 'cal-off': // a measurer's day off: the visits it touches are listed first
+        var cs = S.ops.cset || {}, odays = Ops.workdaysFrom(st.today, Ops.HORIZON, true), od2 = cs.odate || odays[1], or2 = cs.ores || Ops.measurers(st)[0];
+        var po = Ops.previewOff(st, od2, or2); S.ops.freed = null;
+        if (!po.moved.length && !po.left.length) { Ops.setOff(st, od2, or2, true); S.ops.cmsg = t('bk.ops.offDone', { m: or2, date: fmtDate(od2, 'day'), moved: 0, left: 0 }); refreshOps('cal-msg', S.ops.cmsg); break; }
+        S.ops.pend = { kind: 'off', date: od2, m: or2, list: po.moved.concat(po.left), moved: po.moved }; S.ops.cmsg = ''; refreshOps('cal-pend'); break;
       case 'cal-block':
-        var cb = S.ops.cset || {}, bdays = Ops.workdaysFrom(st.today, Ops.HORIZON, true), bd = cb.bdate || bdays[1], bs = cb.bslot || '*', on3 = el.getAttribute('data-on') === '1';
-        r = Ops.setBlock(st, bd, bs, on3);
-        S.ops.cmsg = t(on3 ? 'bk.ops.blockDone' : 'bk.ops.unblockDone', { date: fmtDate(bd, 'day'), slot: bs === '*' ? t('bk.ops.wholeDay').toLowerCase() : t('slot.' + bs), n: r.affected ? r.affected.length : 0 });
-        refreshOps('cal-msg', S.ops.cmsg); break;
+        var cb = S.ops.cset || {}, bdays = Ops.workdaysFrom(st.today, Ops.HORIZON, true), bd = cb.bdate || bdays[1], bs = cb.bslot || '*';
+        var pb = Ops.previewBlock(st, bd, bs); S.ops.freed = null;
+        if (!pb.length) { Ops.setBlock(st, bd, bs, true); S.ops.cmsg = t('bk.ops.blockDone', { date: fmtDate(bd, 'day'), slot: bs === '*' ? t('bk.ops.wholeDay').toLowerCase() : t('slot.' + bs), n: 0 }); refreshOps('cal-msg', S.ops.cmsg); break; }
+        S.ops.pend = { kind: 'block', date: bd, slot: bs, list: pb }; S.ops.cmsg = ''; refreshOps('cal-pend'); break;
       case 'cal-release':
-        var cr2 = S.ops.cset || {}, rdays = Ops.workdaysFrom(st.today, Ops.HORIZON, true), rf = cr2.rfrom || rdays[1];
-        r = Ops.releaseWeb(st, rf); S.ops.cmsg = t('bk.ops.released', { n: r.released, date: fmtDate(rf, 'day') }); refreshOps('cal-msg', S.ops.cmsg); break;
-      case 'ops-assign': if (!o) break; r = Ops.assignMeasurer(st, o, draft('mRes', o.measure ? o.measure.res : '')); S.ops.err.res = r.ok ? null : r.error; if (r.ok) delete S.ops.drafts.mRes; refreshOps(r.ok ? 'od-res' : 'od-res', r.ok ? t('bk.ops.assigned') : t('ops.e.slotTaken')); break;
+        var cr2 = S.ops.cset || {}, rdays = Ops.workdaysFrom(st.today, Ops.HORIZON, true), rf = cr2.rfrom || rdays[1], pr2 = Ops.previewRelease(st, rf); S.ops.freed = null;
+        if (!pr2.length) { S.ops.cmsg = t('bk.ops.releaseNone', { date: fmtDate(rf, 'day') }); refreshOps('cal-msg', S.ops.cmsg); break; }
+        S.ops.pend = { kind: 'release', date: rf, list: pr2 }; S.ops.cmsg = ''; refreshOps('cal-pend'); break;
+      case 'cal-pend-no': S.ops.pend = null; S.ops.cmsg = t('bk.ops.pendCancelled'); refreshOps('cal-msg', S.ops.cmsg); break;
+      case 'cal-pend-yes':
+        var pnd = S.ops.pend; S.ops.pend = null; if (!pnd) break;
+        if (pnd.kind === 'off') { r = Ops.setOff(st, pnd.date, pnd.m, true); S.ops.cmsg = t('bk.ops.offDone', { m: pnd.m, date: fmtDate(pnd.date, 'day'), moved: r.moved.length, left: r.affected.length }); }
+        else if (pnd.kind === 'block') { r = Ops.setBlock(st, pnd.date, pnd.slot, true); S.ops.cmsg = t('bk.ops.blockDone', { date: fmtDate(pnd.date, 'day'), slot: pnd.slot === '*' ? t('bk.ops.wholeDay').toLowerCase() : t('slot.' + pnd.slot), n: r.affected.length }); }
+        else if (pnd.kind === 'ms') { r = Ops.setMeasurers(st, pnd.ms); S.ops.cmsg = t('bk.ops.whoDone', { n: pnd.ms.length, left: Ops.rearrangeList(st).length }); }
+        else if (pnd.kind === 'release') { S.ops.freed = pnd.list.slice(); r = Ops.releaseWeb(st, pnd.date); S.ops.cmsg = t('bk.ops.released', { n: r.released, date: fmtDate(pnd.date, 'day') }); }
+        refreshOps('cal-msg', S.ops.cmsg); break;
+      case 'cal-unoff': var uk = el.getAttribute('data-k'); Ops.setOff(st, uk.slice(0, 10), uk.slice(11), false); S.ops.cmsg = t('bk.ops.offCleared', { m: uk.slice(11), date: fmtDate(uk.slice(0, 10), 'day') }); refreshOps('cal-msg', S.ops.cmsg); break;
+      case 'cal-unblock':
+        var bk2 = el.getAttribute('data-k'), bsl = bk2.slice(11); Ops.setBlock(st, bk2.slice(0, 10), bsl, false);
+        S.ops.cmsg = t('bk.ops.unblockDone', { date: fmtDate(bk2.slice(0, 10), 'day'), slot: bsl === '*' ? t('bk.ops.wholeDay').toLowerCase() : t('slot.' + bsl) }) + (bsl !== '*' && Ops.blocked(st, bk2.slice(0, 10), bsl) ? ' ' + t('bk.ops.stillBlocked') : '');
+        refreshOps('cal-msg', S.ops.cmsg); break;
+      case 'ph-view': // the customer's photograph at full width, in the page
+        var po2 = orderById(el.getAttribute('data-id')), pi = Number(el.getAttribute('data-i'));
+        if (po2 && po2.photos && po2.photos[pi]) {
+          var pv = document.createElement('div'); pv.className = 'ph-view'; pv.id = 'ph-view'; pv.setAttribute('role', 'dialog'); pv.setAttribute('aria-modal', 'true'); pv.setAttribute('aria-label', t('bk.ops.photoN', { n: pi + 1 }));
+          pv.innerHTML = '<img src="' + po2.photos[pi].url + '" alt="' + t('bk.ops.photoN', { n: pi + 1 }) + '"><button type="button" class="btn small" data-act="ph-close" id="ph-close" data-back="' + el.id + '">' + t('ops.close') + '</button>';
+          document.body.appendChild(pv); $('ph-close').focus();
+        } break;
+      case 'ph-close': var pvx = $('ph-view'); if (pvx) pvx.remove(); var pb2 = $(el.getAttribute('data-back')); if (pb2) pb2.focus(); break;
+      case 'cal-inst': S.ops.inst = !S.ops.inst; refreshOps('cal-inst'); break;
+      case 'cal-pause-now': st.paused = true; S.ops.cmsg = t('bk.ops.pausedOn'); refreshOps('cal-msg', S.ops.cmsg); break;
+      case 'ops-assign': if (!o) break; r = Ops.assignMeasurer(st, o, draft('mRes', o.measure ? o.measure.res : '')); S.ops.err.res = r.ok ? null : r.error; if (r.ok) delete S.ops.drafts.mRes; refreshOps('od-res', r.ok ? t('bk.ops.assigned') : t(r.error === 'same' ? 'bk.ops.e.same' : 'ops.e.slotTaken')); break;
       case 'ops-next-day': Ops.nextDay(st); refreshOps(S.ops.open ? ['od-next-day', 'od-advance'] : 'ops-next-day', ''); break;
       case 'ops-jump': var col = $('bcol-' + el.getAttribute('data-s')), sc = $('board-scroll'); if (col && sc) sc.scrollLeft = col.offsetLeft - sc.offsetLeft; break;
       case 'lead-open': S.ops.leadOpen = true; refreshOps('lead-name'); break;
-      case 'ops-open': openDrawer(el.getAttribute('data-id'), el.id); break;
+      case 'ops-open': openDrawer(el.getAttribute('data-id'), el.id);
+        var to2 = el.getAttribute('data-to') && $(el.getAttribute('data-to')); if (to2) { try { to2.scrollIntoView({ block: 'center' }); } catch (e) { /* ignore */ } to2.focus({ preventScroll: true }); } break; // from the list to confirm: straight to the time
       case 'ops-close': closeDrawer(); break;
       case 'ops-confirm-no':
         var was = S.ops.confirm; S.ops.confirm = null;
@@ -6160,7 +6396,7 @@ if (typeof module !== 'undefined') module.exports = I18N;
         if (!o) break;
         r = Ops.confirmMeasure(st, o, draft('mTime', o.measure ? o.measure.time || (o.measure.pref !== 'any' ? o.measure.pref : '') : ''));
         S.ops.err.mtime = r.ok ? null : r.error; if (r.ok) delete S.ops.drafts.mTime;
-        refreshOps(r.ok ? ['od-wa-confirm', 'od-mconfirm'] : 'od-mtime', r.ok ? t('bk.ops.flash') : t('bk.ops.e.time')); break;
+        refreshOps(r.ok ? ['od-wa-confirm', 'od-mconfirm'] : 'od-mtime', r.ok ? t('bk.ops.flash') : ''); break; // an error is read by the field it describes, once
       case 'ops-set-measure':
         if (!o) break;
         r = Ops.setMeasure(st, o, draft('mDate', o.measure ? o.measure.date : ''), draft('mSlot', o.measure ? o.measure.slot : ''));
@@ -6222,14 +6458,14 @@ if (typeof module !== 'undefined') module.exports = I18N;
         var nm = blindById(v); if (!nm || nm.cat !== S.kind) break;
         S.blind.model = nm.id; S.blind.color = nm.colors[0].id; S.added = false; refreshConfig(true); break;
       case 'bcolor': if (blindColor(blindById(S.blind.model), v)) { S.blind.color = v; S.added = false; refreshConfig(true); } break;
-      case 'bmount': case 'bside': S.blind[f === 'bmount' ? 'mount' : 'side'] = v; S.added = false; refreshConfig(true); break;
+      case 'bmount': case 'bside': S.blind[f === 'bmount' ? 'mount' : 'side'] = v; S.added = false; S.bMore = true; refreshConfig(true); break;
       case 'bwidth': case 'bheight':
         var bf = f === 'bwidth' ? 'width' : 'height', bv = num(v);
         if (isChange) S.sizeSeen[bf] = true;
         if (isChange && (bv === S.blind[bf] || (isNaN(bv) && isNaN(S.blind[bf])))) { paintSizeErrors(); break; } // already applied while typing
         S.blind[bf] = bv; S.added = false; refreshConfig(true); break; // the fields themselves are not redrawn: they stand outside the redrawn part
       case 'sheerFam': case 'mainFam': // a new fabric starts on the colour its photograph shows (else its first)
-        S.cfg[f === 'sheerFam' ? 'sheerId' : 'mainId'] = famFabric(v).id; S.added = false;
+        S.cfg[f === 'sheerFam' ? 'sheerId' : 'mainId'] = famFabric(v).id; S.added = false; if (S.fromSum) S.famChanged = true;
         settle(f); refreshConfig(true); sayFabric(familyOf(v)[0]); break;
       case 'room': S.room = v; setSum(); break;
       case 'width': case 'height':
@@ -6259,7 +6495,7 @@ if (typeof module !== 'undefined') module.exports = I18N;
         // the hour chips come into sight, but never so far that the chosen cell, which keeps the focus, leaves the screen
         try {
           var bp = $('book-pref'), cell = $('slot-' + v.replace('|', '-')), bar = $('bk-bar');
-          if (bp && cell && bar) { var need = bp.getBoundingClientRect().bottom - bar.getBoundingClientRect().top + 8, room = cell.getBoundingClientRect().top - stickyTop() - 12; if (need > 0) window.scrollBy(0, Math.min(need, Math.max(0, room))); }
+          if (bp && cell && bar) { var need = bp.getBoundingClientRect().bottom - bar.getBoundingClientRect().top + 8, room = bp.getBoundingClientRect().top - stickyTop() - 12; if (need > 0) window.scrollBy(0, Math.min(need, Math.max(0, room))); } // the legend repeats the day chosen
         } catch (e) { /* stays where it is */ }
         saveBook();
         say(t('book.chosen', { date: fmtDate(v.split('|')[0], 'day'), slot: t('slot.' + v.split('|')[1]) }) + ' ' + t('bk.pref.say')); break;
@@ -6282,7 +6518,11 @@ if (typeof module !== 'undefined') module.exports = I18N;
       case 'b-access': S.book.access = v; saveBook(); break;
       case 't-code': S.track.code = v; break;
       case 'ph-file': if (isChange) addPhotos(el); break;
-      case 'tr-slot': S.track.pick = v; var sv = $('tr-move-save'); if (sv) { sv.disabled = false; try { var sr = sv.getBoundingClientRect(); if (sr.bottom > window.innerHeight) window.scrollBy(0, Math.min(sr.bottom - window.innerHeight + 16, el.getBoundingClientRect().top - stickyTop() - 12)); } catch (e) { /* stays */ } } break;
+      case 'tr-slot': S.track.pick = v; var sv = $('tr-move-save'); if (sv) sv.disabled = false;
+        [].forEach.call(document.querySelectorAll('#tr-table input[data-f="tr-slot"]'), function (inp) { // the tick follows the choice
+          if (inp.hasAttribute('data-off')) return; var pv = inp.value.split('|');
+          inp.nextSibling.innerHTML = (inp.checked ? TICK : '') + pv[1].replace('-', '–'); inp.setAttribute('aria-label', fmtDate(pv[0], 'day') + ', ' + t('slot.' + pv[1]) + ', ' + t(inp.checked ? 'book.tt.yours' : 'book.tt.free'));
+        }); break;
       case 't-pin': S.track.pin = v; break;
       case 'lead': S.ops.lead[k] = v; break;
       case 'od-draft': S.ops.drafts[k] = v; break;
@@ -6292,8 +6532,13 @@ if (typeof module !== 'undefined') module.exports = I18N;
         if (isChange && (k === 'cday' || k === 'cres')) refreshOps(el.id); break;
       case 'cal-ms': if (!isChange) break;
         var cur = Ops.measurers(st).slice(), mi = cur.indexOf(v); if (el.checked && mi < 0) cur.push(v); if (!el.checked && mi >= 0) cur.splice(mi, 1); cur.sort();
-        r = Ops.setMeasurers(st, cur); S.ops.cmsg = r.ok ? t('bk.ops.whoDone', { n: cur.length, left: r.affected.length }) : t('bk.ops.whoOne'); refreshOps(el.id, S.ops.cmsg); break;
-      case 'cal-cap': if (!isChange) break; var cn = parseInt(v, 10); st.webCap = cn > 0 ? Math.min(cn, 99) : 0; S.ops.cmsg = st.webCap ? t('bk.ops.capSet', { n: st.webCap }) : t('bk.ops.capOff'); refreshOps(el.id, S.ops.cmsg); break;
+        if (!cur.length) { S.ops.cmsg = t('bk.ops.whoOne'); refreshOps(el.id, S.ops.cmsg); break; }
+        var pm = el.checked ? [] : Ops.previewMeasurers(st, cur);
+        if (pm.length) { S.ops.pend = { kind: 'ms', ms: cur, list: pm }; S.ops.cmsg = ''; refreshOps('cal-pend'); break; }
+        r = Ops.setMeasurers(st, cur); S.ops.cmsg = t('bk.ops.whoDone', { n: cur.length, left: Ops.rearrangeList(st).length }); refreshOps(el.id, S.ops.cmsg); break;
+      case 'cal-cap': if (!isChange) break;
+        if (v.trim() && !/^\d{1,2}$/.test(v.trim())) { S.ops.capErr = true; refreshOps(el.id); break; }
+        S.ops.capErr = false; var cn = parseInt(v, 10); st.webCap = cn > 0 ? cn : 0; S.ops.cmsg = st.webCap ? t('bk.ops.capSet', { n: st.webCap }) : t('bk.ops.capOff'); refreshOps(el.id, S.ops.cmsg); break;
       case 'cal-pause': st.paused = el.checked; S.ops.cmsg = t(st.paused ? 'bk.ops.pausedOn' : 'bk.ops.pausedOff'); refreshOps(el.id, S.ops.cmsg); break;
       case 'od-pick': S.ops.drafts[k] = v; if (isChange) refreshOps(el.id); break; // which slots are taken depends on the day and team picked
       case 'od-room': if (o) Ops.setWindowField(st, o, i, 'room', v, !isChange); break;
@@ -6337,6 +6582,7 @@ if (typeof module !== 'undefined') module.exports = I18N;
   document.addEventListener('keydown', function (ev) {
     if (ev.key !== 'Enter' || ev.isComposing || !ev.target.closest || !ev.target.closest('#cfg-form, #book-form') || ev.target.tagName !== 'INPUT' || (ev.target.type !== 'text' && ev.target.type !== 'tel')) return;
     ev.preventDefault(); onField(ev.target, true);
+    if (ev.target.id === 'book-city') { var ca = document.querySelector('#book-pref input:checked') || document.querySelector('#book-pref input'); if (ca) { ca.focus(); bringUp(ca.closest('fieldset')); return; } } // the call time is asked under it
     if (ev.target.closest('#book-form')) { // the keyboard's Next goes to the next field; only the last one goes on
       var flds = [].slice.call(document.querySelectorAll('#bk-body input[type=text], #bk-body input[type=tel]')), at2 = flds.indexOf(ev.target);
       if (at2 >= 0 && at2 < flds.length - 1) { flds[at2 + 1].focus(); return; }
@@ -6366,6 +6612,7 @@ if (typeof module !== 'undefined') module.exports = I18N;
       var btn = $(enter); if (btn) { ev.preventDefault(); btn.click(); }
       return;
     }
+    if (ev.key === 'Escape' && $('ph-view')) { var pc = $('ph-close'); if (pc) pc.click(); return; }
     if (ev.key === 'Escape' && S.menu) { setMenu(false, true); return; }
     if ((ev.key === 'ArrowUp' || ev.key === 'ArrowDown') && ev.target && (ev.target.name === 'slot' || ev.target.name === 'trslot')) { // a day up or down at the same time of day
       var cells = [].slice.call(document.querySelectorAll(ev.target.name === 'slot' ? '#book-table input[name=slot]' : '#tr-table input[name=trslot]')), to = cells[cells.indexOf(ev.target) + (ev.key === 'ArrowDown' ? 1 : -1) * Ops.MEASURE_SLOTS.length];
@@ -6400,10 +6647,9 @@ if (typeof module !== 'undefined') module.exports = I18N;
     }
     if (S.ops.open && v === 'ops') { closeDrawer(true); return; } // Back from an open order
     var ph = parseHash(v);
-    if (S.bJump && ph.view === 'book') { S.bJump = false; try { window.scrollTo(0, 0); } catch (e) { /* ignore */ } var dh = $('book-done-h'); if (dh) dh.focus({ preventScroll: true }); return; } // the history going back over the steps after sending: the page stays on its answer, at its top
+    if (S.bJump && ph.view === 'book') { S.bJump = false; if (v !== 'book') { try { history.replaceState(null, '', '#book'); } catch (e2) { /* ignore */ } } try { window.scrollTo(0, 0); } catch (e) { /* ignore */ } var dh = $('book-done-h'); if (dh) dh.focus({ preventScroll: true }); return; } // the history going back over the steps after sending: the page stays on its answer, at its top
     if (ph.view === 'book' && S.view === 'book' && S.book.done && ph.param) { try { history.replaceState(null, '', '#book'); } catch (e) { /* ignore */ } return; }
     if (ph.view === 'book' && S.view === 'book' && !S.book.done && hashFor() !== v) { // Back and Forward between the booking's steps
-      var bs = S.bStack || []; if (bs.length > 1 && bs[bs.length - 2] === v) bs.pop(); else bs.push(v);
       S.bFromSum = false; S.bstep = ph.param ? BSTEPS.indexOf(ph.param) + 1 : 1; setHTML($('bk-top'), bkTop()); setHTML($('book-form'), bkInner()); var hb = $('bk-step-h'); if (hb) hb.focus({ preventScroll: true }); return; }
     if (ph.view === 'config' && S.view === 'config' && hashFor() !== v) { var hi = path().map(stepWord).indexOf(ph.param); setStep(hi < 0 ? 1 : hi + 1); return; } // Back and Forward between steps
     if (VIEWS.indexOf(ph.view) >= 0 && hashFor() !== v) go(ph.view, true, ph.param);
