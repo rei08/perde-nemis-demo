@@ -1125,6 +1125,97 @@ table.data.matrix td.yes { color: var(--accent); }
   .igrid.has-lead > .icard:first-child .icard-title { align-self: end; }
   .igrid.has-lead > .icard:first-child p { display: block; align-self: start; }
 }
+/* ===== 29 October: organised as the reference (tesorocasa.it, seen again in the built-in browser) =====
+   one trail at the top of every shop page, five main links, the small ones as icons, every section opening the same way,
+   lists that never end on one card alone, a footer of short lists */
+.crumbs { margin: 6px 0 2px; }
+.crumbs ol { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; align-items: center; font-size: .875rem; letter-spacing: .02em; color: var(--ink-2); }
+.crumbs li { display: inline-flex; align-items: center; min-width: 0; }
+.crumbs li + li::before { content: ''; flex: none; width: 6px; height: 6px; margin: 0 10px 0 6px; border-top: 1px solid currentColor; border-right: 1px solid currentColor; transform: rotate(45deg); opacity: .7; }
+.crumbs a { display: inline-block; padding: 12px 0; color: var(--ink-2); text-decoration: none; }
+.crumbs a:hover { color: var(--ink); text-decoration: underline; text-underline-offset: 4px; }
+.crumbs [aria-current] { color: var(--ink); overflow-wrap: anywhere; }
+.crumbs + .view-head, .crumbs + .shop, .crumbs + .fab-page, .crumbs + .insp-page, .crumbs + .article { margin-top: 8px; }
+
+/* the small links: icons in a computer's bar, a quiet list under the main links on a phone */
+.nav-util { display: inline-flex; align-items: center; gap: 2px; margin-left: 8px; }
+.utillink { display: inline-grid; place-items: center; width: 44px; height: 44px; color: var(--ink); border-radius: 50%; text-decoration: none; }
+.utillink svg { width: 22px; height: 22px; }
+.utillink span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.utillink:hover { background: var(--surface-2); }
+.utillink[aria-current="page"] { color: var(--accent); box-shadow: inset 0 -2px 0 var(--accent); border-radius: 0; }
+@media (max-width: 1240px) {
+  .navlink { font: 700 1rem/1.3 var(--font-body); text-transform: uppercase; letter-spacing: .06em; padding: 18px 0; color: var(--ink); }
+  .navlink[aria-current="page"] { color: var(--accent); text-decoration: none; }
+  .nav-util { display: flex; flex-direction: column; align-items: stretch; margin: 14px 0 0; gap: 0; }
+  .utillink { display: flex; align-items: center; justify-content: flex-start; gap: 12px; width: auto; height: auto; min-height: 44px; padding: 6px 0; border-radius: 0; color: var(--ink-2); }
+  .utillink svg { width: 20px; height: 20px; }
+  .utillink span { position: static; width: auto; height: auto; overflow: visible; clip-path: none; font-size: .875rem; letter-spacing: .04em; text-transform: uppercase; }
+  .utillink:hover { background: none; color: var(--ink); }
+  .utillink[aria-current="page"] { box-shadow: none; color: var(--accent); }
+}
+
+/* the five kinds: a ruled list on a phone (picture, name, one line), five in a row on a computer */
+@media (max-width: 899px) {
+  .cgrid.klist { grid-template-columns: minmax(0, 1fr); gap: 0; border-top: 1px solid var(--line); }
+  .cgrid.klist .ctile, .cgrid.klist .ctile:last-child, .cgrid.klist .ctile:nth-child(n+4) { grid-column: auto; display: grid; grid-template-columns: 88px minmax(0, 1fr) 14px; grid-template-areas: "ph name chev" "ph meta chev"; column-gap: 16px; row-gap: 2px; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--line); }
+  .cgrid.klist .ctile .ph, .cgrid.klist .ctile:last-child .ph, .cgrid.klist .ctile:nth-child(n+4) .ph { grid-area: ph; aspect-ratio: 1 / 1; width: 88px; margin: 0; border-radius: 8px; }
+  .cgrid.klist .ctile .fcard-name { grid-area: name; align-self: end; font-size: 1rem; letter-spacing: .06em; text-transform: uppercase; }
+  .cgrid.klist .ctile .fcard-name small { display: block; font-size: .875rem; font-weight: 400; letter-spacing: 0; text-transform: none; color: var(--ink-2); }
+  .cgrid.klist .ctile .fcard-meta { grid-area: meta; align-self: start; display: block; font-size: .875rem; color: var(--ink-2); }
+  .cgrid.klist .ctile::after { content: ''; grid-area: chev; width: 8px; height: 8px; border-top: 1.5px solid var(--ink-2); border-right: 1.5px solid var(--ink-2); transform: rotate(45deg); justify-self: start; }
+  .cgrid.klist .ctile:last-child .ph > img { object-position: 50% 50%; }
+}
+@media (min-width: 900px) {
+  .cgrid.klist { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 40px 18px; }
+  .cgrid.klist .ctile, .cgrid.klist .ctile:last-child, .cgrid.klist .ctile:nth-child(n+4) { grid-column: auto; }
+  .cgrid.klist .ctile .ph, .cgrid.klist .ctile:last-child .ph, .cgrid.klist .ctile:nth-child(n+4) .ph { aspect-ratio: 3 / 4; }
+  .cgrid.klist .fcard-meta { font-size: .875rem; color: var(--ink-2); }
+}
+
+/* three rooms: one wide and two beside each other on a phone, three in a row on a computer */
+.igrid.trio { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 26px 14px; }
+.igrid.trio > .icard:first-child { grid-column: 1 / -1; }
+.igrid.trio > .icard:first-child .ph { aspect-ratio: 4 / 3; }
+.igrid.trio > .icard:first-child .ph > img { object-position: 50% 40%; }
+.igrid.trio > .icard:not(:first-child) p { display: none; }
+@media (min-width: 761px) {
+  .igrid.trio { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 36px clamp(14px, 2.4vw, 28px); }
+  .igrid.trio > .icard:first-child { grid-column: auto; }
+  .igrid.trio > .icard:first-child .ph { aspect-ratio: 3 / 4; }
+  .igrid.trio > .icard:not(:first-child) p { display: block; }
+}
+
+/* the free visit: three steps under its words */
+.split-text .eyebrow { margin-bottom: -8px; }
+ol.how { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; counter-reset: how; width: 100%; max-width: 40ch; }
+ol.how li { counter-increment: how; display: grid; grid-template-columns: 34px minmax(0, 1fr); column-gap: 10px; padding-top: 14px; border-top: 1px solid var(--rule, var(--line)); }
+ol.how li::before { content: counter(how); grid-row: 1 / span 2; font: 400 var(--fs-h3)/1 var(--font-display); color: var(--accent); }
+ol.how b { font-size: 1rem; }
+ol.how span { font-size: .875rem; color: var(--ink-2); }
+
+/* related products: a section like the others */
+.sec.related { padding-block: clamp(48px, 7vw, 88px) 0; }
+.sec.related .fgrid { margin-bottom: 26px; }
+
+/* the footer: follow us, two short lists, the name and the details */
+.foot-in { align-items: start; }
+.foot-follow .eyebrow { margin-bottom: 6px; }
+.foot-social { display: flex; gap: 6px; margin-left: -10px; }
+.foot-social .soc { display: inline-grid; place-items: center; width: 44px; height: 44px; color: var(--ink); border-radius: 50%; }
+.foot-social .soc svg { width: 24px; height: 24px; }
+.foot-social .soc:hover { background: var(--surface-2); }
+.foot .foot-links ul { display: flex; flex-direction: column; }
+.foot .foot-links ul.foot-more { margin-top: 14px; padding-top: 10px; border-top: 1px solid var(--line); }
+.foot .foot-more li a { font-weight: 500; color: var(--ink-2); }
+.foot-brand p { color: var(--ink-2); }
+.foot-copy { font-size: .75rem; }
+@media (max-width: 699px) {
+  .foot-in { grid-template-columns: minmax(0, 1fr); gap: 28px; }
+  .foot-in > div:first-child { grid-column: auto; }
+  .foot-brand { border-top: 1px solid var(--line); padding-top: 28px; }
+  .foot-brand .brand { align-self: center; }
+}
 </style>
 </head>
 <body>
@@ -3183,7 +3274,7 @@ var I18N = {
     'cat.grila.hint': 'Veneciane dhe vertikale',
     'cat.perde.hint': 'Tyl dhe perde të trasha',
     'cat.romane.hint': 'Ngrihen në pala',
-    'cat.rolera.hint': 'Rolera dhe zebra',
+    'cat.rolera.hint': 'Blackout, screen dhe zebra',
     'ph.cat': '{name}, foto e llojit',
     'ph.fitted': '{name}, e montuar në dritare',
     'bl.ven25.text': 'Fletë alumini 25 mm që kthehen për të lënë sa dritë doni. Pastrohen lehtë; të mira për kuzhinë dhe banjë.',
@@ -3567,7 +3658,20 @@ var I18N = {
     'bk.ops.offShort': 'pushon: {m}',
     'bk.ops.showInst': 'Shfaq/fshih montimet',
     'bk.tr.wasCancelled': 'E anuluar nga ju më {date}. Kërkesa mbetet.',
-    'bl.more': '{m} · {s}. Ndryshoje'
+    'bl.more': '{m} · {s}. Ndryshoje',
+    'foot.follow': 'Na ndiqni',
+    'home.cats.eye': 'Produktet',
+    'home.insp.eye': 'Punët tona',
+    'home.book.eye': 'Si punojmë',
+    'home.how.1.h': 'Rezervoni një orë',
+    'home.how.1.t': 'Online ose në WhatsApp.',
+    'home.how.2.h': 'Vijmë me mostrat',
+    'home.how.2.t': 'Masim dritaret; pëlhurën e zgjidhni në dritën e shtëpisë suaj.',
+    'home.how.3.h': 'Qepim dhe montojmë',
+    'home.how.3.t': 'Pas ofertës, perdet i qep punishtja dhe i monton ekipi ynë.',
+    'ui.crumbs': 'Ku ndodheni',
+    'rel.eye': 'Shikoni edhe',
+    'rel.allOf': 'Të gjitha: {k}'
   },
   en: {
     'demo.notePublic': 'Demo: models, fabrics, inspiration and availability are samples. Some photographs are our own work; the others are Unsplash samples that your own photographs replace. The empty frames hold the place of the ones still missing. The price comes with the quote, after the free measurement.', 
@@ -4000,7 +4104,7 @@ var I18N = {
     'cat.grila.hint': 'Venetian and vertical',
     'cat.perde.hint': 'Sheers and heavy curtains',
     'cat.romane.hint': 'Lift in folds',
-    'cat.rolera.hint': 'Roller and zebra',
+    'cat.rolera.hint': 'Blackout, screen and zebra',
     'ph.cat': '{name}, a photo for this kind',
     'ph.fitted': '{name}, fitted at a window',
     'bl.ven25.text': '25 mm aluminium slats that turn to let in as much light as you want. Easy to wipe; good for kitchens and bathrooms.',
@@ -4384,7 +4488,20 @@ var I18N = {
     'bk.ops.offShort': 'off: {m}',
     'bk.ops.showInst': 'Show/hide installations',
     'bk.tr.wasCancelled': 'Cancelled by you on {date}. The request stays.',
-    'bl.more': '{m} · {s}. Change'
+    'bl.more': '{m} · {s}. Change',
+    'foot.follow': 'Follow us',
+    'home.cats.eye': 'Products',
+    'home.insp.eye': 'Our work',
+    'home.book.eye': 'How we work',
+    'home.how.1.h': 'Book a time',
+    'home.how.1.t': 'Online or on WhatsApp.',
+    'home.how.2.h': 'We bring the samples',
+    'home.how.2.t': 'We measure the windows; you choose the fabric in your own light.',
+    'home.how.3.h': 'We sew and fit',
+    'home.how.3.t': 'After the quote, our workshop sews and our team fits.',
+    'ui.crumbs': 'You are here',
+    'rel.eye': 'See also',
+    'rel.allOf': 'All {k}'
   }
 };
 if (typeof module !== 'undefined') module.exports = I18N;
@@ -4394,7 +4511,8 @@ if (typeof module !== 'undefined') module.exports = I18N;
   var root = document.documentElement;
   var PUBLIC_ONLY = window.PN_PUBLIC === true; // a copy for showing to customers: the staff view is left out
   var VIEWS = ['home', 'catalog', 'fabric', 'item', 'config', 'inspire', 'guides', 'book', 'track', 'ops'].filter(function (v) { return v !== 'ops' || !PUBLIC_ONLY; });
-  var NAV = ['catalog', 'config', 'inspire', 'guides', 'track', 'ops'].filter(function (v) { return VIEWS.indexOf(v) >= 0; }); // the links in the bar; booking is its button
+  var NAV = ['catalog', 'config', 'inspire', 'guides'].filter(function (v) { return VIEWS.indexOf(v) >= 0; }); // the main links, as on the reference (five with the home page); booking is the bar's button
+  var NAV2 = ['track', 'ops'].filter(function (v) { return VIEWS.indexOf(v) >= 0; }); // the smaller ones: icons in the bar of a computer, a short list under the main links on a phone
   var KEEP_DAYS = 30, KEEP_MS = KEEP_DAYS * 86400000; // how long a window of the request stays in this browser
 
   // the colour each fabric's main photograph shows: its page and the configurator open on it, and say so
@@ -4556,6 +4674,12 @@ if (typeof module !== 'undefined') module.exports = I18N;
   function uc1(v) { return v.charAt(0).toUpperCase() + v.slice(1); }
   function lc1(v) { return v.charAt(0).toLowerCase() + v.slice(1); } // "Shufër dekorative Ø28" keeps its diameter sign
   var CAM = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l1.6-2.4h6.8L17 8h3v10.5H4z"/><circle cx="12" cy="13" r="3.4"/></svg>';
+  var ICON = { // line icons in the weight of the others
+    track: '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"><path d="M12 2.8l8.2 4.4v9.6L12 21.2l-8.2-4.4V7.2z"/><path d="M3.8 7.2L12 11.6l8.2-4.4M12 11.6v9.6"/></svg>',
+    ops: '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4.5 20.5c1.2-3.6 4-5.5 7.5-5.5s6.3 1.9 7.5 5.5"/></svg>',
+    ig: '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r=".9" fill="currentColor" stroke="none"/></svg>',
+    wa: '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"><path d="M4.2 20l1.1-3.9A8.3 8.3 0 1 1 8.2 19z"/><path d="M9 8.6c.2-.5.6-.6.9-.6l.6.1.9 2.1-.7.9c.6 1.2 1.5 2.1 2.7 2.7l.9-.7 2.1.9.1.6c0 .3-.1.7-.6.9-1.6.7-5.3-1-6.9-4.6-.4-.9-.4-1.8 0-2.3z"/></svg>'
+  };
   var CHEV = '<svg viewBox="0 0 18 18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3l6 6-6 6"/></svg>';
   var TICK = '<svg viewBox="0 0 18 18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9.5l3.4 3.4L14 5.6"/></svg>';
   var BACK = '<svg viewBox="0 0 18 18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 3L5 9l6 6"/></svg>';
@@ -4633,6 +4757,16 @@ if (typeof module !== 'undefined') module.exports = I18N;
       return '<li><a href="#guide-' + g.id + '" data-act="open-guide" data-id="' + g.id + '" id="guide-link-' + g.id + '"><b>' + t('guide.' + g.id + '.title') + '</b><span>' + t('guide.' + g.id + '.lead') + '</span>' + CHEV + '</a></li>';
     }).join('') + '</ul>';
   }
+  // Where the page stands, as on the reference: Kreu › Produktet › Perde › Tyl Liri. Each step but the last is a link.
+  function crumbs(list) {
+    var home = { label: t('nav.home'), href: 'home', attrs: 'data-go="home"' };
+    return '<nav class="crumbs" aria-label="' + t('ui.crumbs') + '"><ol>' + [home].concat(list).map(function (c, i, a) {
+      return '<li>' + (i === a.length - 1 ? '<span aria-current="page">' + c.label + '</span>' : '<a href="#' + c.href + '" ' + c.attrs + (c.id ? ' id="' + c.id + '"' : '') + '>' + c.label + '</a>') + '</li>';
+    }).join('') + '</ol></nav>';
+  }
+  function evenN(n) { return n >= 4 ? 4 : n > 1 ? n - n % 2 : n; } // a related row never ends on one card alone
+  function crumbShop() { return { label: t('nav.catalog'), href: 'catalog', attrs: 'data-go="catalog"', id: 'crumb-catalog' }; }
+  function crumbKind(c, id) { return { label: catShort(c), href: 'shop-' + c, attrs: 'data-act="open-cat" data-cat="' + c + '" data-back', id: id }; }
   function more(view, key, id) { return '<a class="btn ghost" href="#' + view + '" data-go="' + view + '"' + (id ? ' id="' + id + '"' : '') + '>' + t(key) + '</a>'; }
   function secTitle(eye, title, text) { // a centred heading in capitals under a small label, as the sections of the home page open
     return '<div class="sec-title">' + (eye ? '<p class="eyebrow">' + t(eye) + '</p>' : '') + '<h2 class="caps">' + title + '</h2>' + (text ? '<p>' + text + '</p>' : '') + '</div>';
@@ -4643,12 +4777,14 @@ if (typeof module !== 'undefined') module.exports = I18N;
     // The opening photograph fills the whole screen, on a phone too, and carries the heading; the top bar stands over it.
     var h = '<section class="hero">' + photo('9 / 16', t('ph.hero'), { cls: 'hero-ph', note: t('ph.wide'), img: 'hero-phone', wide: 'hero-wide', eager: true }) + '<div class="wrap hero-in"><h1><span class="l1">' + t('home.h1a') + '</span> <span>' + t('home.h1b') + '</span></h1><p class="hero-kinds">' + t('home.kinds') + '</p>' +
       '<div class="hero-side"><a class="btn" href="#book" data-go="book" id="home-book">' + t('home.cta1') + '</a>' + waBtn('btn ghost', t('wa.hello'), t('wa.ask'), 'home-wa') + '<a class="hero-link" href="#catalog" data-act="jump" data-to="home-cats" id="home-see">' + t('home.cats.all') + '</a></div></div></section>';
-    // every part opens the same way: a centred heading in capitals, one line, the pictures, one button under them
-    h += '<section class="sec" id="home-cats" tabindex="-1"><div class="wrap">' + secTitle('', t('home.cats.h'), t('home.cats.t')) +
-      '<div class="cgrid">' + CATEGORIES.map(function (c) { return catTile(c, true); }).join('') + '</div><p class="center">' + more('config', 'home.cta2', 'home-build') + '</p></div></section>';
-    h += '<section class="sec" id="home-insp"><div class="wrap">' + secTitle('', t('insp.h'), t('home.insp.t')) +
-      '<div class="igrid row">' + INSPIRE.filter(function (x) { return hasPh('room-' + x.id + '-1'); }).slice(0, 3).map(inspCard).join('') + '</div><p class="center">' + more('inspire', 'home.insp.all', 'home-insp-all') + '</p></div></section>';
-    h += '<section class="split" id="home-book-band">' + photo('1 / 1', t('ph.visit'), { cls: 'fill', img: 'visit' }) + '<div class="split-text"><h2 class="caps">' + t('home.book.h') + '</h2><p>' + t('home.book.t') + '</p>' +
+    // every part opens the same way, as on the reference: a small label with its dot, a heading in capitals, one line,
+    // the content, one button under it
+    h += '<section class="sec" id="home-cats" tabindex="-1"><div class="wrap">' + secTitle('home.cats.eye', t('home.cats.h'), t('home.cats.t')) +
+      '<div class="cgrid klist">' + CATEGORIES.map(function (c) { return catTile(c, 'list'); }).join('') + '</div><p class="center">' + more('config', 'home.cta2', 'home-build') + '</p></div></section>';
+    h += '<section class="sec" id="home-insp"><div class="wrap">' + secTitle('home.insp.eye', t('insp.h'), t('home.insp.t')) +
+      '<div class="igrid trio">' + INSPIRE.filter(function (x) { return hasPh('room-' + x.id + '-1'); }).slice(0, 3).map(inspCard).join('') + '</div><p class="center">' + more('inspire', 'home.insp.all', 'home-insp-all') + '</p></div></section>';
+    h += '<section class="split" id="home-book-band">' + photo('1 / 1', t('ph.visit'), { cls: 'fill', img: 'visit' }) + '<div class="split-text"><p class="eyebrow">' + t('home.book.eye') + '</p><h2 class="caps">' + t('home.book.h') + '</h2><p>' + t('home.book.t') + '</p>' +
+      '<ol class="how">' + [1, 2, 3].map(function (n) { return '<li><b>' + t('home.how.' + n + '.h') + '</b><span>' + t('home.how.' + n + '.t') + '</span></li>'; }).join('') + '</ol>' +
       '<a class="btn" href="#book" data-go="book">' + t('home.cta1') + '</a></div></section>';
     return h;
   }
@@ -4684,7 +4820,7 @@ if (typeof module !== 'undefined') module.exports = I18N;
   function catTile(c, bare) { // one of the five kinds, as a tile that opens its page; on the home page the photograph and the name only
     var n = catParts(c);
     return '<a class="ctile" href="#shop-' + c + '" data-act="open-cat" data-cat="' + c + '" id="cat-tile-' + c + '">' + photo('4 / 5', t('ph.cat', { name: catName(c) }), { deco: true, img: 'cat-' + c }) +
-      '<span class="fcard-name">' + n.main + (n.sub ? ' <small>' + n.sub + '</small>' : '') + '</span>' + (bare === true ? '' : '<span class="fcard-meta">' + t('cat.' + c + '.text') + '</span>') + '</a>';
+      '<span class="fcard-name">' + n.main + (n.sub ? ' <small>' + n.sub + '</small>' : '') + '</span>' + (bare === true ? '' : '<span class="fcard-meta">' + t('cat.' + c + (bare === 'list' ? '.hint' : '.text')) + '</span>') + '</a>';
   }
   function blindCard(b) { // a model of blind in a list
     return '<a class="fcard" href="#item-' + b.id + '" data-act="open-item" data-id="' + b.id + '" id="item-card-' + b.id + '">' + photo('2 / 3', t('ph.fitted', { name: blindName(b) }), { deco: true, img: 'blind-' + b.id }) +
@@ -4720,8 +4856,8 @@ if (typeof module !== 'undefined') module.exports = I18N;
   // The shop: with no kind chosen, the five kinds as tiles; with one, its products beside the column of kinds.
   function viewCatalog() {
     var c = S.cat;
-    if (!c) return '<div class="view-head"><h1>' + t('shop.h') + '</h1><p>' + t('shop.sub') + '</p></div><div class="cgrid" id="cat-tiles">' + CATEGORIES.map(catTile).join('') + '</div>';
-    var h = '<div class="shop">' + shopSide() + '<div class="shop-main"><div class="view-head">' + (catParts(c).sub ? '<p class="kind">' + catParts(c).main + '</p>' : '') + '<h1 id="shop-name">' + (catParts(c).sub || catParts(c).main) + '</h1><p>' + t('cat.' + c + '.text') + '</p></div>';
+    if (!c) return crumbs([{ label: t('nav.catalog') }]) + '<div class="view-head"><h1>' + t('shop.h') + '</h1><p>' + t('shop.sub') + '</p></div><div class="cgrid klist" id="cat-tiles">' + CATEGORIES.map(catTile).join('') + '</div>';
+    var h = crumbs([crumbShop(), { label: catShort(c) }]) + '<div class="shop">' + shopSide() + '<div class="shop-main"><div class="view-head">' + (catParts(c).sub ? '<p class="kind">' + catParts(c).main + '</p>' : '') + '<h1 id="shop-name">' + (catParts(c).sub || catParts(c).main) + '</h1><p>' + t('cat.' + c + '.text') + '</p></div>';
     if (c === 'perde') {
       h += '<div class="filters kinds" role="group" aria-label="' + t('fab.spec.type') + '">' + ['all', 'sheer', 'blackout', 'decor'].map(function (k) {
         return '<button class="tag" id="cat-' + k + '" data-act="cat-filter" data-type="' + k + '" aria-pressed="' + (S.ftype === k) + '">' + t('type.' + k) + '</button>';
@@ -4736,7 +4872,7 @@ if (typeof module !== 'undefined') module.exports = I18N;
   function itemGallery(b, c) { return photo('1 / 1', t('ph.fitted', { name: blindName(b) + ', ' + bColorName(c) }), { hex: c.hex, id: 'item-main', img: 'blind-' + b.id, cap: blindColor(b, BLIND_PHOTO_COL[b.id]) ? t('ph.shows', { c: bColorName(blindColor(b, BLIND_PHOTO_COL[b.id])) }) : '' }) + itemSecond(b, c); }
   function viewItem() {
     var b = blindById(S.item), c = blindColor(b, S.itemCol[b.id] || (PH['blind-' + b.id] && BLIND_PHOTO_COL[b.id])) || b.colors[0];
-    var h = '<p class="crumb"><a href="#shop-' + b.cat + '" data-act="open-cat" data-cat="' + b.cat + '" data-back id="item-back">' + BACK + catName(b.cat) + '</a></p><div class="fab-page"><div class="pg-head"><p class="kind">' + catShort(b.cat) + '</p><h1 id="item-name">' + capsSafe(esc(blindName(b))) + '</h1></div>' +
+    var h = crumbs([crumbShop(), crumbKind(b.cat, 'item-back'), { label: esc(blindName(b)) }]) + '<div class="fab-page"><div class="pg-head"><p class="kind">' + catShort(b.cat) + '</p><h1 id="item-name">' + capsSafe(esc(blindName(b))) + '</h1></div>' +
       '<div class="fab-gallery pg-media" id="item-gallery">' + itemGallery(b, c) + '</div><div class="fab-info pg-info"><p class="lead">' + t('bl.' + b.id + '.text') + '</p>' +
       '<fieldset><legend class="sw-name">' + t('car.color') + ': <b id="item-col-name">' + esc(bColorName(c)) + '</b></legend><div class="swatches">' +
       b.colors.map(function (x) { return bSwatch('itemcol', b, x, x.id === c.id, 'item-color'); }).join('') + '</div></fieldset>' +
@@ -4748,7 +4884,8 @@ if (typeof module !== 'undefined') module.exports = I18N;
       '<dt>' + t('fab.spec.colors') + '</dt><dd>' + b.colors.map(function (x) { return esc(bColorName(x)); }).join(', ') + '</dd></dl>' +
       '<div class="fab-gallery pg-second" id="item-second">' + itemSecond(b, c) + '</div></div></div>';
     var others = blindsOf(b.cat).filter(function (x) { return x.id !== b.id; });
-    if (others.length) h += '<section><div class="sec-head"><div><h2 class="plain-h">' + t('item.more') + '</h2></div></div><div class="fgrid more">' + others.map(blindCard).join('') + '</div></section>';
+    others = others.slice(0, evenN(others.length));
+    if (others.length) h += '<section class="sec related">' + secTitle('rel.eye', t('item.more')) + '<div class="fgrid more">' + others.map(blindCard).join('') + '</div><p class="center">' + '<a class="btn ghost" href="#shop-' + b.cat + '" data-act="open-cat" data-cat="' + b.cat + '" id="item-all">' + t('rel.allOf', { k: catShort(b.cat) }) + '</a>' + '</p></section>';
     return h;
   }
 
@@ -4758,7 +4895,7 @@ if (typeof module !== 'undefined') module.exports = I18N;
   function fabGallery(f) { return photo('1 / 1', t('ph.hung', { name: fabName(f) }), { hex: f.hex, id: 'fab-main', img: 'fab-' + f.fam, cap: FAB_PHOTO_COL[f.fam] && fabricById(FAB_PHOTO_COL[f.fam]) ? t('ph.shows', { c: colorName(fabricById(FAB_PHOTO_COL[f.fam])) }) : '' }) + fabSecond(f); }
   function viewFabric() {
     var fam = S.fab, list = familyOf(fam), f = famFabric(fam, S.fabCol[fam]);
-    var h = '<p class="crumb"><a href="#shop-perde" data-act="open-cat" data-cat="perde" data-back id="fab-back">' + BACK + t('fab.back') + '</a></p><div class="fab-page"><div class="pg-head"><p class="kind">' + t('type.' + f.type) + '</p><h1 id="fab-name">' + esc(f[S.lang]) + '</h1></div>' +
+    var h = crumbs([crumbShop(), crumbKind('perde', 'fab-back'), { label: esc(f[S.lang]) }]) + '<div class="fab-page"><div class="pg-head"><p class="kind">' + t('type.' + f.type) + '</p><h1 id="fab-name">' + esc(f[S.lang]) + '</h1></div>' +
       '<div class="fab-gallery pg-media" id="fab-gallery">' + fabGallery(f) + '</div><div class="fab-info pg-info"><p class="lead">' + t('fab.' + fam + '.text') + '</p>' +
       '<fieldset><legend class="sw-name">' + t('car.color') + ': <b id="fab-col-name">' + esc(colorName(f)) + '</b></legend><div class="swatches">' +
       list.map(function (c) { return swatch('fabcol', c, c.id === f.id, 'fab-color', fam); }).join('') + '</div></fieldset>' + stockHtml(f, 'fab-stock') +
@@ -4768,8 +4905,9 @@ if (typeof module !== 'undefined') module.exports = I18N;
       '<dt>' + t('fab.spec.width') + '</dt><dd>' + f.bolt + ' cm</dd><dt>' + t('fab.spec.seams') + '</dt><dd>' + t(f.roomHigh ? 'cat.roomHigh' : 'cat.drops') + '</dd>' +
       (f.repeat ? '<dt>' + t('fab.spec.repeat') + '</dt><dd>' + f.repeat + ' cm</dd>' : '') + '<dt>' + t('fab.spec.colors') + '</dt><dd>' + list.map(function (c) { return esc(colorName(c)); }).join(', ') + '</dd></dl>' +
       '<div class="fab-gallery pg-second" id="fab-second">' + fabSecond(f) + '</div></div></div>';
-    var others = FAMILIES.filter(function (x) { return x !== fam && familyOf(x)[0].type === f.type; }).slice(0, 4);
-    if (others.length) h += '<section><div class="sec-head"><div><h2 class="plain-h">' + t('fab.more') + '</h2></div></div><div class="fgrid more">' + others.map(fabCard).join('') + '</div></section>';
+    var others = FAMILIES.filter(function (x) { return x !== fam && familyOf(x)[0].type === f.type; });
+    others = others.slice(0, evenN(others.length));
+    if (others.length) h += '<section class="sec related">' + secTitle('rel.eye', t('fab.more')) + '<div class="fgrid more">' + others.map(fabCard).join('') + '</div><p class="center">' + '<a class="btn ghost" href="#shop-perde" data-act="open-cat" data-cat="perde" id="fab-all">' + t('rel.allOf', { k: catShort('perde') }) + '</a>' + '</p></section>';
     return h;
   }
 
@@ -4782,11 +4920,11 @@ if (typeof module !== 'undefined') module.exports = I18N;
   /* ----- inspiration: rooms, each with what hangs in it ----- */
   function viewInspire() {
     var r = S.insp ? byId(INSPIRE, S.insp) : null;
-    if (!r) return '<div class="view-head"><h1>' + t('insp.h') + '</h1><p>' + t('insp.sub') + '</p></div><p class="note" id="insp-demo">' + t('insp.demo') + '</p><div class="igrid has-lead">' + INSPIRE.filter(function (x) { return hasPh('room-' + x.id + '-1'); }).map(inspCard).join('') + '</div>';
+    if (!r) return crumbs([{ label: t('nav.inspire') }]) + '<div class="view-head"><h1>' + t('insp.h') + '</h1><p>' + t('insp.sub') + '</p></div><p class="note" id="insp-demo">' + t('insp.demo') + '</p><div class="igrid has-lead">' + INSPIRE.filter(function (x) { return hasPh('room-' + x.id + '-1'); }).map(inspCard).join('') + '</div>';
     var x = byId(SAMPLES, r.sample), f = familyOf(x.fam).filter(function (c) { return c.id === x.color; })[0], title = t('insp.' + r.id + '.title'), ph = '';
     for (var i = 1; i <= r.photos; i++) if (hasPh('room-' + r.id + '-' + i) || (i === 1 && !PH['room-' + r.id + '-1'])) ph += photo(i === 1 ? '1 / 1' : '3 / 2', t('ph.insp', { name: title, i: i }), { cls: i === 1 ? '' : 'ph-sec', img: 'room-' + r.id + '-' + i });
     var two = x.layers === 'double', rest = ph.slice(ph.indexOf('</figure>') + 9); // on a phone the later photographs stand after the text
-    return '<p class="crumb"><a href="#inspire" data-go="inspire" id="insp-back">' + BACK + t('insp.back') + '</a></p><div class="insp-page"><div class="pg-head"><h1>' + title + '</h1></div><div class="insp-photos pg-media">' + ph + '</div>' +
+    return crumbs([{ label: t('nav.inspire'), href: 'inspire', attrs: 'data-go="inspire"', id: 'insp-back' }, { label: title }]) + '<div class="insp-page"><div class="pg-head"><h1>' + title + '</h1></div><div class="insp-photos pg-media">' + ph + '</div>' +
       '<div class="fab-info pg-info"><p class="lead">' + t('insp.' + r.id + '.text') + '</p>' +
       '<h2 class="plain-h">' + t('insp.what') + '</h2><dl class="specs lined"><dt>' + t('step.fabric') + '</dt><dd>' + esc(fabName(f)) + (two ? '; ' + esc(fabName(fabricById(x.sheer))) : '') + '</dd>' +
       '<dt>' + t('step.heading') + '</dt><dd>' + t('heading.' + x.heading) + '</dd><dt>' + t('step.rail') + '</dt><dd>' + t('rail.' + x.rail) + ', ' + lc1(t('mount.' + x.mount)) + '</dd></dl>' +
@@ -4797,8 +4935,8 @@ if (typeof module !== 'undefined') module.exports = I18N;
   /* ----- guides: short answers, written out ----- */
   function viewGuides() {
     var g = S.guide ? byId(GUIDES, S.guide) : null;
-    if (!g) return '<div class="view-head"><h1>' + t('guides.h') + '</h1><p>' + t('guides.sub') + '</p></div>' + guideList();
-    var h = '<p class="crumb"><a href="#guides" data-go="guides" id="guide-back">' + BACK + t('guides.back') + '</a></p><article class="article"><h1>' + t('guide.' + g.id + '.title') + '</h1><p class="lead">' + t('guide.' + g.id + '.lead') + '</p>' +
+    if (!g) return crumbs([{ label: t('nav.guides') }]) + '<div class="view-head"><h1>' + t('guides.h') + '</h1><p>' + t('guides.sub') + '</p></div>' + guideList();
+    var h = crumbs([{ label: t('nav.guides'), href: 'guides', attrs: 'data-go="guides"', id: 'guide-back' }, { label: t('guide.' + g.id + '.title') }]) + '<article class="article"><h1>' + t('guide.' + g.id + '.title') + '</h1><p class="lead">' + t('guide.' + g.id + '.lead') + '</p>' +
       '<' + (g.ordered ? 'ol' : 'ul') + ' class="article-parts' + (g.ordered ? ' ordered' : '') + '">';
     for (var k = 1; k <= g.n; k++) {
       var rails = '';
@@ -6085,14 +6223,17 @@ if (typeof module !== 'undefined') module.exports = I18N;
     var nav = $('nav'), cur = navOf(S.view);
     nav.setAttribute('aria-label', t('ui.nav'));
     var link = function (v, cls, idp) { return '<a class="' + cls + '" id="' + idp + v + '" href="#' + v + '" data-go="' + v + '"' + (cur === v ? ' aria-current="page"' : '') + '>' + t('nav.' + v) + '</a>'; };
-    setHTML(nav, ['home'].concat(NAV).map(function (v) { return link(v, 'navlink', 'nav-'); }).join(''));
+    setHTML(nav, ['home'].concat(NAV).map(function (v) { return link(v, 'navlink', 'nav-'); }).join('') +
+      '<span class="nav-util">' + NAV2.map(function (v) { return '<a class="utillink" id="nav-' + v + '" href="#' + v + '" data-go="' + v + '"' + (cur === v ? ' aria-current="page"' : '') + ' title="' + t('nav.' + v) + '">' + ICON[v] + '<span>' + t('nav.' + v) + '</span></a>'; }).join('') + '</span>');
     var sk = $('skip'); if (sk) sk.textContent = t('ui.skip');
     var tc = $('nav-book'); // booking is the button in the bar, on every width
     if (tc) { setHTML(tc, '<span class="l-full">' + t('nav.book') + '</span><span class="l-short" aria-hidden="true">' + t('nav.bookShort') + '</span>' + (S.est.length ? '<b class="top-count" aria-hidden="true" title="' + esc(tn('est.n', S.est.length)) + '">' + S.est.length + '</b>' : '')); tc.setAttribute('aria-label', t('nav.book') + (S.est.length ? ', ' + tn('est.count', S.est.length) : '')); if (S.view === 'book') tc.setAttribute('aria-current', 'page'); else tc.removeAttribute('aria-current'); }
     setHTML($('controls'), '<div class="menu-contact">' + waBtn('btn ghost', t('wa.hello'), t('wa.ask'), 'menu-wa') + '<a class="link" href="https://www.instagram.com/perde_nemis/" target="_blank" rel="noopener">Instagram @perde_nemis</a></div><div class="seg" role="group" aria-label="' + t('ui.lang') + '">' + ['sq', 'en'].map(function (l) { return '<button class="seg-btn" id="lang-' + l + '" data-lang="' + l + '" aria-pressed="' + (S.lang === l) + '" lang="' + l + '" aria-label="' + (l === 'sq' ? 'SQ, Shqip' : 'EN, English') + '">' + l.toUpperCase() + '</button>'; }).join('') + '</div>');
-    setHTML($('foot-in'), '<div><p class="foot-say">' + t('foot.say') + '</p><p><a href="https://www.instagram.com/perde_nemis/" target="_blank" rel="noopener">Instagram: @perde_nemis</a></p><p>' + waBtn('', t('wa.hello'), t('home.contact.wa') + ': ' + t('home.contact.waNo'), 'foot-wa') + '</p></div>' +
-      '<div><ul>' + NAV.concat(['book']).map(function (v) { return '<li>' + link(v, '', 'foot-') + '</li>'; }).join('') + '</ul></div>' +
-      '<div><span class="brand" aria-hidden="true"><b>PERDE</b><span>NEMIS</span></span><p>' + t('foot.about') + '</p><p>' + t('home.contact.addr') + '</p></div>');
+    // the footer as on the reference: where to follow us, the links in two short lists, then the name and the shop's details
+    setHTML($('foot-in'), '<div class="foot-follow"><p class="eyebrow">' + t('foot.follow') + '</p><div class="foot-social"><a class="soc" href="https://www.instagram.com/perde_nemis/" target="_blank" rel="noopener" aria-label="Instagram @perde_nemis">' + ICON.ig + '</a>' +
+      waBtn('soc', t('wa.hello'), ICON.wa + '<span class="sr-only">WhatsApp</span>', 'foot-wa-ic') + '</div></div>' +
+      '<div class="foot-links"><ul>' + NAV.concat(['book']).map(function (v) { return '<li>' + link(v, '', 'foot-') + '</li>'; }).join('') + '</ul><ul class="foot-more">' + NAV2.map(function (v) { return '<li>' + link(v, '', 'foot-') + '</li>'; }).join('') + '</ul></div>' +
+      '<div class="foot-brand"><span class="brand" aria-hidden="true"><b>PERDE</b><span>NEMIS</span></span><p>' + t('foot.about') + '</p><p>' + t('home.contact.addr') + '</p><p>' + waBtn('', t('wa.hello'), t('home.contact.wa') + ': ' + t('home.contact.waNo'), 'foot-wa') + '</p><p class="foot-copy">© ' + Ops.parse(st.today).getFullYear() + ' Perde Nemis</p></div>');
     $('demo-note').textContent = t(PUBLIC_ONLY ? 'demo.notePublic' : 'demo.note');
     var ml = $('menu-label'); if (ml) ml.textContent = t(S.menu ? 'ui.menuClose' : 'ui.menu');
     try { document.title = 'Perde Nemis Demo · ' + titleFor(); } catch (e) { /* ignore */ }
